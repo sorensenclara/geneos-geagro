@@ -1,0 +1,1 @@
+# Archivo donde se guardan las costantes para el mensaje de errores de las validaciones de campos

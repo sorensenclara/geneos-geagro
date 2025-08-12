@@ -1,0 +1,88 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-12 13:04+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
+
+#: agro_system/settings/base.py:143
+msgid "Español"
+msgstr ""
+
+#: user/models/userExtend.py:70
+msgid "General administration"
+msgstr "Administrador General"
+
+#: user/models/userExtend.py:71
+msgid "Organization"
+msgstr "Organización"
+
+#: user/models/userExtend.py:72
+msgid "Producer"
+msgstr "Productor"
+
+#: user/models/userExtend.py:76
+msgid "email"
+msgstr "email"
+
+#: user/models/userExtend.py:77
+msgid "userType"
+msgstr "Tipo de usuario"
+
+#: user/models/userOrganization.py:13
+msgid "company_name"
+msgstr "Nombre de la compania"
+
+#: user/models/userOrganization.py:14 user/models/userProducer.py:15
+msgid "identification_number"
+msgstr "RUT"
+
+#: user/models/userOrganization.py:15 user/models/userProducer.py:16
+msgid "address"
+msgstr "Dirección"
+
+#: user/models/userOrganization.py:18
+msgid "userOrganization"
+msgstr "Organización"
+
+#: user/models/userOrganization.py:19
+msgid "usersOrganizations"
+msgstr "Organizaciones"
+
+#: user/models/userProducer.py:14
+msgid "name"
+msgstr "Nombre"
+
+#: user/models/userProducer.py:17
+msgid "association"
+msgstr "Asociacón"
+
+#: user/models/userProducer.py:18
+msgid "prefix"
+msgstr "prefijo"
+
+#: user/models/userProducer.py:19
+msgid "sequence"
+msgstr "Secuencia"
+
+#: user/models/userProducer.py:22
+msgid "userProducer"
+msgstr "Productor"
+
+#: user/models/userProducer.py:23
+msgid "usersProducers"
+msgstr "Productores"

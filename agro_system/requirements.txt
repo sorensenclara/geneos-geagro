@@ -1,0 +1,15 @@
+asgiref==3.9.1
+dj-rest-auth==7.0.1
+Django==5.2.5
+django-cors-headers==4.7.0
+django-filter==25.1
+django-jazzmin==3.0.1
+django-markdown==0.8.4
+djangorestframework==3.16.1
+djangorestframework_simplejwt==5.5.1
+Markdown==3.8.2
+psycopg2-binary==2.9.10
+PyJWT==2.10.1
+python-environ==0.4.54
+sqlparse==0.5.3
+typing_extensions==4.14.1
