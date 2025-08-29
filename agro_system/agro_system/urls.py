@@ -18,12 +18,22 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from user.admin.adminSite import adminSite
+from agro_system.admin_dashboard import custom_admin_dashboard
+from django.views.generic import RedirectView
+from operation.views import calendar_json, calendar_view
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/dashboard/', custom_admin_dashboard, name='custom_admin_dashboard'),  # Usa la vista correcta
+    path('admin/', RedirectView.as_view(url='/admin/dashboard/')),
+    path('admin/', adminSite.urls),
     path('api/', include('agro_system.api_urls'), name='apisUrls'), # urls de las apis
-    path('user/', include('user.urls_user'), name='userUrls'), # urls de usuario
-    
+    path('user/', include('user.urls'), name='userUrls'), # urls de usuario
+    path('input/', include('input.urls'), name='inputUrls'), # urls de insumos
+    path('operation/', include('operation.urls'), name='operationsUrls'), # urls de operaciones
+    path('json/', calendar_json, name='calendar_json'),
+    path('calendar/', calendar_view, name='calendar_view'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

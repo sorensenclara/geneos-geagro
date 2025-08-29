@@ -1,8 +1,7 @@
-from django.contrib import admin
 from .userExtend import UserExtendAdmin
 from user.models.userOrganization import UserOrganization
 from django.contrib.auth.models import Group
-
+from user.admin.adminSite import adminSite
 
 class UserOrganizationAdmin(UserExtendAdmin):
     """
@@ -34,4 +33,4 @@ class UserOrganizationAdmin(UserExtendAdmin):
     
 
 
-admin.site.register(UserOrganization, UserOrganizationAdmin)
+adminSite.register(UserOrganization, UserOrganizationAdmin)

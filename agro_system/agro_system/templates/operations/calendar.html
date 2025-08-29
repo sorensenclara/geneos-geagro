@@ -1,0 +1,51 @@
+{% extends 'admin/base_site.html' %}  <!-- O base.html si lo usás fuera del admin -->
+
+{% block content %}
+
+<style>
+    .fc-event {
+      background-color: #4CAF50 !important;  /* Verde */
+      border: none;
+      color: white;
+      font-weight: bold;
+    }
+  
+    .fc .fc-toolbar-title {
+      font-size: 1.5rem;
+      color: #2c3e50;
+    }
+  
+    .fc-daygrid-event {
+      border-radius: 4px;
+      padding: 2px;
+    }
+  </style>
+
+<h1>Planificación de Ordenes de Trabajo</h1>
+<div id="calendar"></div>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var calendarEl = document.getElementById('calendar');
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'es',
+    eventDisplay: 'block',
+    height: 'auto',
+    contentHeight: 'auto',
+    expandRows: true,  // Asegura que se ajuste al contenedor
+    events: "{% url 'calendar_json' %}",  // URL que da los eventos
+    headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'  // 👈 botones de vista
+    }
+  });
+  calendar.render();
+});
+</script>
+{% endblock %}
+

@@ -1,6 +1,7 @@
 # Para que aparezcan los grupos y permisos en el admin
 from django.contrib.auth.models import Group, Permission
-from django.contrib import admin
+from user.admin.adminSite import adminSite 
 
-admin.site.register(Group)
-admin.site.register(Permission)
+
+adminSite.register(Group)
+adminSite.register(Permission)

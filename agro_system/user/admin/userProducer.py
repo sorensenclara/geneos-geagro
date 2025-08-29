@@ -1,8 +1,15 @@
-from django.contrib import admin
 from .userExtend import UserExtendAdmin
 from user.models.userProducer import UserProducer
 from user.models.userOrganization import UserOrganization
 from django.contrib.auth.models import Group
+from user.admin.adminSite import adminSite
+from producer.models.staff import Staff
+from django.contrib import admin
+
+class StaffInline(admin.TabularInline):
+    model = Staff
+    fields = ['name','surname','cuit','address','city','phone','email','type','gender','date_birth','date_entry','state','discharged']
+    extra = 0
 
 
 class UserProducerAdmin(UserExtendAdmin):
@@ -10,16 +17,17 @@ class UserProducerAdmin(UserExtendAdmin):
     Administrador del modelo Usuario productor
     """
 
-    list_display = ('name', 'email', 'identification_number', 'address')
+    inlines = [StaffInline]
+    list_display = ('name', 'email', 'cuit', 'address')
     fieldsets = (
-        (None, {'fields': ('name', 'identification_number', 'address', 'association', 'email', 'password', 'prefix', 'sequence')}),
+        (None, {'fields': ('name', 'cuit', 'address','city', 'phone', 'organization', 'email', 'password', 'prefix', 'sequence')}),
         ('Permissions', {'fields': ('is_active',)}),
         ('Grupos', {'fields': ('groups',)}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('name', 'identification_number', 'address', 'email', 'password1', 'password2', 'is_active', 'association', 'prefix', 'sequence')}
+            'fields': ('name', 'cuit', 'address', 'city', 'phone', 'email', 'password1', 'password2', 'is_active', 'organization', 'prefix', 'sequence')}
         ),
     )
 
@@ -32,7 +40,7 @@ class UserProducerAdmin(UserExtendAdmin):
         
         if hasattr(request.user, 'type') and request.user.type == 'Organization':
             userAsocciation = UserOrganization.objects.filter(email=request.user.email).first()
-            obj.association = userAsocciation
+            obj.organization = userAsocciation
             obj.save()
         super().save_model(request, obj, form, change)
         
@@ -44,15 +52,15 @@ class UserProducerAdmin(UserExtendAdmin):
     def get_fieldsets(self, request, obj=None):
         """
         Modifica dinámicamente los fieldsets dependiendo del tipo de usuario logueado.
-        Si el usuario logueado es del tipo 'Asociación', se oculta el campo 'association'.
+        Si el usuario logueado es del tipo 'Asociación', se oculta el campo 'organization'.
         """
 
         # Copia de los fieldsets por defecto
         fieldsets = super().get_fieldsets(request, obj)
         if hasattr(request.user, 'type') and request.user.type == 'Organization':
-            # Quitar el campo 'association' de los fieldsets
+            # Quitar el campo 'organization' de los fieldsets
             fieldsets = tuple(
-                (name, {'fields': [field for field in options['fields'] if field != 'association']})
+                (name, {'fields': [field for field in options['fields'] if field != 'organization']})
                 for name, options in fieldsets
             )
         
@@ -64,7 +72,7 @@ class UserProducerAdmin(UserExtendAdmin):
         """
         queryset = super().get_queryset(request)
         if hasattr(request.user, 'type') and request.user.type == 'Organization':
-            return queryset.filter(association=request.user)
+            return queryset.filter(organization=request.user)
         return queryset
 
-admin.site.register(UserProducer, UserProducerAdmin)
+adminSite.register(UserProducer, UserProducerAdmin)

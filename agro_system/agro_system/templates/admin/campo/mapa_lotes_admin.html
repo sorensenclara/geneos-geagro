@@ -1,0 +1,62 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'leaflet/leaflet.css' %}"/>
+<script src="{% static 'leaflet/leaflet.js' %}"></script>
+<style>
+#map {
+    height: 600px !important;
+    min-height: 400px;
+    width: 100% !important;
+    z-index: 0 !important;
+}
+
+#map, .leaflet-container, .leaflet-pane, .leaflet-tile-pane {
+    background: #e5e3df !important;
+    z-index: 0 !important;
+}
+
+.leaflet-container {
+    z-index: 0 !important;
+}
+</style>
+
+<h2>Mapa de Lotes - {{ campo.nombre }}</h2>
+<div id="map" style="height: 600px;"></div>
+<script>
+    function flipCoords(geojson) {
+        geojson.features.forEach(function(feature) {
+            if (feature.geometry.type === "Polygon") {
+                feature.geometry.coordinates = feature.geometry.coordinates.map(function(ring) {
+                    return ring.map(function(coord) {
+                        return [coord[1], coord[0]];
+                    });
+                });
+            }
+        });
+        return geojson;
+    }
+
+    var lotes = JSON.parse('{{ lotes_geojson|escapejs }}');
+    //lotes = flipCoords(lotes);
+
+    var map = L.map('map');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+    }).addTo(map);
+
+    var geojsonLayer = L.geoJSON(lotes, {
+        style: { color: 'green', fillOpacity: 0.3 },
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup(feature.properties.nombre);
+        }
+    }).addTo(map);
+
+    if (geojsonLayer.getLayers().length > 0) {
+        map.fitBounds(geojsonLayer.getBounds());
+    } else {
+        // Centra en Argentina si no hay polígonos
+        map.setView([-38.54, -59.39], 13);
+    }
+</script>
+{% endblock %}

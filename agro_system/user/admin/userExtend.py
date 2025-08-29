@@ -1,8 +1,7 @@
-from django.contrib import admin
 from ..models.userExtend import UserExtend
 from django.contrib.auth.admin import UserAdmin
 from user.models import UserExtend
-
+from user.admin.adminSite import adminSite
 
 class UserExtendAdmin(UserAdmin):
     """
@@ -28,4 +27,4 @@ class UserExtendAdmin(UserAdmin):
     list_filter = ('groups','type')
     
 
-admin.site.register(UserExtend, UserExtendAdmin)
+adminSite.register(UserExtend, UserExtendAdmin)

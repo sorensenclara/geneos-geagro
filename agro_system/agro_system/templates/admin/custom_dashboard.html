@@ -1,0 +1,80 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+{% load static %}
+
+<style>
+.dashboard-flex {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+.dashboard-flex .dashboard-iframe {
+    flex: 0 0 25%;
+    min-width: 220px;
+}
+.dashboard-flex .dashboard-table {
+    flex: 1 1 75%;
+}
+@media (max-width: 900px) {
+    .dashboard-flex {
+        flex-direction: column;
+    }
+    .dashboard-flex .dashboard-iframe,
+    .dashboard-flex .dashboard-table {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+}
+</style>
+
+<div class="dashboard-flex">
+    <div class="dashboard-iframe">
+        <iframe src="https://api.wo-cloud.com/content/widget/?geoObjectKey=9481979&language=es&region=AR&timeFormat=HH:mm&windUnit=kmh&systemOfMeasurement=metric&temperatureUnit=celsius"
+            name="CW2" scrolling="no" width="100%" height="318" frameborder="0"
+            style="border: 1px solid #FFFFFF; border-radius: 14px"></iframe>
+    </div>
+    <div class="dashboard-table">
+        <h2>Precios de Granos (BCR)</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio en pesos</th>
+                    <th>Precio en dólares</th>
+                    <th>Fecha</th>
+                    <th>Movimiento Cotización</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in precios.data %}
+                    <tr>
+                        <td>{{ item.nombre_Grano }}</td>
+                        <td>{{ item.precio_Cotizacion|floatformat:4 }}</td>
+                        <td>{{ item.precio_Dolar|floatformat:4 }}</td>
+                        <td>
+                        {% if item.fecha_Operacion_Pizarra %}
+                            {{ item.fecha_Operacion_Pizarra|slice:"8:10" }}/{{ item.fecha_Operacion_Pizarra|slice:"5:7" }}/{{ item.fecha_Operacion_Pizarra|slice:"0:4" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                        </td>
+                        <td>
+                            {% if item.movimiento_Cotizacion == 1 %}
+                                Mayor a la pizarra anterior
+                            {% elif item.movimiento_Cotizacion == 2 %}
+                                Menor a la pizarra anterior
+                            {% elif item.movimiento_Cotizacion == 3 %}
+                                Igual a la pizarra anterior
+                            {% else %}
+                                Sin información
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4">No hay datos disponibles.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

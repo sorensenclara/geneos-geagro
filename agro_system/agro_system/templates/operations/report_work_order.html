@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chau+Philomene+One:ital@0;1&family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">    
+<meta charset="UTF-8">
+<title>Informe PDF</title>
+<style>
+    @page {
+        size: A4 landscape;
+        margin: 1cm;
+    }
+    /* Estilos generales */
+    body {
+        font-family: 'Roboto Condensed', sans-serif;
+    }
+
+    /* Estilos para el encabezado */
+    header {
+        padding: 20px 0; /* Espaciado interior */
+    }
+
+    .logo {
+        padding: 16px 0px 0 200px;
+        width: 328px;
+    }
+
+    p {
+        font-size: 14px; /* Tamaño de fuente */
+    }
+
+    h1 {
+        font-size: 32px; /* Tamaño de fuente */
+        font-family: 'Chau Philomene One', sans-serif;
+        letter-spacing: 2px;
+        margin: 0; /* Eliminar margen predeterminado */
+        padding: 20px ;
+    }
+
+    /* Estilos para las secciones */
+    .section {
+        margin-bottom: 30px;
+    }
+
+    .section h2 {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    /* Estilos para los encabezados */
+    h2 {
+        font-size: 28px;
+        font-weight: bold;
+        padding-left: 32px;
+    }
+
+    h3 {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    h4 {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* Estilos para la img iconos de los encabezados de las listas */         
+    .icon_list {
+        width: 48px;
+        vertical-align: middle;
+        padding-right: 32px;
+     }
+   /* Estilos para la lista */
+    td {
+        font-size: 14px; /* Tamaño de fuente */
+        color: #000; /* Color de texto */
+        margin-bottom: 5px; /* Espacio entre elementos li */
+        list-style-type: disc; /* Estilo de viñeta (puedes cambiarlo) */
+        margin-left: 32px;
+    }
+
+    /* Estilos para la tabla */
+    .header_table {
+        border-radius: 32px 32px 0px 0px;
+        width: 80%;
+        text-align: center; /* Centrar el texto horizontalmente */
+        margin: 0 auto;
+        background-color: #404274;
+        color:#fff;
+    }
+
+    .table-datos-cabecera {
+        border-radius: 32px 32px 0px 0px;
+        width: 80%;
+        text-align: center; /* Centrar el texto horizontalmente */
+        margin: 0 auto;
+        background-color: #f08789;
+        color:#fff;
+    }
+        
+    .table-cabecera-salud {
+        width: 80%;
+        text-align: center; /* Centrar el texto horizontalmente */
+        margin: 0 auto;
+        color:#f08789;
+    }
+
+    .table-cabecera-familia {
+        width: 80%;
+        text-align: center; /* Centrar el texto horizontalmente */
+        margin: 0 auto;
+        color:#75A032;
+    }
+
+    .table-cabecera-educacion {
+        width: 80%;
+        text-align: center; /* Centrar el texto horizontalmente */
+        margin: 0 auto;
+        color:#597EC1;
+    }
+
+    .table-cabecera-violencia {
+        width: 80%;
+        text-align: center; /* Centrar el texto horizontalmente */
+        margin: 0 auto;
+        color:#714DAA;
+    }
+
+    .table-datos {
+        text-align: center; /* Centrar el texto horizontalmente */
+        margin: 0 auto;
+    }
+
+    .table-wrapper {
+        margin: 0 auto;
+        padding-top: 20px;
+        table-layout: fixed;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed; /* Fija el ancho de la tabla */
+    }
+
+    .td_header {
+        border: 0px solid #ddd;
+        text-align: center;
+        color: #fff !important;
+        width: 100%;
+    }
+    .td_header_familia {
+        text-align: center;
+        color: #75A032 !important;
+        border: 3px solid #75A032;
+        width: 100%;
+    }
+
+    .td_header_salud {
+        text-align: center;
+        color: #f08789 !important;
+        border: 3px solid #f08789;
+        width: 100%;
+    }
+
+    .td_header_educacion {
+        text-align: center;
+        color: #597EC1 !important;
+        border: 3px solid #597EC1;
+        width: 100%;
+    }
+
+    .td_header_violencia {
+        text-align: center;
+        color: #714DAA !important;
+        border: 3px solid #714DAA;
+        width: 100%;
+    }
+    
+    .td_datos {
+        width: 100%;
+    }
+
+    .header_familiar {
+        background-color: #75A032 ;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .header_educacion{
+        background-color: #597EC1 ;
+        color: #fff;
+        font-weight: 700;
+    }
+    
+    .header_violencia-genero{
+        background-color: #714DAA ;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+        min-width: 100px; /* Establece un ancho mínimo para cada columna */
+    }
+
+    th {
+        background-color: #304179; /* Cambia el color de fondo del encabezado de la tabla */
+        color: #fff; /* Cambia el color del texto del encabezado de la tabla */
+    }
+
+    /* Estilos para el separador horizontal */
+    hr {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        border: 0;
+        border-top: 1px solid #ccc;
+    }
+</style>
+</head>
+<body>
+    <header> 
+        <div class="logo">
+        <img src="img/logo.jpg" alt="">
+        </div>
+    </header>
+    <br>
+
+    <table class="header_table">
+        <tr>
+            <td class="td_header"><h2> ORDENES DE TRABAJO </h2></td>
+        </tr>
+    </table>
+    <br>
+    <table class="table-datos">
+        <tr>
+            <td class="td_datos"><b>CAMPAÑA</b></td>
+            <td class="td_datos"><b>FECHA</b></td>
+            <td class="td_datos"><b>CULTIVO</b></td>
+            <td class="td_datos"><b>SERVICIO</b></td>
+            <td class="td_datos"><b>ESTADO</b></td>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td class="td_datos">{{order.campaing}}</td>
+            <td class="td_datos">{{order.date_init}}</td>
+            <td class="td_datos">{{order.crop}}</td>
+            <td class="td_datos">{{order.service}}</td>
+            <td class="td_datos">{{order.stateOT}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+</html>
