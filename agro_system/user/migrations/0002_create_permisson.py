@@ -25,6 +25,7 @@ def create_producer_group(apps, schema_editor):
 
     # Asignarlos al grupo
     group.permissions.add(*permissions)
+    group.save()
 
 def remove_productor_group(apps, schema_editor):
         Group = apps.get_model("auth", "Group")
