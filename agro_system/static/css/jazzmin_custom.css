@@ -1,0 +1,100 @@
+/* Estilo Base: Oculta el texto de Font Awesome y establece el tamaño base */
+.main-sidebar .nav-sidebar .nav-icon.png-icon-user,
+.main-sidebar .nav-sidebar .nav-icon.png-icon-post,
+.main-sidebar .nav-sidebar .nav-icon.png-icon-producto {
+    /* Oculta el marcador de texto de Font Awesome */
+    display: inline-block;
+    color: transparent !important; /* Esconde el color del texto del icono si aparece */
+    width: 20px; /* Ancho para el PNG */
+    height: 20px; /* Altura para el PNG */
+    text-align: center;
+    line-height: 20px;
+    position: relative;
+    /* Necesario para ocultar cualquier residuo de la fuente */
+    font-family: initial !important; 
+    font-size: 0;
+}
+
+/* Icono personalizado para producer en el menú */
+.main-sidebar .nav-sidebar .nav-icon.png-icon-producer {
+    background-image: url("/static/img/icons/producer.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    color: transparent !important;
+    font-size: 0 !important;
+    vertical-align: middle;
+}
+
+/* Icono personalizado para insumos en el menú */
+.main-sidebar .nav-sidebar .nav-icon.png-icon-insumos {
+    background-image: url("/static/img/icons/insumos.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    color: transparent !important;
+    font-size: 0 !important;
+    vertical-align: middle;
+}
+
+/* Icono personalizado para insumos en el menú */
+.main-sidebar .nav-sidebar .nav-icon.png-icon-parametros {
+    background-image: url("/static/img/icons/parametros.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    color: transparent !important;
+    font-size: 0 !important;
+    vertical-align: middle;
+}
+
+/* Icono personalizado para insumos en el menú */
+.main-sidebar .nav-sidebar .nav-icon.png-icon-ventas {
+    background-image: url("/static/img/icons/ventas.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    color: transparent !important;
+    font-size: 0 !important;
+    vertical-align: middle;
+}
+
+/* Icono personalizado para insumos en el menú */
+.main-sidebar .nav-sidebar .nav-icon.png-icon-operaciones {
+    background-image: url("/static/img/icons/operaciones.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    color: transparent !important;
+    font-size: 0 !important;
+    vertical-align: middle;
+}
+
+/* Icono personalizado para insumos en el menú */
+.main-sidebar .nav-sidebar .nav-icon.png-icon-configuracion {
+    background-image: url("/static/img/icons/configuracion.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    color: transparent !important;
+    font-size: 0 !important;
+    vertical-align: middle;
+}

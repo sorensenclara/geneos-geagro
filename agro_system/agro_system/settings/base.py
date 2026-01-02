@@ -17,7 +17,7 @@ from datetime import timedelta
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     HOST=(str, None),
 )
-environ.Env.read_env(f'{BASE_DIR}/.env')
+environ.Env.read_env(f'{BASE_DIR}/agro_system/.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
@@ -88,7 +88,7 @@ ROOT_URLCONF = 'agro_system.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -162,6 +162,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
 ]
+print("*******************************")
+print(STATICFILES_DIRS)
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -176,18 +178,18 @@ DJANGO_SUPERUSER_PASSWORD = env('DJANGO_SUPERUSER_PASSWORD')
 
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
-    "site_title": "GENEOS ADMIN",
+    "site_title": "GEAGRO ADMIN",
 
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "GENEOS",
+    "site_header": "GEAGRO",
 
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_brand": "GENEOS",
+    "site_brand": "GEAGRO",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "img/logo_geneos.png",
+    "site_logo": "img/iso_logo.png",
 
-    "login_logo": "img/logo_geneos.png",
+    "login_logo": "img/logo.png",
 
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
@@ -199,10 +201,10 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
 
     # Welcome text on the login screen
-    "welcome_sign": "Bienvenidos a la intranet de GENEOS",
+    "welcome_sign": "Bienvenidos a la intranet de GEAGRO",
 
     # Copyright on the footer
-    "copyright": "Geneos",
+    "copyright": "Cooperativa Geneos",
 
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you dont need to use a list, you can use a simple string 
@@ -279,9 +281,15 @@ JAZZMIN_SETTINGS = {
     # Custom icons for side menu apps/models See https://fontawesome.com/icons?d=gallery&m=free&v=5.0.0,5.0.1,5.0.10,5.0.11,5.0.12,5.0.13,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,5.0.9,5.1.0,5.1.1,5.2.0,5.3.0,5.3.1,5.4.0,5.4.1,5.4.2,5.13.0,5.12.0,5.11.2,5.11.1,5.10.0,5.9.0,5.8.2,5.8.1,5.7.2,5.7.1,5.7.0,5.6.3,5.5.0,5.4.2
     # for the full list of 5.13.0 free icon classes
     "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
+        "auth": "png-icon-configuracion",
+        "auth.user": "png-icon-configuracion",
+        "auth.Group": "png-icon-configuracion",
+        "producer": "png-icon-producer",
+        "input": "png-icon-insumos",
+        "operation": "png-icon-operaciones",
+        "parameter": "png-icon-parametros",
+        "sale": "png-icon-ventas",
+        "user": "png-icon-configuracion",
     },
     # Icons that are used when one is not manually specified
     "default_icon_parents": "fas fa-chevron-circle-right",
@@ -297,7 +305,8 @@ JAZZMIN_SETTINGS = {
     # UI Tweaks #
     #############
     # Relative paths to custom CSS/JS scripts (must be present in static files)
-    "custom_css": None, ##
+    # "custom_css": None,
+    "custom_css": "css/jazzmin_custom.css",
     "custom_js": None,
     # Whether to link font from fonts.googleapis.com (use custom_css to supply font otherwise)
     "use_google_fonts_cdn": True,

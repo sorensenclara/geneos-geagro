@@ -8,7 +8,7 @@ class MaensureUnit(models.Model):
     name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
     is_reference = models.BooleanField(default=True, verbose_name=_('is reference unit'))
     mu_referenced = models.ForeignKey('MaensureUnit', models.CASCADE, blank=True, null=True, verbose_name=_('referenced unit'))
-    multiplier = models.FloatField( verbose_name=_('multiplier'))
+    multiplier = models.FloatField( verbose_name=_('multiplier'), blank=True, null=True)
     
 
     def __str__(self):

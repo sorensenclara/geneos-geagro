@@ -7,7 +7,15 @@ from operation.models.service import Service
 
 # Register your models here.
 
+
+
+
+class StageAdmin(admin.ModelAdmin):
+    list_display = ['order','name','activity']
+    ordering = ['order']
+
+
 adminSite.register(Activity)
-adminSite.register(Stage)
+adminSite.register(Stage, StageAdmin)
 adminSite.register(ServiceType)
 adminSite.register(Service)

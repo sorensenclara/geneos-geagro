@@ -116,6 +116,14 @@ class CropAdmin(admin.ModelAdmin):
 
     actions = [process_plan]
 
+
+    def save_model(self, request, obj, form, change):
+        # Asigna por defecto el usuario productor logueado
+        userProducer = UserProducer.objects.filter(email=request.user.email).first()
+        if userProducer:
+            obj.producer = userProducer
+        super().save_model(request, obj, form, change)
+
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         if request.user.is_superuser:

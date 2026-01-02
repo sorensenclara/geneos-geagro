@@ -13,7 +13,7 @@ class InputWorkOrder(models.Model):
     details = models.TextField(null=True, blank=True, verbose_name= _('details'))
 
     def __str__(self):
-        return f"{self.code} - {self.crop} - {self.stage}"    
+        return f"{self.work_order} - {self.input} - {self.dose}"    
 
     class Meta:
         verbose_name =  _('input work order')

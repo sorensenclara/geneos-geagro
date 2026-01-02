@@ -29,7 +29,7 @@ class Crop(models.Model):
     hectares_harvested = models.IntegerField(default=0, verbose_name = _('hectares harvested'))
     hectares_not_harvested = models.IntegerField(default=0, verbose_name = _('hectares not harvested'))
     impute_bills = models.BooleanField(default=True, verbose_name = _('inpute bills'))
-    port = models.ForeignKey(Port, models.CASCADE, verbose_name = _('port'))
+    port = models.ForeignKey(Port, models.CASCADE, blank=True, null=True, verbose_name = _('port'))
     date_init = models.DateField(blank=True, null=True, verbose_name = _('date init'))
     freight_estimate = models.FloatField(blank=True, null=True,verbose_name = _('freight estimate') )
     estimate_saranda = models.FloatField(blank=True, null=True, verbose_name = _('estimate saranda'))
