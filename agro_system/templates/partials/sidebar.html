@@ -1,0 +1,71 @@
+{% load static %}
+{% block sidebar %}
+
+<!-- ========== Left Sidebar Start ========== -->
+<div class="vertical-menu">
+
+    <div data-simplebar class="h-100">
+
+        <!--- Sidemenu -->
+        <div id="sidebar-menu">
+            <!-- Left Menu Start -->
+            <ul class="metismenu list-unstyled" id="side-menu">
+                <li class="menu-title">Viñedo actual - Curtel Norte</li>
+
+                <li>
+                    <a href="{% url 'dashboard' %}" class="waves-effect">
+                        <img src="{% static 'images/icon/dashboard.svg' %}" class="menu-icon-img" />
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'kanbanboard' %}" class=" waves-effect">
+                        <img src="{% static 'images/icon/technical_plan.svg' %}" class="menu-icon-img" />
+                        <span class="badge rounded-pill bg-success float-end">New</span>
+                        <span>Plan Técnico</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'calendarboard' %}" class=" waves-effect">
+                        <img src="{% static 'images/icon/calendar.svg' %}" class="menu-icon-img" />
+                        <span>Calendario</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="alert" class=" waves-effect">
+                        <img src="{% static 'images/icon/alert.svg' %}" class="menu-icon-img" />
+                        <span class="badge rounded-pill bg-danger float-end">Atención</span>
+                        <span>Alerta y Avisos</span>
+                    </a>
+                </li>
+
+                                
+                <li>
+                    <a href="weather" class=" waves-effect">
+                        <img src="{% static 'images/icon/weather.svg' %}" class="menu-icon-img" />
+                        <span>Clima</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="wines" class=" waves-effect">
+                        <img src="{% static 'images/icon/vinedos.svg' %}" class="menu-icon-img" />
+                        <span>Mis Viñedos</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="" class=" waves-effect  mb-4">
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+        <!-- Sidebar -->
+    </div>
+</div>
+<!-- Left Sidebar End -->
+
+{% endblock sidebar %}

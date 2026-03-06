@@ -28,12 +28,12 @@
 </style>
 
 <div class="dashboard-flex">
-    <div class="dashboard-iframe">
+<!--     <div class="dashboard-iframe">
         <iframe src="https://api.wo-cloud.com/content/widget/?geoObjectKey=9481979&language=es&region=AR&timeFormat=HH:mm&windUnit=kmh&systemOfMeasurement=metric&temperatureUnit=celsius"
             name="CW2" scrolling="no" width="100%" height="318" frameborder="0"
             style="border: 1px solid #FFFFFF; border-radius: 14px"></iframe>
-    </div>
-    <div class="dashboard-table">
+    </div> -->
+<!--     <div class="dashboard-table">
         <h2>Precios de Granos (BCR)</h2>
         <table class="table table-striped">
             <thead>
@@ -75,6 +75,18 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
+    </div> -->
 </div>
+<!-- <div>
+<h2>Datos Climáticos en Tiempo Real</h2>
+<ul>
+    {% for estacion in clima %}
+        <li>
+            <strong>{{ estacion.name }}/{{ estacion.id }}</strong>:
+            {{ estacion.weather.temp }}°C,
+            {{ estacion.weather.description }}
+        </li>
+    {% endfor %}
+</ul>
+</div> -->
 {% endblock %}

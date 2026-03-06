@@ -1,0 +1,76 @@
+{% extends 'account/base.html' %}
+{% load static %}
+{% load i18n %}
+{% load account socialaccount %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sign Up{% endblock title %}
+    
+{% block content %}
+
+            <div class="p-3">
+                <h4 class="text-muted font-size-18 mb-1 text-center">Free Register</h4>
+                <p class="text-muted text-center">Get your free Lexa account now.</p>
+                <form class="needs-validation" novalidate method="post" action="{% url 'account_signup' %}">
+                    {% for message in messages %}
+                    <div class="alert {{ message.tags }} mb-4" role="alert">
+                        <strong>{{ message }}</strong>
+                    </div>
+                    {% endfor %} 
+                    {% if field.help_text %}
+                        <div class="alert alert-danger mb-4" role="alert">
+                            <strong>{{ field.help_text }}</strong>
+                        </div>
+                    {% endif %}
+                    {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                    {% endif %}
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{form.email|as_crispy_field }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{form.username|as_crispy_field }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{form.password1|as_crispy_field }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{form.password2|as_crispy_field }}
+                    </div>
+
+                    <div class="mb-3 row mt-4">
+                        <div class="col-12 text-end">
+                            <button class="btn btn-primary w-md waves-effect waves-light" type="submit">Sign Up</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-0 row">
+                        <div class="col-12 mt-4">
+                            <p class="text-muted mb-0 font-size-14">By registering you agree to the Lexa <a href="#" class="text-primary">Terms of Use</a></p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-2 text-center">
+                        <div class="signin-other-title">
+                            <h5 class="fs-sm mb-4 title">Sign In with</h5>
+                        </div>
+                        <div>
+                            <a href="{% provider_login_url 'google' %}" class="btn btn-danger btn-icon waves-effect waves-light"><i class="mdi mdi-google fs-lg"></i></a>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="mt-5 text-center">
+        <p>Already have an account ? <a href="{{ login_url }}" class="text-primary"> Login </a> </p>
+        © <script>document.write(new Date().getFullYear())</script> GENEOS <span class="d-none d-sm-inline-block"> - Diseñado por la cooperativa de software</span>
+
+{% endblock content %}
+
+

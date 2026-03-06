@@ -18,10 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from agro_system import views
 from user.admin.adminSite import adminSite
 from agro_system.admin_dashboard import custom_admin_dashboard
 from django.views.generic import RedirectView
 from operation.views import calendar_json, calendar_view
+from django.contrib.auth.decorators import login_required
+from .views import MyPasswordChangeView, MyPasswordSetView, kanbanboard_view, weather_view, alert_view, wines_view, calendar_front_view
 
 
 urlpatterns = [
@@ -34,6 +37,34 @@ urlpatterns = [
     path('operation/', include('operation.urls'), name='operationsUrls'), # urls de operaciones
     path('json/', calendar_json, name='calendar_json'),
     path('calendar/', calendar_view, name='calendar_view'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+
+    path('', views.dashboard, name='dashboard'),
+    path('calendarboard',view=calendar_front_view,name="calendarboard"),
+
+    path('weather',view=weather_view,name="weather"),
+    path('alert',view=alert_view,name="alert"),
+    path('wines',view=wines_view,name="wines"),
+    path('kanbanboard',view=kanbanboard_view,name="kanbanboard"),
+
+
+
+    # =========================
+    # Account / Auth
+    # =========================
+    path(
+        "account/password/change/",
+        login_required(MyPasswordChangeView.as_view()),
+        name="account_change_password",
+    ),
+    path(
+        "account/password/set/",
+        login_required(MyPasswordSetView.as_view()),
+        name="account_set_password",
+    ),
+    path("account/", include("allauth.urls")),
+
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,0 +1,99 @@
+{% extends 'account/base.html' %}
+{% load static %}
+{% load i18n %}
+{% load account socialaccount %}
+{% load crispy_forms_tags %}
+
+{% block title %}Ingresar | GEAGRO – Gestión de Viñedos{% endblock title %}
+    
+{% block content %}
+
+<div class="p-3">
+
+    <h1 class="text-muted font-size-18 mb-1 text-center">
+        Bienvenido a GEAGRO VIÑEDOS
+    </h1>
+
+    <p class="text-muted text-center">
+        Iniciá sesión para continuar con tu gestión y operaciones productivas.
+    </p>
+
+    <form class="needs-validation" novalidate method="POST" action="{% url 'account_login' %}">
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} mb-4" role="alert">
+            <strong>{{ message }}</strong>
+        </div>
+        {% endfor %}
+
+        {% if field.help_text %}
+        <div class="alert alert-danger mb-4" role="alert">
+            <strong>{{ field.help_text }}</strong>
+        </div>
+        {% endif %}
+
+        {% csrf_token %}
+
+        <div class="mb-3">
+            {{ form.login|as_crispy_field }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.password|as_crispy_field }}
+        </div>
+
+        <div class="mb-3 row mt-4">
+            <div class="col-6">
+                <div class="form-check">
+                    {{ form.remember|as_crispy_field }}
+                </div>
+            </div>
+            <div class="col-6 text-end">
+                <button class="btn btn-primary w-md waves-effect waves-light" type="submit">
+                    Ingresar
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group mb-0 row">
+            <div class="col-12 mt-4">
+                <a href="{% url 'account_reset_password' %}" class="text-muted">
+                    <i class="mdi mdi-lock"></i>
+                    ¿Olvidaste tu contraseña?
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-4 pt-2 text-center">
+            <div class="signin-other-title">
+                <h5 class="fs-sm mb-4 title">
+                    Ingresar con
+                </h5>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+</div>
+</div>
+
+<div class="mt-5 text-center">
+    <p>
+        ¿No tenés una cuenta?
+        <a href="{{ signup_url }}" class="text-primary">
+            Registrate ahora
+        </a>
+    </p>
+
+    <p class="text-muted small mt-2">
+        GEAGRO es una plataforma de gestión agrícola especializada en viñedos y producción vitivinícola.
+    </p>
+
+    © <script>document.write(new Date().getFullYear())</script> GENEOS
+    <span class="d-none d-sm-inline-block">
+        – Desarrollada y diseñada por cooperativa de software
+    </span>
+</div>
+
+{% endblock content %}

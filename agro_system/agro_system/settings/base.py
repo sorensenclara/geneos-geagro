@@ -15,6 +15,7 @@ import environ
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta
 import os
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -57,6 +58,15 @@ THIRD_PARTY_APPS = [
     'corsheaders', # Cors
     "ckeditor",
     "leaflet",
+    
+    "crispy_forms",
+    "crispy_bootstrap5",
+
+    # Allauth
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
 ]
 
 LOCAL_APPS = [
@@ -81,6 +91,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'agro_system.urls'
@@ -102,6 +114,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'agro_system.wsgi.application'
 
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -168,6 +184,11 @@ print(STATICFILES_DIRS)
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Crispy
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 
 AUTH_USER_MODEL = 'user.UserExtend'
@@ -251,6 +272,7 @@ JAZZMIN_SETTINGS = {
     # Whether to aut expand the menu
     "navigation_expanded": False,
 
+
     # Hide these apps when generating side menu e.g (auth)
     "hide_apps": [],
 
@@ -313,6 +335,9 @@ JAZZMIN_SETTINGS = {
     # Whether to show the UI customizer on the sidebar
     "show_ui_builder": True,
 
+
+    "changeform_fixed_submit_buttons": True,
+
     ###############
     # Change view #
     ###############
@@ -339,10 +364,11 @@ JAZZMIN_UI_TWEAKS = {
     "accent": "accent-primary",
     "navbar": "navbar-white navbar-light",
     "no_navbar_border": False,
-    "navbar_fixed": False,
+    "navbar_fixed": True,
     "layout_boxed": False,
-    "footer_fixed": False,
+    "footer_fixed": True,
     "sidebar_fixed": False,
+    "actions_sticky_top": False,
     "sidebar": "sidebar-dark-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
@@ -420,5 +446,69 @@ EMAIL_USE_TLS = env('EMAIL_USE_TLS')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
-# redireccion 
-LOGIN_URL = "/"
+
+# Crispy
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# Messages tags (Bootstrap alerts)
+MESSAGE_TAGS = {
+    messages.DEBUG: "alert-info",
+    messages.INFO: "alert-info",
+    messages.SUCCESS: "alert-success",
+    messages.WARNING: "alert-warning",
+    messages.ERROR: "alert-danger",
+}
+
+# =========================
+# EMAIL (DEV: no rompe login)
+# =========================
+# Con esto, Allauth "envía" emails a consola (terminal) y NO explota por from vacío.
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@localhost")
+
+# Si algún paquete usa SERVER_EMAIL:
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# =========================
+# DJANGO-ALLAUTH
+# =========================
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "account_login"
+ACCOUNT_LOGOUT_ON_GET = False
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
+
+# Reemplazo deprecado: ACCOUNT_EMAIL_REQUIRED -> ACCOUNT_SIGNUP_FIELDS
+# El * indica requerido
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+
+ACCOUNT_UNIQUE_EMAIL = True
+SOCIALACCOUNT_QUERY_EMAIL = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+# Para DEV: evitá que te bloquee el login por verificación obligatoria
+# (si lo dejás en "mandatory", va a intentar enviar email sí o sí)
+ACCOUNT_EMAIL_VERIFICATION = "none"   # <- clave para que no rompa
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+
+ACCOUNT_FORMS = {
+    "login": "agro_system.forms.UserLoginForm",
+    "signup": "agro_system.forms.UserRegistrationForm",
+    "change_password": "agro_system.forms.PasswordChangeForm",
+    "set_password": "agro_system.forms.PasswordSetForm",
+    "reset_password": "agro_system.forms.PasswordResetForm",
+    "reset_password_from_key": "agro_system.forms.PasswordResetKeyForm",
+}
+
+# Sites framework
+# OJO: en sqlite nueva normalmente el Site es ID=1.
+# Si dejás SITE_ID=3 y no existe, rompe flujos de allauth/socialaccount.
+SITE_ID = int(os.environ.get("SITE_ID", "1"))
+
+# Provider Configurations
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+    }
+}

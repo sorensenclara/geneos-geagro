@@ -1,0 +1,331 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block title %} Dashboard {% endblock title %}
+
+{% block content %} 
+
+    {% block pagetitle %}
+    {% include "partials/page-title.html" with pagetitle="Paciencia" subtitle="Seccion XX" title="Cuartel Norte"%}
+    {% endblock pagetitle %}
+            <div class="geagro-dashboard">
+                <!-- FRANJA DE ALERTAS (violeta / compacta) -->
+                <div class="geagro-alertbar mb-4">
+                <div class="geagro-alertbar-inner">
+
+                    <div class="geagro-alertbar-left">
+                    <span class="geagro-alertbar-title">
+                        <i class="mdi mdi-bell-outline"></i>
+                        Alertas
+                    </span>
+
+                    <span class="geagro-alertbar-count">2</span>
+
+                    <div class="geagro-alertbar-list">
+                        <span class="geagro-alert-pill"><i class="mdi mdi-snowflake"></i> Helada posible (48h)</span>
+                        <span class="geagro-alert-pill"><i class="mdi mdi-flask-outline"></i> Oídio pendiente</span>
+                    </div>
+                    </div>
+
+                    <a href="#" class="geagro-alertbar-link">Ver todas</a>
+                </div>
+                </div>
+
+                <!-- PRIMERA FILA: 4 CARDS IGUALES -->
+                <div class="p-3 rounded-3 mb-3" style="background:#f8f9fa;">
+                <div class="row g-3">
+
+                    <!-- 1) RIESGO SANITARIO (semáforo) -->
+                    <div class="col-xl-3 col-md-6 geagro-kpi">
+                    <!-- cambiá risk-high por risk-med / risk-low -->
+                    <div class="card h-100 geagro-card-risk risk-high">
+                        <div class="card-body">
+
+                        <div class="geagro-card-header">
+                            <h5 class="card-title">Riesgo sanitario</h5>
+                            <i class="mdi mdi-shield-alert-outline geagro-card-icon"></i>
+                        </div>
+
+                        <div class="risk-value">Alto</div>
+
+                        <div class="geagro-kpi-meta">
+                            Basado en:<br>
+                            Hoja mojada: 320 min<br>
+                            Temp media: 24°
+                        </div>
+
+                        <div class="geagro-card-footer">
+                            <span class="geagro-badge geagro-badge-danger">Intervenir</span>
+                            <a href="#" class="small">Ver análisis</a>
+                        </div>
+
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- 2) PRÓXIMA ACCIÓN -->
+                    <div class="col-xl-3 col-md-6 geagro-kpi">
+                    <div class="card h-100 geagro-card-action">
+                        <div class="card-body">
+
+                        <div class="geagro-card-header">
+                            <h5 class="card-title">Próxima acción</h5>
+                            <img src="/static/images/icon/technical_plan_color.svg" class="dashboard-icon-img" />
+                        </div>
+
+                        <div class="geagro-kpi-h4">Aplicar fungicida (Oídio)</div>
+
+                        <div class="geagro-kpi-meta">
+                            Hoy 18–22 h · Cuartel Norte
+                        </div>
+
+                        <div class="geagro-card-footer">
+                            <span class="geagro-badge geagro-badge-danger">Prioridad Alta</span>
+                            <a href="#" class="small">Ver plan</a>
+                        </div>
+
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- 3) ESTADO DEL VIÑEDO -->
+                    <div class="col-xl-3 col-md-6 geagro-kpi">
+                    <div class="card h-100 geagro-card-status">
+                        <div class="card-body">
+
+                        <div class="geagro-card-header">
+                            <h5 class="card-title">Estado del viñedo</h5>
+                            <img src="/static/images/icon/vinedos-color.svg" class="dashboard-icon-img" />
+                        </div>
+
+                        <div class="geagro-kpi-h4">En observación</div>
+
+                        <div class="geagro-kpi-meta">
+                            Fenología: <strong>Envero</strong><br>
+                            Humedad foliar alta (48h)
+                        </div>
+
+                        <div class="geagro-card-footer">
+                            <span class="geagro-badge geagro-badge-primary">Etapa</span>
+                            <a href="#" class="small">Ver diagnóstico</a>
+                        </div>
+
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- 4) CLIMA AGRONÓMICO 48h -->
+                    <div class="col-xl-3 col-md-6 geagro-kpi">
+                    <div class="card h-100 geagro-card-weatherVisual">
+                        <div class="card-body">
+
+                        <div class="geagro-card-header">
+                            <h5 class="card-title">Clima agronómico</h5>
+                            <i class="mdi mdi-weather-partly-rainy geagro-card-icon text-primary"></i>
+                        </div>
+
+                        <div class="geagro-kpi-content">
+
+                            <div class="geagro-weather-metrics mb-2">
+                            <div class="metric"><i class="mdi mdi-thermometer"></i><span>Media 24°</span></div>
+                            <div class="metric"><i class="mdi mdi-arrow-up"></i><span>Máx 30°</span></div>
+                            <div class="metric"><i class="mdi mdi-arrow-down"></i><span>Mín 18°</span></div>
+                            </div>
+
+                            <div class="geagro-weather-metrics mb-2">
+                            <div class="metric"><i class="mdi mdi-weather-rainy"></i><span>Precip 12 mm</span></div>
+                            <div class="metric"><i class="mdi mdi-weather-windy"></i><span>Viento 22 km/h N</span></div>
+                            </div>
+
+                            <div class="geagro-weather-metrics">
+                            <div class="metric"><i class="mdi mdi-water-outline"></i><span>Hoja mojada 320 min</span></div>
+                            </div>
+
+                        </div>
+
+                        <div class="geagro-card-footer">
+                            <span class="geagro-badge geagro-badge-warning">Condición crítica</span>
+                            <a href="#" class="small">Ver más</a>
+                        </div>
+
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+                </div>
+
+                <!-- SEGUNDA FILA: RESUMEN + ACTIVIDAD + COMPARATIVO -->
+                <div class="row">
+
+                    <!-- Card 5: Resumen productivo -->
+                    <div class="col-xl-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div>
+                            <h4 class="card-title mb-1">Resumen productivo</h4>
+                            <div class="text-muted">Contexto general - Cuartel Norte</div>
+                            </div>
+                            <i class="mdi mdi-chart-box-outline font-size-24 text-primary"></i>
+                        </div>
+
+                        <div class="row g-3">
+
+                            <div class="col-sm-6">
+                            <div class="p-3 rounded-3 border">
+                                <div class="text-muted mb-1">Has. activas</div>
+                                <div class="h4 mb-0">12,4 ha</div>
+                            </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                            <div class="p-3 rounded-3 border">
+                                <div class="text-muted mb-1">Cuarteles/Lotes</div>
+                                <div class="h4 mb-0">4</div>
+                            </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                            <div class="p-3 rounded-3 border">
+                                <div class="text-muted mb-1">Variedades</div>
+                                <div class="h5 mb-0">Malbec · Cabernet</div>
+                                <div class="text-muted small">+3 más</div>
+                            </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                            <div class="p-3 rounded-3 border">
+                                <div class="text-muted mb-1">Campaña actual</div>
+                                <div class="h5 mb-0">2025/26</div>
+                                <div class="text-muted small">Etapa: Envero</div>
+                            </div>
+                            </div>
+
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="row g-3">
+                            <div class="col-sm-4">
+                            <div class="text-muted mb-1">Rinde estimado</div>
+                            <div class="h5 mb-0">8,2 t/ha</div>
+                            </div>
+                            <div class="col-sm-4">
+                            <div class="text-muted mb-1">Calidad esperada</div>
+                            <div class="h5 mb-0">Media</div>
+                            </div>
+                            <div class="col-sm-4">
+                            <div class="text-muted mb-1">Riego</div>
+                            <div class="h5 mb-0">OK</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <a href="#" class="btn btn-sm btn-primary">Ver detalle</a>
+                        </div>
+
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Actividad reciente (pre resumen antes de Plan Técnico) -->
+                    <div class="col-xl-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div>
+                            <h4 class="card-title mb-1">Próximas actividades</h4>
+                            <div class="text-muted">Plan Técnico</div>
+                            </div>
+                            <i class="mdi mdi-timeline-clock-outline font-size-24 text-info"></i>
+                        </div>
+
+                        <ol class="activity-feed mb-0">
+                            <li class="feed-item">
+                            <div class="feed-item-list">
+                                <span class="date">HOY · PRIORIDAD ALTA</span>
+                                <span class="activity-text">Aplicar fungicida (control Oídio)</span>
+                                <span class="activity-text">Motivo: Humedad foliar alta (48 h)</span>
+                            </div>
+                            </li>
+                            <li class="feed-item">
+                            <div class="feed-item-list">
+                                <span class="date">PRÓXIMAS 48 h</span>
+                                <span class="activity-text">Monitorear evolución sanitaria</span>
+                                <span class="activity-text">Foco: Oídio / síntomas foliares</span>
+                            </div>
+                            </li>
+                            <li class="feed-item">
+                            <div class="feed-item-list">
+                                <span class="date">PRÓXIMA SEMANA</span>
+                                <span class="activity-text">Seguimiento fenológico – Envero</span>
+                                <span class="activity-text">Verificar uniformidad y carga</span>
+                            </div>
+                            </li>
+                        </ol>
+
+                        <div class="text-center mt-3">
+                            <a href="#" class="btn btn-sm btn-primary">Ir a Plan técnico</a>
+                        </div>
+
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Card comparativo económico -->
+                    <div class="col-xl-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div>
+                            <h4 class="card-title mb-1">Comparativo</h4>
+                            <div class="text-muted">Estimación simple del cuartel</div>
+                            </div>
+                            <i class="mdi mdi-cash-multiple font-size-24 text-success"></i>
+                        </div>
+
+                        <div class="row text-center mt-3">
+                            <div class="col-6">
+                            <h5 class="font-size-20 mb-0">USD 12.450</h5>
+                            <p class="text-muted mb-0">Ingreso estimado</p>
+                            </div>
+                            <div class="col-6">
+                            <h5 class="font-size-20 mb-0">USD 7.720</h5>
+                            <p class="text-muted mb-0">Costo estimado</p>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <span class="geagro-badge geagro-badge-success">Margen estimado · 38%</span>
+                        </div>
+
+                        <!-- Donut: distribución costo vs ingreso -->
+                        <div id="morris-donut-example"
+                            data-colors='["#f0f1f4","--bs-success","--bs-danger"]'
+                            class="morris-charts morris-charts-height"
+                            dir="ltr"></div>
+
+                        <div class="text-center mt-2">
+                            <a href="#" class="btn btn-sm btn-primary">Ver comparativo completo</a>
+                        </div>
+
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+                <!-- end row -->
+            </div>
+{% endblock content %}
+
+{% block extra_javascript %}
+  <!--Morris Chart-->
+  <script src="{% static 'libs/morris.js/morris.min.js' %}"></script>
+  <script src="{% static 'libs/raphael/raphael.min.js' %}"></script>
+
+  <!-- Dashboard init (si tu init ya dibuja el donut, lo dejas) -->
+  <script src="{% static 'js/pages/dashboard.init.js' %}"></script>
+{% endblock extra_javascript %}

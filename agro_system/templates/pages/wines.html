@@ -1,0 +1,55 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block title %} Calendar {% endblock title %}
+
+{% block extra_css %}
+
+    <link href="{% static 'libs/@fullcalendar/core/main.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'libs/@fullcalendar/daygrid/main.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'libs/@fullcalendar/bootstrap/main.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'libs/@fullcalendar/timegrid/main.min.css' %}" rel="stylesheet" type="text/css" />
+
+{% endblock extra_css %}
+
+{% block content %} 
+
+    {% block pagetitle %}
+    {% include "partials/page-title.html" with pagetitle="GEAGRO" subtitle="Producción" title="Clima" %}
+    {% endblock pagetitle %}
+
+                            <div class="container-fluid">
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h4 class="mb-3">Clima</h4>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                Contenido de clima
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+{% endblock content %}
+
+{% block extra_javascript %}
+
+    <!-- plugin js -->
+    <script src="{% static 'libs/moment/min/moment.min.js' %}"></script>
+    <script src="{% static 'libs/jquery-ui-dist/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'libs/@fullcalendar/core/main.min.js' %}"></script>
+    <script src="{% static 'libs/@fullcalendar/bootstrap/main.min.js' %}"></script>
+    <script src="{% static 'libs/@fullcalendar/daygrid/main.min.js' %}"></script>
+    <script src="{% static 'libs/@fullcalendar/timegrid/main.min.js' %}"></script>
+    <script src="{% static 'libs/@fullcalendar/interaction/main.min.js' %}"></script>
+
+    <!-- Calendar init -->
+    <script src="{% static 'js/pages/calendar.init.js' %}"></script>
+      
+{% endblock extra_javascript %}

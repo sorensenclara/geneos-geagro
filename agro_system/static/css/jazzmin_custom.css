@@ -98,3 +98,26 @@
     font-size: 0 !important;
     vertical-align: middle;
 }
+
+/* Fija los botones de acciones en la parte inferior del formulario */
+.changeform-actions {
+    position: fixed !important;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    z-index: 9999;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+    padding: 16px 24px;
+    border-top: 1px solid #eee;
+    width: 100%;
+}
+
+/* Asegura que el contenedor padre permita sticky */
+#content-main {
+    position: relative;
+}
+
+#content-main, .content, .main-content, .card-body {
+    overflow: visible !important;
+}

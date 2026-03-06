@@ -1,0 +1,610 @@
+/*!
+ * GEAGRO UI — Custom overrides (FIXED)
+ * Basado en el CSS antiguo (layout compacto de KPIs) + tokens/orden del nuevo
+ * Objetivo: recuperar el look "Viejo" sin perder variables y mejoras de especificidad.
+ */
+
+/* ==========================================================
+   1) Tokens (paleta + radios + sombras)
+   ========================================================== */
+:root{
+  --geagro-purple-900:#3F2642;
+  --geagro-purple-700:#6b3f6e;
+  --geagro-purple-500:#906693;
+
+  --geagro-text:#0f172a;
+  --geagro-muted:#64748b;
+
+  --geagro-danger:#cf4e4e;
+  --geagro-success:#5a994c;
+  --geagro-warning:#f0b429;
+
+  --geagro-radius-lg:18px;
+  --geagro-radius-xl:22px;
+
+  --geagro-shadow-sm:0 10px 24px rgba(15,23,42,.06);
+  --geagro-shadow-md:0 18px 50px rgba(15,23,42,.16);
+
+  /* KPIs (compacto, como en el CSS antiguo) */
+  --kpi-radius: 22px;
+  --kpi-border: #eef0f2;
+  --kpi-pad: 18px;
+
+  --kpi-title: 18px;
+  --kpi-icon: 24px;
+
+  --kpi-main: clamp(26px, 2vw, 34px);
+  --kpi-h4: clamp(18px, 1.6vw, 24px);
+  --kpi-meta: 14px;
+
+  --risk-low:#1f9d55;
+  --risk-med:#f0b429;
+  --risk-high:#e02424;
+}
+
+/* ==========================================================
+   2) Bootstrap / Theme vars (Primary + Sidebar dark)
+   ========================================================== */
+:root,
+[data-bs-theme="light"]{
+  --bs-primary-rgb: 107, 63, 110;
+}
+
+:root,
+[data-bs-theme="light"],
+[data-bs-theme="dark"]{
+  --bs-primary: var(--geagro-purple-700);
+  --bs-primary-rgb: 107, 63, 110;
+
+  --bs-info: #138037;
+  --bs-info-rgb: 19, 128, 55;
+
+  --bs-light: #E0E0E0;
+  --bs-light-rgb: 224, 224, 224;
+}
+
+/* Igualamos especificidad del tema (sin !important) */
+:root [data-sidebar="dark"],
+[data-bs-theme="light"] [data-sidebar="dark"]{
+  --bs-sidebar-dark-bg: var(--geagro-purple-900);
+
+  --bs-sidebar-dark-menu-item-color: #d6c9d9;
+  --bs-sidebar-dark-menu-sub-item-color: #d6c9d9;
+  --bs-sidebar-dark-menu-item-icon-color: #d6c9d9;
+  --bs-sidebar-dark-menu-item-hover-color: #ffffff;
+  --bs-sidebar-dark-menu-item-active-color: #ffffff;
+
+  /* hover/active suaves (del CSS nuevo) */
+  --bs-sidebar-dark-menu-item-hover-bg: rgba(255,255,255,.08);
+  --bs-sidebar-dark-menu-item-active-bg: #2c1830;
+
+  --bs-sidebar-dark-menu-sub-item-hover-color: #ffffff;
+  --bs-sidebar-dark-menu-sub-item-active-color: #ffffff;
+  --bs-sidebar-dark-menu-sub-item-hover-bg: rgba(255,255,255,.08);
+  --bs-sidebar-dark-menu-sub-item-active-bg: rgba(255,255,255,.10);
+}
+
+/* por si el atributo está en body */
+body[data-sidebar="dark"]{
+  --bs-sidebar-dark-bg: var(--geagro-purple-900);
+  --bs-sidebar-dark-menu-item-color: #d6c9d9;
+  --bs-sidebar-dark-menu-sub-item-color: #d6c9d9;
+  --bs-sidebar-dark-menu-item-icon-color: #d6c9d9;
+  --bs-sidebar-dark-menu-item-hover-color: #ffffff;
+  --bs-sidebar-dark-menu-item-active-color: #ffffff;
+  --bs-sidebar-dark-menu-item-active-bg: #2c1830;
+}
+
+/* ==========================================================
+   3) Iconos
+   ========================================================== */
+.menu-icon-img{
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+  vertical-align: middle;
+  opacity: .9;
+}
+
+.dashboard-icon-img{
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+  vertical-align: middle;
+  opacity: .95;
+}
+
+/* ==========================================================
+   4) Topbar filter (Airbnb-like)
+   ========================================================== */
+.geagro-filterbar{ padding-top: 10px; }
+
+.geagro-filterbar-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 520px;
+  max-width: 640px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(15,23,42,.10);
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+
+.geagro-filterbar-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(107,63,110,.20);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
+}
+
+.geagro-filterbar-btn .seg{
+  display:flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.geagro-filterbar-btn .lbl{
+  font-size: 11px;
+  color:#6b7280;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.geagro-filterbar-btn .val{
+  font-size: 13px;
+  color:#0f172a;
+  font-weight: 800;
+}
+.geagro-filterbar-btn .sep{
+  width: 1px;
+  height: 28px;
+  background: rgba(15,23,42,.10);
+}
+.geagro-filterbar-icon{
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(107,63,110,.12);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.geagro-filterbar-icon i{
+  font-size: 18px;
+  color: var(--bs-primary);
+}
+
+/* Dropdown */
+.geagro-filterbar-menu{
+  width: 420px;
+  border-radius: 16px;
+  border: 1px solid rgba(15,23,42,.10);
+  box-shadow: var(--geagro-shadow-md);
+}
+.geagro-filterbar-menu .form-label{
+  font-weight: 800;
+  color:#0f172a;
+}
+.geagro-filterbar-menu .form-text{
+  font-size: 12px;
+}
+/* topbar dropdown spacing */
+#page-topbar .dropdown-menu{ margin-top: 10px; }
+
+/* ==========================================================
+   5) Dashboard KPIs (layout compacto del CSS antiguo)
+   ========================================================== */
+.geagro-kpi .card{
+  border-radius: var(--kpi-radius);
+  border: 1px solid var(--kpi-border);
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(15,23,42,.08);
+}
+
+.geagro-kpi .card-body{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  padding: var(--kpi-pad);
+}
+
+/* Alto consistente SOLO en desktop */
+@media (min-width: 1200px){
+  .geagro-kpi .card{ height: 310px; }
+}
+
+/* Header */
+.geagro-kpi .geagro-card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.geagro-kpi .card-title{
+  font-size: var(--kpi-title);
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  margin: 0;
+}
+
+@media (min-width: 1200px){
+  .geagro-kpi .card-title{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.geagro-kpi .geagro-card-icon{
+  font-size: var(--kpi-icon);
+  line-height: 1;
+  opacity: .9;
+}
+
+/* Main values */
+.geagro-kpi .geagro-kpi-value{
+  font-size: var(--kpi-main);
+  font-weight: 900;
+  line-height: 1.05;
+  margin: 4px 0 10px;
+}
+.geagro-kpi .geagro-kpi-h4{
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.15;
+  margin: 4px 0 10px;
+}
+
+/* Meta */
+.geagro-kpi .geagro-kpi-meta{
+  font-size: var(--kpi-meta);
+  line-height: 1.45;
+  color:#5b6472;
+  margin: 0;
+}
+
+/* Content block */
+.geagro-kpi .geagro-kpi-content{
+  margin-top: 2px;
+  min-height: 72px;
+}
+
+.geagro-kpi .geagro-kpi-clamp{
+  display:-webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow:hidden;
+}
+
+/* Footer */
+.geagro-kpi .geagro-card-footer{
+  margin-top:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 12px;
+}
+
+/* Card variants */
+.geagro-card-status,
+.geagro-card-action{ background:#fff; }
+
+/* Card 1 destaque suave */
+.geagro-card-primary{
+  box-shadow: 0 16px 40px rgba(15,23,42,.10);
+  border: 1px solid rgba(107,63,110,.18);
+}
+
+/* ==========================================================
+   6) Riesgo sanitario (semáforo)
+   ========================================================== */
+.geagro-card-risk{
+  background:#fff;
+  border:1px solid var(--kpi-border);
+  position:relative;
+}
+.geagro-card-risk::before{
+  content:"";
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:6px;
+  border-radius:22px 0 0 22px;
+  background:#e5e7eb;
+}
+.risk-value{
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.05;
+  margin: 6px 0 10px;
+}
+.risk-badge{
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  background: rgba(15,23,42,.06);
+  color:#111827;
+}
+.geagro-card-risk.risk-low::before{ background: var(--risk-low); }
+.geagro-card-risk.risk-low .risk-value{ color: var(--risk-low); }
+.geagro-card-risk.risk-low .risk-badge{ background: rgba(31,157,85,.12); color: var(--risk-low); }
+
+.geagro-card-risk.risk-med::before{ background: var(--risk-med); }
+.geagro-card-risk.risk-med .risk-value{ color: var(--risk-med); }
+.geagro-card-risk.risk-med .risk-badge{ background: rgba(240,180,41,.18); color:#7a4f01; }
+
+.geagro-card-risk.risk-high::before{ background: var(--risk-high); }
+.geagro-card-risk.risk-high .risk-value{ color: var(--risk-high); }
+.geagro-card-risk.risk-high .risk-badge{ background: rgba(224,36,36,.14); color: var(--risk-high); }
+
+/* ==========================================================
+   7) Clima agronómico (volver al layout "Viejo")
+   - evita que se "infle" con chips enormes
+   ========================================================== */
+.geagro-card-weatherVisual{
+  border-color: var(--kpi-border);
+  background: linear-gradient(180deg, #f3f8ff 0%, #fbfdff 100%);
+}
+
+.geagro-weather-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.geagro-weather-sub{
+  font-size: 14px;
+  color:#6b7280;
+  margin-top: 2px;
+}
+
+.geagro-weather-icon{
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+.geagro-weather-temp{
+  font-size: var(--kpi-main);
+  font-weight: 900;
+  line-height: 1.05;
+  margin: 4px 0 10px;
+  color:#111827;
+}
+
+.geagro-weather-minmax{
+  font-size: 14px;
+  color:#4b5563;
+  margin: 0;
+}
+.geagro-weather-minmax .dot{ margin: 0 6px; opacity: .7; }
+
+/* métricas compactas (sin “pills grandes”) */
+.geagro-weather-metrics{
+  display:flex;
+  gap: 8px;
+  margin-top: 10px;
+  color:#374151;
+  flex-wrap: wrap;
+}
+.geagro-weather-metrics .metric{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  font-size: 14px;
+}
+.geagro-weather-metrics i{
+  font-size: 18px;
+  color:#6b3f6e;
+}
+
+/* chips chicos (como en antiguo) */
+.geagro-weather-chips{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.geagro-weather-chips .chip{
+  background:#e5e7eb;
+  color:#111827;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ==========================================================
+   8) Alert bar (violeta compacta + responsive)
+   ========================================================== */
+.geagro-alertbar{
+  background: var(--geagro-purple-500);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(15,23,42,.08);
+}
+
+.geagro-alertbar-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding: 12px 14px;
+  flex-wrap: wrap;
+}
+
+.geagro-alertbar-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+}
+
+.geagro-alertbar-title{
+  font-weight: 900;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+}
+
+.geagro-alertbar-count{
+  background: rgba(255,255,255,.16);
+  color:#fff;
+  font-weight:900;
+  border-radius:999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  white-space:nowrap;
+}
+
+.geagro-alertbar-list{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  min-width:0;
+}
+
+.geagro-alert-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.16);
+  color:#fff;
+  font-weight:800;
+  font-size:12px;
+}
+
+.geagro-alert-pill i{ color:#fff; font-size: 14px; }
+
+.geagro-alertbar-link{
+  font-weight: 900;
+  color:#fff;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.geagro-alertbar-link:hover{ text-decoration: underline; }
+
+/* MOBILE: pills scrolleables */
+@media (max-width: 576px){
+  .geagro-alertbar-inner{ gap: 10px; padding:10px 12px; }
+  .geagro-alertbar-left{ width: 100%; justify-content: space-between; align-items:center; }
+  .geagro-alertbar-list{
+    width: 100%;
+    order: 2;
+    display:flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    padding-bottom: 2px;
+  }
+  .geagro-alert-pill{ flex: 0 0 auto; white-space: nowrap; padding:4px 8px; font-size:11px; }
+}
+
+/* ==========================================================
+   9) Buttons (del CSS antiguo, bien “premium”)
+   ========================================================== */
+.btn-primary{
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color:#fff;
+
+  border-radius: 32px;
+  padding: 12px 24px;
+
+  font-weight: 800;
+  letter-spacing: .3px;
+
+  transition: 
+    background-color .2s ease,
+    border-color .2s ease,
+    transform .15s ease,
+    box-shadow .2s ease;
+}
+
+.btn-primary:hover{
+  background-color: #5a345d;
+  border-color: #5a345d;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(107,63,110,.25);
+}
+
+.btn-primary:active{
+  transform: translateY(0px);
+  box-shadow: 0 4px 10px rgba(107,63,110,.25);
+}
+
+.btn-primary:focus,
+.btn-primary:focus-visible{
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(107,63,110,.25),
+    0 6px 14px rgba(107,63,110,.20);
+}
+
+.btn-primary:disabled,
+.btn-primary.disabled{
+  background-color: rgba(107,63,110,.4);
+  border-color: rgba(107,63,110,.4);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* CTA secundarios en footer de cards */
+.geagro-kpi .geagro-card-footer a{
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--bs-primary);
+  text-decoration: none;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 12px;
+  border-radius: 32px;
+  border: 1px solid rgba(107,63,110,.28);
+
+  transition: 
+    background-color .2s ease,
+    transform .15s ease,
+    border-color .2s ease;
+}
+
+.geagro-kpi .geagro-card-footer a:hover{
+  background: rgba(107,63,110,.08);
+  border-color: rgba(107,63,110,.40);
+  transform: translateY(-1px);
+}
+
+.geagro-kpi .geagro-card-footer a:focus,
+.geagro-kpi .geagro-card-footer a:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(107,63,110,.18);
+}
+
+/* ==========================================================
+   10) Responsive microajustes
+   ========================================================== */
+@media (max-width:576px){
+  .geagro-card-action{
+    box-shadow: 0 14px 32px rgba(15,23,42,.12);
+  }
+  .geagro-card-action .geagro-kpi-h4{
+    font-size: 20px;
+  }
+}

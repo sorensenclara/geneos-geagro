@@ -1,0 +1,258 @@
+{% load static %}
+{% block topbar %}
+
+<header id="page-topbar">
+    <div class="navbar-header">
+        <div class="d-flex">
+            <!-- LOGO -->
+            <div class="navbar-brand-box">
+                <a href="{% url 'dashboard' %}" class="logo logo-dark">
+                    <span class="logo-sm">
+                        <img src="{% static 'images/logo-sm.png' %}" alt="" height="32">
+                    </span>
+                    <span class="logo-lg">
+                        <img src="{% static 'images/logo-geagro-dark.png' %}" alt="" height="28">
+                    </span>
+                </a>
+
+                <a href="{% url 'dashboard' %}" class="logo logo-light">
+                    <span class="logo-sm">
+                        <img src="{% static 'images/logo-sm.svg' %}" alt="" height="32">
+                    </span>
+                    <span class="logo-lg">
+                        <img src="{% static 'images/logo-geagro-light.svg' %}" alt="" height="28">
+                    </span>
+                </a>
+            </div>
+
+            <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect vertical-menu-btn">
+                <i class="mdi mdi-menu"></i>
+            </button>
+        </div>
+
+        <div class="d-flex">
+
+            <!-- Filtro tipo Airbnb -->
+            <div class="geagro-filterbar d-none d-lg-block">
+                <div class="dropdown">
+                    <button
+                    class="geagro-filterbar-btn"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside"
+                    aria-expanded="false"
+                    id="geagroFilterDropdown"
+                    >
+                    <span class="seg">
+                        <span class="lbl">Campaña</span>
+                        <span class="val" id="valCampania">2025/26</span>
+                    </span>
+                    <span class="sep"></span>
+                    <span class="seg">
+                        <span class="lbl">Viñedo</span>
+                        <span class="val" id="valVinedo">Todos</span>
+                    </span>
+                    <span class="sep"></span>
+                    <span class="seg">
+                        <span class="lbl">Cuartel</span>
+                        <span class="val" id="valCuartel">—</span>
+                    </span>
+
+                    <span class="geagro-filterbar-icon">
+                        <i class="mdi mdi-magnify"></i>
+                    </span>
+                    </button>
+
+                    <div class="dropdown-menu geagro-filterbar-menu p-3" aria-labelledby="geagroFilterDropdown">
+                    <form id="geagroFiltersForm" class="geagro-filterbar-form" method="get" action="">
+                        <div class="row g-3">
+                        <!-- Campaña -->
+                        <div class="col-12">
+                            <label class="form-label mb-1">Campaña</label>
+                            <select class="form-select" name="campania" id="filterCampania">
+                            {% for campaing in campaings %}
+                            <option value="{{campaing.name}}">{{campaing.name}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Viñedo -->
+                        <div class="col-12">
+                            <label class="form-label mb-1">Viñedo</label>
+                            <select class="form-select" name="vinedo" id="filterVinedo">
+                            <option value="" selected>Todos</option>
+                            <option value="paciencia">Paciencia</option>
+                            <option value="don-mario">Don Mario</option>
+                            </select>
+                        </div>
+
+                        <!-- Cuartel / Lote -->
+                        <div class="col-12">
+                            <label class="form-label mb-1">Lote / Cuartel</label>
+                            <select class="form-select" name="cuartel" id="filterCuartel" disabled>
+                            <option value="" selected>—</option>
+                            </select>
+                            <div class="form-text">Se habilita al elegir un viñedo.</div>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="col-12 d-flex gap-2 justify-content-end pt-2">
+                            <button type="button" class="btn btn-light" id="btnClearFilters">
+                            Limpiar
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="btnApplyFilters">
+                            Aplicar filtros
+                            </button>
+                        </div>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón de búsqueda en mobile (abre modal simple o redirige a filtros) -->
+            <div class="d-inline-block d-lg-none ms-2">
+            <button type="button" class="btn header-item noti-icon waves-effect" id="geagroMobileFilterBtn">
+                <i class="mdi mdi-filter-variant"></i>
+            </button>
+            </div>
+
+            <div class="dropdown d-inline-block d-lg-none ms-2">
+                <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="mdi mdi-magnify"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right p-0"
+                    aria-labelledby="page-header-search-dropdown">
+                    
+                    <form class="p-3">
+                        <div class="form-group m-0">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+
+            <div class="dropdown d-none d-md-block ms-2">
+                <button type="button" class="btn header-item waves-effect" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img class="me-2" src="{% static 'images/flags/arg_flag.jpg' %}" alt="Header Language" height="16"> Español <span class="mdi mdi-chevron-down"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+
+                    <!-- item-->
+                    <a href="javascript:void(0);" class="dropdown-item notify-item">
+                        <img src="{% static 'images/flags/us_flag.jpg' %}" alt="user-image" class="me-1" height="12"> <span class="align-middle"> Inglés </span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="dropdown d-none d-lg-inline-block">
+                <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen">
+                    <i class="mdi mdi-fullscreen font-size-24"></i>
+                </button>
+            </div>
+
+            <div class="dropdown d-inline-block ms-1">
+                <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="ti-bell"></i>
+                    <span class="badge text-bg-primary rounded-pill">2</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                    aria-labelledby="page-header-notifications-dropdown">
+                    <div class="p-3">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="m-0"> Notificaciones (2) </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-simplebar style="max-height: 230px;">
+                        <a href="javascript:void(0);" class="text-reset notification-item">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0 me-3">
+                                    <div class="avatar-xs">
+                                    <span class="avatar-title border-success rounded-circle ">
+                                        <i class="mdi mdi-billboard"></i>
+                                    </span>
+                                </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">Nuevo plan de acción</h6>
+                                    <div class="text-muted">
+                                        <p class="mb-1">Campaña 2026</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="javascript:void(0);" class="text-reset notification-item">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0 me-3">
+                                    <div class="avatar-xs">
+                                    <span class="avatar-title border-warning rounded-circle ">
+                                        <i class="mdi mdi-alert-circle-outline"></i>
+                                    </span>
+                                </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">Alerta y avisos</h6>
+                                    <div class="text-muted">
+                                        <p class="mb-1">Alertas heladas (48hs) Cuartel Norte</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        
+                    </div>
+                    <div class="p-2 border-top">
+                        <a class="btn btn-sm btn-link font-size-14 w-100 text-center" href="javascript:void(0)">
+                            View all
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+
+            <div class="dropdown d-inline-block">
+                <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img class="rounded-circle header-profile-user" src="{% static 'images/users/user-4.jpg' %}"
+                        alt="Header Avatar">
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <!-- item-->
+                    <a class="dropdown-item" href="#"><i class="mdi mdi-account-circle font-size-17 text-muted align-middle me-1"></i> Profile</a>
+                    <a class="dropdown-item" href="#"><i class="mdi mdi-wallet font-size-17 text-muted align-middle me-1"></i> My Wallet</a>
+                    <a class="dropdown-item d-flex align-items-center" href="#"><i class="mdi mdi-cog font-size-17 text-muted align-middle me-1"></i> Settings<span class="badge bg-success ms-auto">11</span></a>
+                    <a class="dropdown-item" href="#"><i class="mdi mdi-lock-open-outline font-size-17 text-muted align-middle me-1"></i> Lock screen</a>
+                    <div class="dropdown-divider"></div>
+
+                    {% if user.is_authenticated %}
+                        <a class="dropdown-item" href="{% url 'account_change_password' %}">
+                            <i class="mdi mdi-key text-muted fs-16 align-middle me-1"></i> 
+                            <span class="align-middle" data-key="t-change-password">Cambiar la Contraseña</span>
+                        </a>
+                        <a class="dropdown-item text-danger" href="{% url 'account_logout' %}">
+                            <i class="mdi mdi-power font-size-17 text-muted align-middle me-1 text-danger"></i> Cerrar Sesión</a>
+                    {% else %}
+                        <a class="dropdown-item" href="{% url 'account_login' %}">
+                            <i class="mdi mdi-key text-muted fs-16 align-middle me-1"></i> 
+                            <span class="align-middle" data-key="t-login">Iniciar Sesión</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</header>
+
+{% endblock topbar %}

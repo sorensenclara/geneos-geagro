@@ -1,0 +1,1 @@
+$.sessionTimeout({keepAliveUrl:"/extras/extra-pages/blank_page",logoutButton:"Logout",logoutUrl:"/extras/authentication/pages_login",redirUrl:"/extras/authentication/lock_screen",warnAfter:3e3,redirAfter:3e4,countdownMessage:"Redirecting in {timer} seconds."});

@@ -1,0 +1,473 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block title %} Plan Técnico {% endblock title %}
+
+{% block content %}
+
+  {% block pagetitle %}
+    {% include "partials/page-title.html" with pagetitle="GEAGRO" subtitle="Plan Técnico" title="Plan Técnico" %}
+  {% endblock pagetitle %}
+
+  <div class="row">
+    <div class="geagro-dashboard">
+
+      <!-- HEADER (continuidad con dashboard) -->
+      <div class="card mb-3">
+        <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+
+          <div class="d-flex align-items-center gap-2">
+            <h4 class="mb-0">Plan Técnico</h4>
+            <span class="badge rounded-pill bg-success">Plan activo</span>
+          </div>
+
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="badge rounded-pill bg-light text-dark border">
+              <i class="mdi mdi-calendar-range"></i> Campaña: <strong>2025/26</strong>
+            </span>
+            <span class="badge rounded-pill bg-light text-dark border">
+              <i class="mdi mdi-vine"></i> Viñedo: <strong>Paciencia</strong>
+            </span>
+            <span class="badge rounded-pill bg-light text-dark border">
+              <i class="mdi mdi-map-marker-outline"></i> Cuartel: <strong>Cuartel Norte</strong>
+            </span>
+          </div>
+
+          <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2">
+              <img src="{% static 'images/users/user-3.jpg' %}" class="rounded-circle" alt="tecnico" style="width:32px;height:32px;object-fit:cover;">
+              <div class="small">
+                <div class="fw-semibold">Ing. Horacio Peinado</div>
+                <div class="text-muted">Actualizado: 24/02 · 10:30</div>
+              </div>
+            </div>
+
+            <div class="text-end">
+              <div class="small text-muted mb-1">% completado</div>
+              <div class="progress" style="width:160px;height:8px;">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: 42%;" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="small text-muted mt-1">42%</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- BANDA DE ALERTAS -->
+      <div class="geagro-alertbar mb-4">
+        <div class="geagro-alertbar-inner">
+
+          <div class="geagro-alertbar-left">
+            <span class="geagro-alertbar-title">
+              <i class="mdi mdi-bell-outline"></i>
+              Alertas
+            </span>
+
+            <span class="geagro-alertbar-count">2</span>
+
+            <div class="geagro-alertbar-list">
+              <span class="geagro-alert-pill"><i class="mdi mdi-snowflake"></i> Helada posible (48h)</span>
+              <span class="geagro-alert-pill"><i class="mdi mdi-flask-outline"></i> Oídio pendiente</span>
+            </div>
+          </div>
+
+          <a href="{% url 'alert' %}" class="geagro-alertbar-link">Ver todas</a>
+        </div>
+      </div>
+
+      <!-- CUERPO -->
+      <div class="row g-3">
+
+        <!-- Columna A -->
+        <div class="col-xl-8">
+          <div class="card">
+            <div class="card-body">
+
+              <div class="d-flex align-items-start justify-content-between mb-3">
+                <div>
+                  <h4 class="card-title mb-1">Timeline fenológico</h4>
+                  <div class="text-muted">Etapas del ciclo y actividades sugeridas</div>
+                </div>
+                <i class="mdi mdi-timeline-clock-outline font-size-24 text-info"></i>
+              </div>
+
+              <div class="accordion" id="planTecnicoAccordion">
+
+                <!-- Reposo (realizada) -->
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingReposo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReposo" aria-expanded="false" aria-controls="collapseReposo">
+                      <div class="w-100 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="fw-semibold">Reposo invernal</span>
+                          <span class="badge rounded-pill bg-success">Realizada</span>
+                        </div>
+                        <div class="small text-muted">Ventana: 01 Jun – 31 Ago</div>
+                      </div>
+                    </button>
+                  </h2>
+
+                  <div id="collapseReposo" class="accordion-collapse collapse" aria-labelledby="headingReposo" data-bs-parent="#planTecnicoAccordion">
+                    <div class="accordion-body">
+
+                      <div class="mb-3">
+                        <div class="fw-semibold">Resumen técnico</div>
+                        <div class="text-muted">
+                          La planta está en reposo; se prioriza planificación de poda, saneamiento y preparación de estructura.
+                        </div>
+                        <ul class="text-muted mb-0">
+                          <li>Riesgo: heladas intensas</li>
+                          <li>Riesgo: madera enferma / mala selección de cargadores</li>
+                          <li>Riesgo: estructura floja (alambres/postes)</li>
+                        </ul>
+                      </div>
+
+                      <div class="fw-semibold mb-2">Actividades sugeridas</div>
+
+                      <div class="list-group">
+                        <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-open-activity="act-1" data-scroll="1">
+                          Planificar poda (carga objetivo)
+                          <span class="badge bg-secondary">Media</span>
+                        </a>
+
+                        <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-open-activity="act-2" data-scroll="1">
+                          Reparar alambres y torniquetas
+                          <span class="badge bg-secondary">Media</span>
+                        </a>
+                      </div>
+
+                      <div class="d-none">
+                        <div id="act-1"
+                          data-title="Planificar poda (carga objetivo)"
+                          data-cat="Productivo"
+                          data-priority="Media"
+                          data-when="Durante reposo (sin heladas fuertes)"
+                          data-what="Definir carga de yemas por planta según vigor y objetivo de rendimiento."
+                          data-why="La poda define número de brotes, racimos y equilibrio vegetativo/productivo."
+                          data-inputs="Tijeras, registro de vigor, planilla de carga por cuartel"
+                          data-risks="Rendimientos inestables; falta de madurez; agotamiento de reservas."></div>
+
+                        <div id="act-2"
+                          data-title="Reparar alambres y torniquetas"
+                          data-cat="Infraestructura"
+                          data-priority="Media"
+                          data-when="Antes de brotación"
+                          data-what="Revisión de postes, tensores, alambres de sostén y de conducción."
+                          data-why="Evita roturas en primavera y mejora conducción y aireación."
+                          data-inputs="Torniquetas, alambre, grampas, herramientas"
+                          data-risks="Caída de canopia; mayor presión sanitaria; costos urgentes en plena temporada."></div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Brotación (realizada) -->
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingBrotacion">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBrotacion" aria-expanded="false" aria-controls="collapseBrotacion">
+                      <div class="w-100 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="fw-semibold">Brotación</span>
+                          <span class="badge rounded-pill bg-success">Realizada</span>
+                          <span class="badge rounded-pill bg-light text-dark border"><i class="mdi mdi-snowflake"></i> Riesgo heladas</span>
+                        </div>
+                        <div class="small text-muted">Ventana: 15 Sep – 31 Oct</div>
+                      </div>
+                    </button>
+                  </h2>
+
+                  <div id="collapseBrotacion" class="accordion-collapse collapse" aria-labelledby="headingBrotacion" data-bs-parent="#planTecnicoAccordion">
+                    <div class="accordion-body">
+
+                      <div class="mb-3">
+                        <div class="fw-semibold">Resumen técnico</div>
+                        <div class="text-muted">
+                          Inicio del crecimiento. Alta sensibilidad a heladas tardías: daño en brotes reduce producción.
+                        </div>
+                        <ul class="text-muted mb-0">
+                          <li>Riesgo: heladas tardías</li>
+                          <li>Riesgo: brotación desuniforme por reservas bajas</li>
+                          <li>Riesgo: malezas compiten por agua/nutrientes</li>
+                        </ul>
+                      </div>
+
+                      <div class="fw-semibold mb-2">Actividades sugeridas</div>
+
+                      <div class="list-group">
+                        <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-open-activity="act-3" data-scroll="1">
+                          Activar protocolo anti-heladas
+                          <span class="badge bg-danger">Alta</span>
+                        </a>
+                        <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-open-activity="act-4" data-scroll="1">
+                          Monitoreo de brotación y uniformidad
+                          <span class="badge bg-warning text-dark">Media</span>
+                        </a>
+                      </div>
+
+                      <div class="d-none">
+                        <div id="act-3"
+                          data-title="Activar protocolo anti-heladas"
+                          data-cat="Clima"
+                          data-priority="Alta"
+                          data-when="48h previas si mín < 2°C (según alertas)"
+                          data-what="Revisar medidas disponibles (riego/aspersión si aplica, suelo húmedo, monitoreo térmico)."
+                          data-why="En brotación, el tejido verde es muy sensible; una helada puede cortar el ciclo productivo."
+                          data-inputs="Termómetros, estación meteo, checklist operativo"
+                          data-risks="Pérdida de brotes fértiles; rebrote con menor rendimiento; atraso fenológico."></div>
+
+                        <div id="act-4"
+                          data-title="Monitoreo de brotación y uniformidad"
+                          data-cat="Productivo"
+                          data-priority="Media"
+                          data-when="Semanal durante brotación"
+                          data-what="Relevar % de yemas brotadas, vigor inicial y zonas atrasadas."
+                          data-why="Permite ajustar manejo de riego, nutrición y carga en verde."
+                          data-inputs="Planilla de muestreo, GPS/lote, cinta métrica"
+                          data-risks="Desuniformidad; costos mayores en canopia; menor calidad y estabilidad."></div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Envero (activa) -->
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingEnvero">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEnvero" aria-expanded="true" aria-controls="collapseEnvero">
+                      <div class="w-100 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="fw-semibold">Envero</span>
+                          <span class="badge rounded-pill bg-primary">Activa</span>
+                          <span class="badge rounded-pill bg-light text-dark border">Ventana: 05 Feb – 05 Mar</span>
+                          <span class="badge rounded-pill bg-danger">Riesgo sanitario: Alto</span>
+                          <span class="badge rounded-pill bg-light text-dark border"><i class="mdi mdi-water-outline"></i> Humedad foliar alta</span>
+                        </div>
+                        <div class="small text-muted">Objetivo: proteger racimos y consolidar calidad.</div>
+                      </div>
+                    </button>
+                  </h2>
+
+                  <div id="collapseEnvero" class="accordion-collapse collapse show" aria-labelledby="headingEnvero" data-bs-parent="#planTecnicoAccordion">
+                    <div class="accordion-body">
+
+                      <div class="mb-3">
+                        <div class="fw-semibold">Resumen técnico</div>
+                        <div class="text-muted">
+                          Comienza acumulación de azúcares y compuestos de calidad. Aumenta sensibilidad a enfermedades del racimo.
+                        </div>
+                        <ul class="text-muted mb-0">
+                          <li>Riesgo: Oídio tardío</li>
+                          <li>Riesgo: Podredumbres con humedad sostenida</li>
+                          <li>Riesgo: Dilución por exceso hídrico</li>
+                        </ul>
+                      </div>
+
+                      <div class="fw-semibold mb-2">Actividades sugeridas</div>
+
+                      <div class="list-group">
+                        <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-open-activity="act-5" data-scroll="1">
+                          Aplicar fungicida (Oídio)
+                          <span class="badge bg-danger">Alta</span>
+                        </a>
+
+                        <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-open-activity="act-6" data-scroll="1">
+                          Monitorear evolución sanitaria (48h)
+                          <span class="badge bg-warning text-dark">Media</span>
+                        </a>
+
+                        <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-open-activity="act-7" data-scroll="1">
+                          Ajuste fino de riego (evitar exceso)
+                          <span class="badge bg-warning text-dark">Media</span>
+                        </a>
+                      </div>
+
+                      <div class="d-none">
+                        <div id="act-5"
+                          data-title="Aplicar fungicida (Oídio)"
+                          data-cat="Sanitario"
+                          data-priority="Alta"
+                          data-when="Hoy 18–22 h (si viento < 25 km/h)"
+                          data-what="Aplicar fungicida sistémico + contacto con buena penetración en racimo."
+                          data-why="Hoja mojada 320 min + temp media 24°C → presión fúngica alta."
+                          data-inputs="Fungicida registrado, pulverizadora calibrada, EPP"
+                          data-risks="Daño en racimos; pérdida de calidad; más presión de podredumbres."></div>
+
+                        <div id="act-6"
+                          data-title="Monitorear evolución sanitaria (48h)"
+                          data-cat="Sanitario"
+                          data-priority="Media"
+                          data-when="Próximas 48 h"
+                          data-what="Revisar 100 racimos: síntomas, humedad retenida, daño previo."
+                          data-why="Confirmar respuesta a condiciones ambientales y ajustar estrategia."
+                          data-inputs="Planilla de monitoreo, lupa, fotos"
+                          data-risks="Detección tardía; pérdida de ventanas de control."></div>
+
+                        <div id="act-7"
+                          data-title="Ajuste fino de riego (evitar exceso)"
+                          data-cat="Riego"
+                          data-priority="Media"
+                          data-when="48–72 h post-lluvia"
+                          data-what="Reducir/suspender riego si hay aporte de lluvia y suelo con buena humedad."
+                          data-why="Evita dilución de azúcares y exceso de vigor en etapa de calidad."
+                          data-inputs="Programador de riego, lectura de suelo (calicata/sensor)"
+                          data-risks="Dilución; atraso de madurez; aumento de presión sanitaria."></div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Cosecha (pendiente) -->
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingCosecha">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCosecha" aria-expanded="false" aria-controls="collapseCosecha">
+                      <div class="w-100 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="fw-semibold">Madurez / Cosecha</span>
+                          <span class="badge rounded-pill bg-light text-dark border">Pendiente</span>
+                        </div>
+                        <div class="small text-muted">Ventana: 10 Mar – 15 Abr</div>
+                      </div>
+                    </button>
+                  </h2>
+                  <div id="collapseCosecha" class="accordion-collapse collapse" aria-labelledby="headingCosecha" data-bs-parent="#planTecnicoAccordion">
+                    <div class="accordion-body">
+                      <div class="text-muted">Muestreos de madurez, logística de cosecha y decisiones de calidad.</div>
+                    </div>
+                  </div>
+                </div>
+
+              </div><!-- /accordion -->
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna B -->
+        <div class="col-xl-4">
+          <div class="position-sticky" style="top: 90px;">
+
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between mb-2">
+                  <div>
+                    <h4 class="card-title mb-1">Próxima acción</h4>
+                    <div class="text-muted">Coherente con el dashboard</div>
+                  </div>
+                  <img src="{% static 'images/icon/technical_plan_color.svg' %}" class="dashboard-icon-img" alt="plan" />
+                </div>
+
+                <div class="h5 mb-1">Aplicar fungicida (Oídio)</div>
+                <div class="text-muted mb-3">Hoy 18–22 h · Cuartel Norte</div>
+
+                <div class="d-flex align-items-center justify-content-between">
+                  <span class="geagro-badge geagro-badge-danger">Prioridad Alta</span>
+                  <button class="btn btn-sm btn-primary" type="button" data-open-activity="act-5">
+                    Ver detalle
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between mb-2">
+                  <div>
+                    <h4 class="card-title mb-1">¿Por qué ahora?</h4>
+                    <div class="text-muted">Explicación simple</div>
+                  </div>
+                  <i class="mdi mdi-lightbulb-on-outline font-size-24 text-warning"></i>
+                </div>
+
+                <div class="p-3 rounded-3" style="background:#f8f9fa;">
+                  <div class="fw-semibold mb-1">Presión fúngica alta</div>
+                  <div class="text-muted mb-0">
+                    Hoja mojada 320 min + temp media 24°C + precipitación 12 mm → aumenta riesgo de Oídio.
+                  </div>
+                </div>
+
+                <div class="mt-3 small text-muted">
+                  Tip: si el viento supera 25 km/h, reprogramar para evitar deriva.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /row -->
+
+    </div><!-- /geagro-dashboard -->
+  </div><!-- /row -->
+
+  <!-- MODAL: Detalle de Actividad -->
+  <div class="modal fade" id="activityDetailModal" tabindex="-1" aria-labelledby="activityDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title" id="activityDetailLabel">Detalle de actividad</h5>
+            <div class="small text-muted" id="activityMeta"></div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+
+        <div class="mb-3">
+            <div class="fw-semibold d-flex align-items-center gap-2">
+            <i class="mdi mdi-tractor text-primary"></i>
+            Qué hacer
+            </div>
+            <div id="activityWhat" class="text-muted"></div>
+        </div>
+
+        <div class="mb-3">
+            <div class="fw-semibold d-flex align-items-center gap-2">
+            <i class="mdi mdi-chart-line text-info"></i>
+            Por qué
+            </div>
+            <div id="activityWhy" class="text-muted"></div>
+        </div>
+
+        <div class="mb-3">
+            <div class="fw-semibold d-flex align-items-center gap-2">
+            <i class="mdi mdi-toolbox-outline text-secondary"></i>
+            Insumos
+            </div>
+            <div id="activityInputs" class="text-muted"></div>
+        </div>
+
+        <div class="mb-3">
+            <div class="fw-semibold d-flex align-items-center gap-2">
+            <i class="mdi mdi-clock-time-four-outline text-warning"></i>
+            Momento recomendado
+            </div>
+            <div id="activityWhen" class="text-muted"></div>
+        </div>
+
+        <div class="mb-0">
+            <div class="fw-semibold d-flex align-items-center gap-2">
+            <i class="mdi mdi-alert-circle-outline text-danger"></i>
+            Riesgos si no se realiza
+            </div>
+            <div id="activityRisks" class="text-muted"></div>
+        </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block extra_javascript %}
+<script src="{% static 'js/pages/plan_tecnico.js' %}"></script>
+{% endblock %}
