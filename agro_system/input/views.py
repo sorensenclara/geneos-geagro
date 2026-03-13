@@ -1,9 +1,9 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-from user.models.userProducer import UserProducer
-from input.models.purchaseOrderDetail import PurchaseOrderDetail
-from input.models.purchaseOrder import PurchaseOrder
+from user.models.user_producer import UserProducer
+from input.models.purchase_order_detail import PurchaseOrderDetail
+from input.models.purchase_order import PurchaseOrder
 from django.contrib import messages 
 
 def InputPendingPDFView(request):

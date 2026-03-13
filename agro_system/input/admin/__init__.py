@@ -1,4 +1,4 @@
 from .admin import adminSite  
-from .purchaseOrder import *
+from .purchase_order import *
 from .input import *
-from .purchaseReception import *
+from .purchase_reception import *

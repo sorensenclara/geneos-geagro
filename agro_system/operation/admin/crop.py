@@ -1,18 +1,18 @@
 from django.contrib import admin
 from user.admin.adminSite import adminSite
 from operation.models.crop import Crop
-from operation.models.partnerCrop import PartnerCrop
-from operation.models.technicalCropDetail import TechnicalCropDetail
-from operation.models.cropYields import CropYields
+from operation.models.partner_crop import PartnerCrop
+from operation.models.technical_crop_detail import TechnicalCropDetail
+from operation.models.crop_yields import CropYields
 from django.utils.translation import gettext_lazy as _
-from user.models.userProducer import UserProducer
-from operation.models.technicalPlan import TechnicalPlan
-from operation.models.technicalPlanDetail import TechnicalPlanDetail
+from user.models.user_producer import UserProducer
+from operation.models.technical_plan import TechnicalPlan
+from operation.models.technical_plan_detail import TechnicalPlanDetail
 from datetime import datetime, timedelta
-from operation.models.workOrder import WorkOrder
-from parameter.models.otState import OTState
-from operation.models.technicalPlanInput import TechnicalPlanInput
-from operation.models.inputWorkOrder import InputWorkOrder
+from operation.models.work_order import WorkOrder
+from parameter.models.ot_state import OTState
+from operation.models.technical_plan_input import TechnicalPlanInput
+from operation.models.input_work_order import InputWorkOrder
 
 class TechnicalCropDetailInline(admin.StackedInline):
     model = TechnicalCropDetail

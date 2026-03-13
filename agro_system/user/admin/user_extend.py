@@ -1,4 +1,4 @@
-from ..models.userExtend import UserExtend
+from ..models.user_extend import UserExtend
 from django.contrib.auth.admin import UserAdmin
 from user.models import UserExtend
 from user.admin.adminSite import adminSite

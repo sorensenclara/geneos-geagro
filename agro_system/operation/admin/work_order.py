@@ -1,54 +1,50 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite
-from input.models.purchaseOrder import PurchaseOrder
-from input.models.purchaseOrderDetail import PurchaseOrderDetail
-from user.models.userProducer import UserProducer
+from user.admin.adminSite import adminSite  
+from operation.models.work_order import WorkOrder
+from operation.models.input_work_order import InputWorkOrder
 from django.utils.translation import gettext_lazy as _
-from django.http import HttpResponseRedirect
+from parameter.models.ot_state import OTState
 from django.urls import reverse
-from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from django.http import HttpResponseRedirect
+from user.models.user_producer import UserProducer
 
+class InputWorkOrderInline(admin.StackedInline):
+    model = InputWorkOrder
+    extra = 0
+    show_change_link = True
+    verbose_name_plural = _("Inputs")
 
-@admin.action(description=_("Process Purchase Order"))
-def procesar_purchase_order(modeladmin, request, queryset):
-    queryset.update(state="confirm")
-    
+@admin.action(description="Finalizar orden")
+def finish_order(modeladmin, request, queryset):
     for obj in queryset:
-        details = PurchaseOrderDetail.objects.filter(purchase_order=obj)
-        for item in details:
-            item.pending_amount = item.amount
-            item.input.save()
-            item.save()
+        obj.state = OTState.objects.filter(nombre="Finalizada")[0]
+        obj.save()
+        inputs = InputWorkOrder.objects.filter(work_order=obj)
+        if inputs:
+            for input in inputs:
+                if input.dose_applied:
+                    input.input.stock -= input.dose_applied
+                    input.input.save()
 
-@admin.action(description=_("Pending purchases"))
-def input_pending_pdf(modeladmin, request, queryset):
+
+@admin.action(description=_("Print work orders"))
+def download_pdf(modeladmin, request, queryset):
     # Obtén la URL de la vista personalizada
-    url = reverse('input:input_pending_pdf')
-    url = f'{url}'
-    
+    url = reverse('operation:work_orders_pdf')
+    ids = ','.join(str(obj.id) for obj in queryset)
+    url = f'{url}?ids={ids}'
+
     # Redirige a la vista personalizada
     return HttpResponseRedirect(url)
 
-
-class PurchaseOrderDetailInline(admin.StackedInline):
-    model = PurchaseOrderDetail
-    readonly_fields = ['pending_amount', 'total']
-    extra = 0
-    
-class PurchaseOrderAdmin(admin.ModelAdmin):
-    list_display = ['number','date', 'provider', 'state']
-    list_filter = ['state', 'provider']
-    search_fields = ['number',]
-    inlines = [PurchaseOrderDetailInline]
-    actions = [procesar_purchase_order, input_pending_pdf]
-
-    def changelist_view(self, request, extra_context=None):
-        if 'action' in request.POST and (request.POST['action'] == 'input_pending_pdf'):
-            if not request.POST.getlist(ACTION_CHECKBOX_NAME):
-                post = request.POST.copy()
-                post.update({ACTION_CHECKBOX_NAME: str(PurchaseOrder.objects.first().number)})
-                request._set_post(post)
-        return super(PurchaseOrderAdmin, self).changelist_view(request, extra_context)
+class WorkOrderAdmin(admin.ModelAdmin):
+    list_display = ['code', 'crop', 'stage', 'date_init', 'stateOT', 'type']
+    list_filter = ['campaing','stage','stateOT']
+    search_fields = ['code']
+    ordering = ['code']
+    search_fields = ['name']
+    inlines = [InputWorkOrderInline]
+    actions = [finish_order, download_pdf]
 
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado
@@ -73,7 +69,7 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
             if userProducer:
                 return queryset.filter(producer=userProducer)
         return queryset.none()
-        
+
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super().get_readonly_fields(request, obj)
         if request.user.type == 'Producer':
@@ -90,4 +86,4 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-adminSite.register(PurchaseOrder, PurchaseOrderAdmin)
+adminSite.register(WorkOrder, WorkOrderAdmin)

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from operation.models.workOrder import WorkOrder
+from operation.models.work_order import WorkOrder
 from django.http import HttpResponse, HttpResponseRedirect
 from xhtml2pdf import pisa
 from django.template.loader import get_template

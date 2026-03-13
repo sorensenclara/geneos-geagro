@@ -982,6 +982,16 @@ msgstr "Productor"
 msgid "usersProducers"
 msgstr "Productores"
 
+
+#: parameter/models/TypeVarCropTechnique.py:14
+msgid "type variable crop technique"
+msgstr "Tipo de variables tecnicas de cultivo"
+
+#: parameter/models/TypeVarCropTechnique.py:15
+msgid "types variables crop techniques"
+msgstr "Tipos de variables tecnicas de cultivo"
+
+
 #~ msgid "Pending work orders"
 #~ msgstr "Imprimir ordenes pendientes"
 
@@ -1011,3 +1021,5 @@ msgstr "Productores"
 
 #~ msgid "technical plans detail"
 #~ msgstr "Detalles del plan tecnico"
+
+

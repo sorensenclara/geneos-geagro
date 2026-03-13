@@ -1,9 +1,7 @@
 from django.contrib import admin
 from user.admin.adminSite import adminSite
-from user.models.userProducer import UserProducer
-from sale.models.salesReceipt import SalesReceipt
-
-
+from user.models.user_producer import UserProducer
+from sale.models.sales_receipt import SalesReceipt
 
 
 class SalesReceiptAdmin(admin.ModelAdmin):

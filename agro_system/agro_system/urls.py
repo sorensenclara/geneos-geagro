@@ -24,8 +24,7 @@ from agro_system.admin_dashboard import custom_admin_dashboard
 from django.views.generic import RedirectView
 from operation.views import calendar_json, calendar_view
 from django.contrib.auth.decorators import login_required
-from .views import MyPasswordChangeView, MyPasswordSetView, kanbanboard_view, weather_view, alert_view, wines_view, calendar_front_view
-
+from .views.user_views import MyPasswordChangeView, MyPasswordSetView
 
 urlpatterns = [
     path('admin/dashboard/', custom_admin_dashboard, name='custom_admin_dashboard'),  # Usa la vista correcta
@@ -37,17 +36,10 @@ urlpatterns = [
     path('operation/', include('operation.urls'), name='operationsUrls'), # urls de operaciones
     path('json/', calendar_json, name='calendar_json'),
     path('calendar/', calendar_view, name='calendar_view'),
-    path('dashboard/', views.dashboard, name='dashboard'),
+    #path('dashboard/', views.dashboard, name='dashboard'),
 
-    path('', views.dashboard, name='dashboard'),
-    path('calendarboard',view=calendar_front_view,name="calendarboard"),
-
-    path('weather',view=weather_view,name="weather"),
-    path('alert',view=alert_view,name="alert"),
-    path('wines',view=wines_view,name="wines"),
-    path('kanbanboard',view=kanbanboard_view,name="kanbanboard"),
-
-
+    # Dashboard
+    path('', include('agro_system.urls_dashboard'), name='dashboard'),
 
     # =========================
     # Account / Auth

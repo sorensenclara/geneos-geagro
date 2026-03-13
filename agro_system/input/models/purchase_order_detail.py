@@ -1,14 +1,14 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from producer.models.costCenter import CostCenter
-from .purchaseOrder import PurchaseOrder
+from producer.models.cost_center import CostCenter
+from .purchase_order import PurchaseOrder
 from .input import Input
 
 
 
 class PurchaseOrderDetail(models.Model):
 
-    """ Modelo para representar el los detalles de la orden de compra """
+    """ Modelo para representar los detalles de la orden de compra """
 
 
     purchase_order = models.ForeignKey(PurchaseOrder, models.CASCADE,  verbose_name = _('purchase order'))

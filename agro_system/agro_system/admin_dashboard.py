@@ -12,10 +12,8 @@ def custom_admin_dashboard(request):
     # Recorrer los lotes e imprimir latitud y longitud
     lotes = Lot.objects.all()
     for lote in lotes:
-        print(f"Lote: {lote.name} - Latitud: {lote.ubication.y}, Longitud: {lote.ubication.x}")
-
-
-
+        if lote.ubication:
+            print(f"Lote: {lote.name} - Latitud: {lote.ubication.y}, Longitud: {lote.ubication.x}")
 
     precios = get_quotes_bcr()
     context = adminSite.each_context(request)

@@ -1,12 +1,12 @@
 from django.db import models
-from producer.models.countryside import Countryside
+from producer.models.country_side import Countryside
 from parameter.models.area import Area
 from django.utils.translation import gettext_lazy as _
 from producer.models.staff import Staff
 from operation.models.activity import Activity
 from parameter.models.campaign import Campaing
 from producer.models.lot import Lot
-from parameter.models.cultivationState import CiltivationState
+from parameter.models.cultivation_state import CiltivationState
 from parameter.models.port import Port
 
 # Create your models here.

@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .workOrder import WorkOrder
+from .work_order import WorkOrder
 from input.models.input import Input
 
 class InputWorkOrder(models.Model):

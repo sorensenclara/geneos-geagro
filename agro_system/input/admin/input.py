@@ -1,7 +1,7 @@
 from django.contrib import admin
 from user.admin.adminSite import adminSite
-from input.models.purchaseOrder import PurchaseOrder
-from input.models.purchaseOrderDetail import PurchaseOrderDetail
+from input.models.purchase_order import PurchaseOrder
+from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.input import Input
 from django.utils.translation import gettext_lazy as _
 

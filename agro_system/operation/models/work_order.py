@@ -5,7 +5,7 @@ from parameter.models.area import Area
 from datetime import datetime, time
 from parameter.models.campaign import Campaing
 from operation.models.service import Service
-from parameter.models.otState import OTState
+from parameter.models.ot_state import OTState
 from producer.models.staff import Staff
 
 

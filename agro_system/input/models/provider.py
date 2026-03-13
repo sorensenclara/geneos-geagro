@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .typeProvider import TypeProvider 
+from .type_provider import TypeProvider 
 from agro_system.validacions import validation_cuit 
 from parameter.models.city import City
 

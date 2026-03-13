@@ -1,9 +1,9 @@
 from django.contrib import admin
 from user.admin.adminSite import adminSite
-from operation.models.technicalPlanInput import TechnicalPlanInput
-from operation.models.technicalPlanDetail import TechnicalPlanDetail
-from operation.models.technicalPlan import TechnicalPlan
-from user.models.userProducer import UserProducer
+from operation.models.technical_plan_input import TechnicalPlanInput
+from operation.models.technical_plan_detail import TechnicalPlanDetail
+from operation.models.technical_plan import TechnicalPlan
+from user.models.user_producer import UserProducer
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 

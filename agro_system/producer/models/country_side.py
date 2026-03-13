@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from parameter.models.countrysideCondition import CountrysideCondition
+from parameter.models.countryside_condition import CountrysideCondition
 from .staff import Staff
-from .costCenter import CostCenter
+from .cost_center import CostCenter
 from parameter.models.city import City
 from .store import Store
 

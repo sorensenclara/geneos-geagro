@@ -1,7 +1,7 @@
 from django.contrib import admin
 from user.admin.adminSite import adminSite
 from producer.models.staff import Staff
-from user.models.userProducer import UserProducer
+from user.models.user_producer import UserProducer
 from producer.models.staff import Staff
 
 class StaffAdmin(admin.ModelAdmin):

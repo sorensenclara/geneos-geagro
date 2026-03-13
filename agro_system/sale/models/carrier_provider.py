@@ -1,6 +1,6 @@
 from django.db import models
 from input.models import Provider
-from input.models.typeProvider import TypeProvider
+from input.models.type_provider import TypeProvider
 from django.utils.translation import gettext_lazy as _
 
 

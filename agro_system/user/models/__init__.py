@@ -1,3 +1,3 @@
-from .userExtend import UserExtend
-from .userOrganization import UserOrganization
-from .userProducer import UserProducer
+from .user_extend import UserExtend
+from .user_organization import UserOrganization
+from .user_producer import UserProducer

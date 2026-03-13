@@ -1,10 +1,10 @@
 from django.contrib import admin, messages
 from user.admin.adminSite import adminSite
-from input.models.purchaseReception import PurchaseReception
-from input.models.purchaseReceptionDetail import PurchaseReceptionDetail
-from user.models.userProducer import UserProducer
+from input.models.purchase_reception import PurchaseReception
+from input.models.purchase_reception_detail import PurchaseReceptionDetail
+from user.models.user_producer import UserProducer
 from django.utils.translation import gettext_lazy as _
-from input.models.purchaseOrderDetail import PurchaseOrderDetail
+from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.input import Input
 
 @admin.action(description=_("Process Reception"))

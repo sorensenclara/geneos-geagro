@@ -1,5 +1,5 @@
-from .userExtend import UserExtendAdmin
-from user.models.userOrganization import UserOrganization
+from .user_extend import UserExtendAdmin
+from user.models.user_organization import UserOrganization
 from django.contrib.auth.models import Group
 from user.admin.adminSite import adminSite
 

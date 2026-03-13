@@ -1,7 +1,7 @@
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .technicalPlan import TechnicalPlan
+from .technical_plan import TechnicalPlan
 from operation.models.service import Service
 
 

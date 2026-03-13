@@ -1,8 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
-from .models.userProducer import UserProducer
-from .models.userOrganization import UserOrganization
+from .models.user_producer import UserProducer
+from .models.user_organization import UserOrganization
 
 @receiver(post_save, sender=UserProducer)
 def add_producer_group(sender, instance, created, **kwargs):

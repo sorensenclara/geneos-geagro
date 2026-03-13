@@ -1,6 +1,6 @@
 from django.contrib import admin
 from user.admin.adminSite import adminSite
-from sale.models.carrierProvider import Carrier
+from sale.models.carrier_provider import Carrier
 from sale.models.driver import Driver
 
 

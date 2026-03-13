@@ -1,12 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .typeSalesReceipt import TypeSalesReceipt
+from .type_sales_receipt import TypeSalesReceipt
 from agro_system.validacions import validation_cuit 
 from datetime import date
 from parameter.models.currency import Currency
 from parameter.models.campaign import Campaing
 from parameter.models.specie import Specie
-from producer.models.costCenter import CostCenter
+from producer.models.cost_center import CostCenter
 from input.models.provider import Provider
 from sale.models.driver import Driver
 

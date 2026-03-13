@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum
 from datetime import datetime
 #from dateutil.relativedelta import relativedelta
-from input.models.purchaseReceptionDetail import PurchaseReceptionDetail
+from input.models.purchase_reception_detail import PurchaseReceptionDetail
 from input.models.input import Input
 
 class MiAdmin(AdminSite):

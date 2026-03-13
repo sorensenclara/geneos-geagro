@@ -1,5 +1,5 @@
 from django.db import models
-from .userExtend import UserExtend
+from .user_extend import UserExtend
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
 

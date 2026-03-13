@@ -1,11 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from producer.models.store import Store
-from .purchaseOrder import PurchaseOrder
+from .purchase_order import PurchaseOrder
 
 class PurchaseReception(models.Model):
 
-    """ Modelo para representar la la recepcion de la compra """
+    """ Modelo para representar la recepcion de la compra """
 
     states = [
         ('pending', _('pending')),

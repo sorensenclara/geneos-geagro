@@ -50,6 +50,7 @@ DJANGO_APPS = [
     'django.contrib.sites', # Necesario para dj-rest-auth
     'django.contrib.gis',
 ]
+
 THIRD_PARTY_APPS = [
     'jazzmin',
     'rest_framework',
@@ -178,8 +179,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
 ]
-print("*******************************")
-print(STATICFILES_DIRS)
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -273,24 +273,18 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": False,
 
 
-    # Hide these apps when generating side menu e.g (auth)
+    # Lista de apps a ocultar en el menú lateral
     "hide_apps": [],
 
-    # Hide these models when generating side menu (e.g auth.user)
+    # Lista de modelos a ocultar en el menú lateral
     "hide_models": [],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": ["Crear Colmenas"],
+    "order_with_respect_to": [],
 
-    # Custom links to append to app groups, keyed on app name
+    # Agregar links manuales al menú del admin
     "custom_links": {
         "operation": [
-        # {
-        #     "name": "Estadisticas", 
-        #     "url": "/estadisticas/", 
-        #     "icon": "fas fa-comments",
-        #     "order": 1
-        # },
         {
             "name": "Calendar work orders", 
             "url": "/calendar/", 
@@ -326,8 +320,9 @@ JAZZMIN_SETTINGS = {
     #############
     # UI Tweaks #
     #############
-    # Relative paths to custom CSS/JS scripts (must be present in static files)
-    # "custom_css": None,
+    
+    # PERSONALIZACIÓN DE LA INTERFAZ
+
     "custom_css": "css/jazzmin_custom.css",
     "custom_js": None,
     # Whether to link font from fonts.googleapis.com (use custom_css to supply font otherwise)
@@ -463,8 +458,6 @@ MESSAGE_TAGS = {
 # =========================
 # EMAIL (DEV: no rompe login)
 # =========================
-# Con esto, Allauth "envía" emails a consola (terminal) y NO explota por from vacío.
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@localhost")
 
 # Si algún paquete usa SERVER_EMAIL:
@@ -500,10 +493,6 @@ ACCOUNT_FORMS = {
     "reset_password_from_key": "agro_system.forms.PasswordResetKeyForm",
 }
 
-# Sites framework
-# OJO: en sqlite nueva normalmente el Site es ID=1.
-# Si dejás SITE_ID=3 y no existe, rompe flujos de allauth/socialaccount.
-SITE_ID = int(os.environ.get("SITE_ID", "1"))
 
 # Provider Configurations
 SOCIALACCOUNT_PROVIDERS = {

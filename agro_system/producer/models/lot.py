@@ -1,12 +1,12 @@
 from django.contrib.gis.db import models as geomodels
 from django.db import models
-from .countryside import Countryside
+from .country_side import Countryside
 from parameter.models.area import Area
 from django.utils.translation import gettext_lazy as _
-from parameter.models.countrysideCondition import CountrysideCondition
+from parameter.models.countryside_condition import CountrysideCondition
 from .staff import Staff
-from .costCenter import CostCenter
-from parameter.models.lotRating import LotRating
+from .cost_center import CostCenter
+from parameter.models.lot_rating import LotRating
 from operation.models.activity import Activity
 
 

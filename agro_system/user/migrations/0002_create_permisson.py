@@ -19,10 +19,8 @@ def create_producer_group(apps, schema_editor):
     
     # Buscar todos los contenttypes de esas apps
     cts = ContentType.objects.filter(app_label__in=apps_to_include)
-
     # Traer todos los permisos asociados a esos contenttypes
     permissions = Permission.objects.filter(content_type__in=cts)
-
     # Asignarlos al grupo
     group.permissions.add(*permissions)
     group.save()

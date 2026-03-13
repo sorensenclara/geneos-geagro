@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .crop import Crop
-from parameter.models.varCropTechnique import VarCropTechnique
+from parameter.models.var_crop_technique import VarCropTechnique
 from ckeditor.fields import RichTextField
 
 # Create your models here.

@@ -1,7 +1,7 @@
 from django.db import models
-from .userExtend import UserExtend
+from .user_extend import UserExtend
 from django.contrib.auth.models import Group
-from .userOrganization import UserOrganization
+from .user_organization import UserOrganization
 from django.utils.translation import gettext_lazy as _
 from agro_system.validacions import validation_cuit 
 from parameter.models.city import City

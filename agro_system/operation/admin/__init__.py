@@ -1,4 +1,4 @@
 from .admin import adminSite 
-from .technicalPlan import *
+from .technical_plan import *
 from .crop import *
-from .workOder import *
+from .work_order import *
