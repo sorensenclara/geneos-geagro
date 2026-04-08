@@ -30,6 +30,9 @@ class Lot(geomodels.Model):
     ubication = geomodels.PointField(srid=4326, blank=True, null=True)
     delimitation = geomodels.PolygonField(srid=4326, blank=True, null=True)
 
+    is_main = models.BooleanField(default=False, verbose_name = _('is main lot'), help_text=_('Indicates if this lot is the main lot of the staff. Only one lot can be the main lot for a staff.'))
+    
+    
     def __str__(self):
         return f"{self.name}"
 
@@ -37,3 +40,5 @@ class Lot(geomodels.Model):
         verbose_name = _('lot')
         verbose_name_plural = _('lots')
         ordering = ['name']
+
+    

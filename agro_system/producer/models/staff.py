@@ -31,7 +31,7 @@ class Staff(models.Model):
     state = models.CharField(max_length=15, choices=states, default="Activo", verbose_name = _('state') )
     discharged = models.DateField(null=True, blank=True, verbose_name = _('discharged') )
     producer = models.ForeignKey('user.UserProducer', models.CASCADE, verbose_name = _('producer'))
-
+    user = models.OneToOneField('user.UserExtend', on_delete=models.CASCADE, null=True, related_name='staff_user', verbose_name = _('user'), help_text=_('User associated with the staff member.'))
 
     def __str__(self):
         return f"{self.name} {self.surname}"
@@ -41,3 +41,7 @@ class Staff(models.Model):
         verbose_name_plural = _('staff')
     
 
+    def save(self, *args, **kwargs):
+        self.email = self.user.email if self.user else self.email
+        super().save(*args, **kwargs)
+        

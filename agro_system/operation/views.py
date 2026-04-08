@@ -6,7 +6,8 @@ from django.template.loader import get_template
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages 
-# Create your views here.
+
+
 def WorkOrderPDFView(request):
 
     # Recupera los registros correspondientes a las ordenes

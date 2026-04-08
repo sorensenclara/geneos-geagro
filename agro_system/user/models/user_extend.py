@@ -70,6 +70,8 @@ class UserExtend(AbstractUser):
             ('Administration', _('General administration')),
             ('Organization', _('Organization')),
             ('Producer', _('Producer')),
+            ('Staff', _('Staff')), 
+
         ]
     
     username = None

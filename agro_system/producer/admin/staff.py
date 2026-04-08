@@ -1,12 +1,12 @@
 from django.contrib import admin
 from user.admin.adminSite import adminSite
-from producer.models.staff import Staff
 from user.models.user_producer import UserProducer
 from producer.models.staff import Staff
 
 class StaffAdmin(admin.ModelAdmin):
 
-    list_display = ['name','surname','cuit','city','type','gender']
+
+    list_display = ['name','surname','cuit','city','type','gender','user']
     list_filter = ['city','type','gender']
     search_fields = ['name', 'surname','cuit','city','type','gender']
 

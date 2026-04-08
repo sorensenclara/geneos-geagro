@@ -25,6 +25,8 @@ from django.views.generic import RedirectView
 from operation.views import calendar_json, calendar_view
 from django.contrib.auth.decorators import login_required
 from .views.user_views import MyPasswordChangeView, MyPasswordSetView
+from weather.views import weather_ingest
+
 
 urlpatterns = [
     path('admin/dashboard/', custom_admin_dashboard, name='custom_admin_dashboard'),  # Usa la vista correcta
@@ -37,6 +39,11 @@ urlpatterns = [
     path('json/', calendar_json, name='calendar_json'),
     path('calendar/', calendar_view, name='calendar_view'),
     #path('dashboard/', views.dashboard, name='dashboard'),
+    
+
+
+    path("api/report/", weather_ingest),  #OBTENER CLIMA DESDE LA API EXTERNA Y GUARDARLO EN LA BASE DE DATOS
+
 
     # Dashboard
     path('', include('agro_system.urls_dashboard'), name='dashboard'),

@@ -6,6 +6,7 @@ from producer.models.lot import Lot
 import requests
 
 
+# TODO esto no se esta usando, es la vista del dashboard del admin
 @staff_member_required
 def custom_admin_dashboard(request):
 
@@ -36,6 +37,6 @@ def custom_admin_dashboard(request):
         context['clima_forecast'] = forecast_response.json()
     except Exception:
         context['clima_forecast'] = []
-    print("Pronóstico del clima obtenido:", context['clima_forecast'])
+    # print("Pronóstico del clima obtenido:", context['clima_forecast'])
 
     return render(request, 'admin/custom_dashboard.html', context)

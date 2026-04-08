@@ -77,7 +77,9 @@ LOCAL_APPS = [
     'producer',
     'operation',
     'input',
-    'sale'
+    'sale',
+    'alert',
+    'weather',
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + LOCAL_APPS + DJANGO_APPS
@@ -429,9 +431,11 @@ CORS_ALLOW_CREDENTIALS = True
 #CORS_ALLOW_ALL_ORIGINS = True  # Permite todas las solicitudes CORS 
 
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email'   # Login
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'   # Login
+ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_EMAIL_REQUIRED = True   # Login
-ACCOUNT_USERNAME_REQUIRED = False   # Login
+# ACCOUNT_USERNAME_REQUIRED = False   # Login
+ACCOUNT_SIGNUP_FIELDS = False
 
 # envio de mail
 EMAIL_BACKEND = env('EMAIL_BACKEND')

@@ -17,7 +17,7 @@ class UserProducerAdmin(UserExtendAdmin):
     Administrador del modelo Usuario productor
     """
 
-    inlines = [StaffInline]
+    #inlines = [StaffInline]
     list_display = ('name', 'email', 'cuit', 'address')
     fieldsets = (
         (None, {'fields': ('name', 'cuit', 'address','city', 'phone', 'organization', 'email', 'password', 'prefix', 'sequence')}),
