@@ -88,3 +88,4 @@ python manage.py migrate
 
 Hay 1 migracion para crear el grupo Productor y quitarle el permiso de ver la app Parameter
 Hay 1 migracion para importar provincias y otra para ciudades de Argentina
+
