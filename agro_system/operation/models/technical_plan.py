@@ -14,7 +14,7 @@ class TechnicalPlan(models.Model):
     code = models.CharField(max_length=100, verbose_name= _('code'))
     detail = models.TextField(null=True, blank=True,  verbose_name= _('detail'))
     # Referencia para los cálculos proporcionales
-    hectares = models.IntegerField(verbose_name= _('proportion of hectares'), default=10)
+    hectares = models.FloatField(verbose_name= _('proportion of hectares'), default=10)
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE,verbose_name= _('activity '))
     area = models.ForeignKey(Area, on_delete=models.CASCADE, verbose_name= _('area'))
     # Permite filtrar planes específicos de las empresas que no se comparten.

@@ -13,6 +13,8 @@ from operation.models.work_order import WorkOrder
 from operation.models.crop import Crop
 from producer.models.staff import Staff
 from django.utils import timezone
+from weather.models import WeatherData
+
 
 # Panel principal
 @login_required
@@ -75,7 +77,7 @@ def DashboardView(request):
     today = timezone.now().date()
     work_orders = work_orders.filter(date_init__gte=today).order_by('date_init')[:3]
 
-
+    weather_data = WeatherData.objects.last() 
     data = {
         'country_sides': country_sides,
         'lots': lots,
@@ -86,6 +88,7 @@ def DashboardView(request):
         'selected_countryside': countryside_id,
         'selected_lot': lot_id,
         'selected_campaing': campaing_id,
+        'weather_data': weather_data
     }
     return render(request, 'pages/dashboard.html', data)
 

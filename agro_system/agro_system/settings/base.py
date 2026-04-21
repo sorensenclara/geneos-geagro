@@ -434,6 +434,7 @@ CORS_ALLOW_CREDENTIALS = True
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'   # Login
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_EMAIL_REQUIRED = True   # Login
+ACCOUNT_SIGNUP_FIELDS = ['email', 'username', 'password1', 'password2']
 # ACCOUNT_USERNAME_REQUIRED = False   # Login
 ACCOUNT_SIGNUP_FIELDS = False
 

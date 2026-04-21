@@ -47,7 +47,7 @@ def calendar_json(request):
         data.append({
             'title': f"{order.code} ({order.producer} - {order.campaing})",
             'start': order.init_order.isoformat(),
-            'url': f'/admin/operations/workorder/{order.id}/change/',  # Opcional: enlace al admin
+            'url': f'/admin/operation/workorder/{order.id}/change/',  # Opcional: enlace al admin
         })
     return JsonResponse(data, safe=False)
 

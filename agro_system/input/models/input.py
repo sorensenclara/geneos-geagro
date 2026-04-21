@@ -12,7 +12,6 @@ class Input(models.Model):
     name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
     type = models.ForeignKey(TypeInput, verbose_name = _('type of input'), on_delete=models.CASCADE)
     unit_measure = models.ForeignKey(MaensureUnit, models.CASCADE, verbose_name = _('unit of measure'))
-    category = models.ForeignKey(CategoryInput, models.CASCADE, verbose_name = _('category'))
     presentation = models.CharField(max_length=200, null=True, blank=True, verbose_name = _('presentation'))
     cost = models.FloatField(default=0, verbose_name = _('cost'))
     currency = models.ForeignKey(Currency, models.CASCADE, verbose_name=_('currency'))

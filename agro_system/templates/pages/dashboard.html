@@ -113,6 +113,9 @@
                     </div>
                     </div>
 
+
+
+                        <!--  MODIFICADO FLOR  -->
                     <!-- 4) CLIMA AGRONÓMICO 48h -->
                     <div class="col-xl-3 col-md-6 geagro-kpi">
                     <div class="card h-100 geagro-card-weatherVisual">
@@ -126,30 +129,35 @@
                         <div class="geagro-kpi-content">
 
                             <div class="geagro-weather-metrics mb-2">
-                            <div class="metric"><i class="mdi mdi-thermometer"></i><span>Media 24°</span></div>
-                            <div class="metric"><i class="mdi mdi-arrow-up"></i><span>Máx 30°</span></div>
-                            <div class="metric"><i class="mdi mdi-arrow-down"></i><span>Mín 18°</span></div>
+                            <div class="metric"><i class="mdi mdi-thermometer"></i><span>Temp {{weather_data.temp}} °C</span></div>
+                            <div class="metric"><i class="mdi mdi-arrow-up"></i><span>Máx 30° (FALSO) </span></div>
+                            <div class="metric"><i class="mdi mdi-arrow-down"></i><span>Mín 18° (FALSO) </span></div>
                             </div>
 
                             <div class="geagro-weather-metrics mb-2">
-                            <div class="metric"><i class="mdi mdi-weather-rainy"></i><span>Precip 12 mm</span></div>
-                            <div class="metric"><i class="mdi mdi-weather-windy"></i><span>Viento 22 km/h N</span></div>
+                            <div class="metric"><i class="mdi mdi-weather-rainy"></i><span>Precip {{weather_data.rain_total}} mm</span></div>
+                            <div class="metric"><i class="mdi mdi-weather-windy"></i><span>Viento {{weather_data.wind_speed}} km/h {{weather_data.wind_dir}}</span></div>
                             </div>
 
                             <div class="geagro-weather-metrics">
-                            <div class="metric"><i class="mdi mdi-water-outline"></i><span>Hoja mojada 320 min</span></div>
+                            <div class="metric"><i class="mdi mdi-water-outline"></i><span>Lluvia semanal {{weather_data.rain_week}} mm</span></div>
+                            <div class="metric"><i class="mdi mdi-water-outline"></i><span>Ultima actualizacion: {{weather_data.timestamp}} </span></div>
                             </div>
 
                         </div>
 
                         <div class="geagro-card-footer">
-                            <span class="geagro-badge geagro-badge-warning">Condición crítica</span>
-                            <a href="#" class="small">Ver más</a>
+                            <span class="geagro-badge geagro-badge-warning">Condición crítica (falso) </span>
+                            <a href="{% url 'weather' %}" class="small">Ver más</a>
                         </div>
 
                         </div>
                     </div>
                     </div>
+                     <!--  MODIFICADO FLOR  -->
+
+
+
 
                 </div>
                 </div>

@@ -8,8 +8,8 @@ from leaflet.admin import LeafletGeoAdmin
 
 # Register your models here.
 class LotAdmin(LeafletGeoAdmin):
-    list_display = ['name', 'countryside', 'condition', 'responsible', 'hectares_productive', 'cost_center']
-    list_filter = ['condition','responsible']
+    list_display = ['name', 'countryside', 'responsible', 'hectares_productive', 'cost_center']
+    list_filter = ['responsible']
     search_fields = ['name']
 
         

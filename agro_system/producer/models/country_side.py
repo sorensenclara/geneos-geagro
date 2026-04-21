@@ -12,7 +12,7 @@ class Countryside(models.Model):
 
     name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
     condition = models.ForeignKey(CountrysideCondition, models.CASCADE, verbose_name = _('countryside condition'))
-    hectares = models.IntegerField(default=0, verbose_name = _('hectares'))
+    hectares = models.FloatField(default=0, verbose_name = _('hectares'))
     responsible = models.ForeignKey(Staff, models.CASCADE,verbose_name = _('responsible'))
     address = models.CharField(max_length=50, verbose_name = _('address'))
     city = models.ForeignKey(City, models.CASCADE, verbose_name = _('city'))

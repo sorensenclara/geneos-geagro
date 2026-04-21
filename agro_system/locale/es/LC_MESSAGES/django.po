@@ -1,0 +1,1345 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-21 12:27+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
+
+#: agro_system/settings/base.py:170
+msgid "Español"
+msgstr ""
+
+#: alert/apps.py:7 alert/models/alert.py:20
+msgid "alerts"
+msgstr "Alertas"
+
+#: alert/models/alert.py:10 alert/models/indicator.py:11
+#: alert/models/variable_register.py:10 input/models/category_input.py:9
+#: input/models/input.py:12 input/models/type_input.py:10
+#: input/models/type_provider.py:10 operation/models/activity.py:11
+#: operation/models/crop.py:18 operation/models/service.py:10
+#: operation/models/service_type.py:8 operation/models/stage.py:9
+#: parameter/models/action.py:8 parameter/models/area.py:8
+#: parameter/models/campaign.py:9 parameter/models/city.py:10
+#: parameter/models/country.py:8 parameter/models/countryside_condition.py:8
+#: parameter/models/cultivation_state.py:9 parameter/models/currency.py:8
+#: parameter/models/gender.py:8 parameter/models/lot_rating.py:8
+#: parameter/models/measure_unit.py:8 parameter/models/ot_state.py:9
+#: parameter/models/port.py:10 parameter/models/province.py:10
+#: parameter/models/specie.py:8 parameter/models/type_var_crop_technique.py:8
+#: parameter/models/var_crop_technique.py:10 producer/models/cost_center.py:8
+#: producer/models/country_side.py:13 producer/models/lot.py:16
+#: producer/models/staff.py:20 producer/models/store.py:10
+#: producer/models/typeStaff.py:10 sale/models/driver.py:11
+#: sale/models/type_sales_receipt.py:8 user/models/notification.py:10
+#: weather/models/station_weather.py:7
+msgid "name"
+msgstr "Nombre"
+
+#: alert/models/alert.py:11 alert/models/indicator.py:29
+msgid "indicator"
+msgstr "Indicador"
+
+#: alert/models/alert.py:12 alert/models/variable_register.py:12
+#: input/models/purchase_order.py:19
+#: operation/models/technical_crop_detail.py:17
+#: parameter/models/exchange_rate.py:12 sale/models/sales_receipt.py:17
+#: user/models/notification.py:12
+msgid "date"
+msgstr "Fecha"
+
+#: alert/models/alert.py:13 alert/models/variable_register.py:14
+#: operation/models/crop_yields.py:18
+#: operation/models/technical_crop_detail.py:18
+#: operation/models/technical_plan.py:15
+#: operation/models/technical_plan_input.py:19 user/models/notification.py:13
+msgid "detail"
+msgstr "detalles"
+
+#: alert/models/alert.py:19
+msgid "alert"
+msgstr "Alerta"
+
+#: alert/models/indicator.py:12
+msgid "variable one"
+msgstr "Primera variable"
+
+#: alert/models/indicator.py:13
+msgid "max variable one"
+msgstr "Maximo de la primera variable"
+
+#: alert/models/indicator.py:14
+msgid "min variable one"
+msgstr "Minimo de la primera variable"
+
+#: alert/models/indicator.py:15
+msgid "variable two"
+msgstr "Segunda variable"
+
+#: alert/models/indicator.py:16
+msgid "max variable two"
+msgstr "Maximo de la segunda variable"
+
+#: alert/models/indicator.py:17
+msgid "min variable two"
+msgstr "Minimo de la segunda variable"
+
+#: alert/models/indicator.py:18
+msgid "variable three"
+msgstr "Tercera variable"
+
+#: alert/models/indicator.py:19
+msgid "max variable three"
+msgstr "Maximo de tercera variable"
+
+#: alert/models/indicator.py:20
+msgid "min variable three"
+msgstr "Minimo de tercera variable"
+
+#: alert/models/indicator.py:21
+msgid "user alert"
+msgstr "Usuarios a reportar"
+
+#: alert/models/indicator.py:22
+msgid "report mails"
+msgstr "Emails a notificar"
+
+#: alert/models/indicator.py:23 operation/models/crop.py:45
+msgid "crops"
+msgstr "Cultivos"
+
+#: alert/models/indicator.py:30
+msgid "indicators"
+msgstr "Indicadores"
+
+#: alert/models/variable_register.py:11
+#: operation/models/technical_crop_detail.py:15
+msgid "variable"
+msgstr "Variable"
+
+#: alert/models/variable_register.py:13 operation/models/partner_crop.py:15
+#: operation/models/technical_crop_detail.py:16
+msgid "value"
+msgstr "Valor"
+
+#: alert/models/variable_register.py:15 producer/models/lot.py:33
+#: weather/models/station_weather.py:16 weather/models/weather_data.py:10
+msgid "weather station"
+msgstr "Estación meteorologica"
+
+#: alert/models/variable_register.py:21
+msgid "variable register"
+msgstr "Registro de variables"
+
+#: alert/models/variable_register.py:22
+msgid "variable registers"
+msgstr "Registros de variables"
+
+#: input/admin/input.py:19
+msgid "Order Date"
+msgstr "Fecha de orden"
+
+#: input/admin/input.py:21
+msgid "Purchases"
+msgstr "Compras"
+
+#: input/admin/input.py:22
+msgid "Purchase"
+msgstr "Compra"
+
+#: input/admin/purchase_order.py:12
+msgid "Process Purchase Order"
+msgstr "Procesar orden de compra"
+
+#: input/admin/purchase_order.py:23
+msgid "Pending purchases"
+msgstr "Imprimir compras pendientes"
+
+#: input/admin/purchase_reception.py:10
+msgid "Process Reception"
+msgstr "Procesar recepción de compras"
+
+#: input/apps.py:7 input/models/input.py:28
+msgid "inputs"
+msgstr "Insumos"
+
+#: input/models/category_input.py:15
+msgid "Category of inputs"
+msgstr "Categoria de insumos"
+
+#: input/models/category_input.py:16
+msgid "Categories of inputs"
+msgstr "Categorias de insumos"
+
+#: input/models/input.py:13
+msgid "type of input"
+msgstr "Tipo de insumo"
+
+#: input/models/input.py:14 parameter/models/measure_unit.py:18
+msgid "unit of measure"
+msgstr "Unidad de medida"
+
+#: input/models/input.py:15
+msgid "presentation"
+msgstr "Presentación"
+
+#: input/models/input.py:16
+msgid "cost"
+msgstr "Precio"
+
+#: input/models/input.py:17 parameter/models/currency.py:14
+#: sale/models/sales_receipt.py:20
+msgid "currency"
+msgstr "Moneda"
+
+#: input/models/input.py:18
+msgid "control of stock"
+msgstr "Control de stock"
+
+#: input/models/input.py:19
+msgid "stock"
+msgstr "Stock"
+
+#: input/models/input.py:20 input/models/purchase_order.py:14
+#: input/models/purchase_reception.py:11
+msgid "pending"
+msgstr "Pendiente"
+
+#: input/models/input.py:21
+msgid "control of lot"
+msgstr "Control de lote"
+
+#: input/models/input.py:27 input/models/purchase_order_detail.py:15
+#: input/models/purchase_reception_detail.py:15
+#: operation/models/input_work_order.py:10
+#: operation/models/technical_plan_input.py:17
+msgid "input"
+msgstr "Insumo"
+
+#: input/models/provider.py:12 user/models/user_producer.py:14
+msgid "name_company"
+msgstr "Razon social"
+
+#: input/models/provider.py:13 input/models/type_provider.py:16
+msgid "type of provider"
+msgstr "Tipo de proveedores"
+
+#: input/models/provider.py:15 producer/models/country_side.py:17
+#: producer/models/staff.py:23 producer/models/store.py:11
+#: sale/models/driver.py:13 user/models/user_organization.py:15
+#: user/models/user_producer.py:16
+msgid "address"
+msgstr "Dirección"
+
+#: input/models/provider.py:16 parameter/models/city.py:17
+#: parameter/models/port.py:11 producer/models/country_side.py:18
+#: producer/models/staff.py:24 producer/models/store.py:12
+#: sale/models/driver.py:14 user/models/user_producer.py:17
+msgid "city"
+msgstr "Ciudad"
+
+#: input/models/provider.py:17 producer/models/country_side.py:19
+#: producer/models/staff.py:25 sale/models/driver.py:15
+#: user/models/user_producer.py:18
+msgid "phone"
+msgstr "Telefono"
+
+#: input/models/provider.py:18 producer/models/country_side.py:20
+#: producer/models/staff.py:26 sale/models/driver.py:16
+#: user/models/user_extend.py:78
+msgid "email"
+msgstr "email"
+
+#: input/models/provider.py:25 input/models/purchase_order.py:23
+#: sale/models/sales_receipt.py:29
+msgid "provider"
+msgstr "Proveedor"
+
+#: input/models/provider.py:26
+msgid "providers"
+msgstr "Proveedores"
+
+#: input/models/purchase_order.py:15 input/models/purchase_reception.py:12
+msgid "confirm"
+msgstr "Confirmada"
+
+#: input/models/purchase_order.py:16 input/models/purchase_reception.py:13
+msgid "cancel"
+msgstr "Cancelada"
+
+#: input/models/purchase_order.py:18 sale/models/sales_receipt.py:19
+msgid "number"
+msgstr "Numero"
+
+#: input/models/purchase_order.py:20 input/models/purchase_reception.py:17
+msgid "delivery date"
+msgstr "Fecha de entrega"
+
+#: input/models/purchase_order.py:21 input/models/purchase_reception.py:18
+msgid "reference"
+msgstr "Referencia"
+
+#: input/models/purchase_order.py:22
+msgid "applicant"
+msgstr "Solicitante"
+
+#: input/models/purchase_order.py:25 input/models/purchase_reception.py:20
+#: producer/models/country_side.py:22
+msgid "store"
+msgstr "Almacen"
+
+#: input/models/purchase_order.py:26 input/models/purchase_reception.py:21
+#: operation/models/crop.py:37 operation/models/technical_plan.py:22
+#: operation/models/work_order.py:40 producer/models/country_side.py:24
+#: producer/models/staff.py:33 sale/models/sales_receipt.py:31
+msgid "producer"
+msgstr "Productor"
+
+#: input/models/purchase_order.py:33 input/models/purchase_order_detail.py:14
+#: input/models/purchase_reception.py:16
+#: input/models/purchase_reception_detail.py:14
+msgid "purchase order"
+msgstr "Orden de compra"
+
+#: input/models/purchase_order.py:34
+msgid "purchase orders"
+msgstr "Ordenes de compra"
+
+#: input/models/purchase_order_detail.py:16
+#: input/models/purchase_reception_detail.py:16 sale/models/sales_receipt.py:26
+msgid "amount"
+msgstr "Cantidad"
+
+#: input/models/purchase_order_detail.py:17
+msgid "pending amount"
+msgstr "Cantidad pendiente"
+
+#: input/models/purchase_order_detail.py:18
+msgid "price unit"
+msgstr "Precio unitario"
+
+#: input/models/purchase_order_detail.py:19 sale/models/sales_receipt.py:28
+msgid "taxes"
+msgstr "Impuestos"
+
+#: input/models/purchase_order_detail.py:20
+msgid "price total"
+msgstr "Precio total"
+
+#: input/models/purchase_order_detail.py:21 producer/models/country_side.py:21
+#: producer/models/lot.py:22 sale/models/sales_receipt.py:24
+msgid "cost center"
+msgstr "Centro de costo"
+
+#: input/models/purchase_order_detail.py:36
+msgid "purchase order detail"
+msgstr "Detalle de las ordenes de compra"
+
+#: input/models/purchase_order_detail.py:37
+msgid "purchase order details"
+msgstr "Detalles de ordenes de compra"
+
+#: input/models/purchase_reception.py:28
+msgid "purchase reception"
+msgstr "Recepción de compras"
+
+#: input/models/purchase_reception.py:29
+msgid "purchase receptions"
+msgstr "Recepciones de compras"
+
+#: input/models/purchase_reception_detail.py:23
+msgid "purchase reception detail"
+msgstr "Detalle de la recepcion de compra"
+
+#: input/models/purchase_reception_detail.py:24
+msgid "purchase reception details"
+msgstr "Detalles de las recepciones de compras"
+
+#: input/models/type_input.py:16
+msgid "type of inputs"
+msgstr "Tipo de insumos"
+
+#: input/models/type_input.py:17
+msgid "types of inputs"
+msgstr "Tipos de insumos"
+
+#: input/models/type_provider.py:17
+msgid "types of provider"
+msgstr "Tipos de proveedores"
+
+#: operation/admin/crop.py:21
+msgid "technical details"
+msgstr "Detalles tecnicos"
+
+#: operation/admin/crop.py:28
+msgid "yields"
+msgstr "Rindes"
+
+#: operation/admin/crop.py:36
+msgid "partners"
+msgstr "Socios"
+
+#: operation/admin/crop.py:39
+msgid "Process Plan in Crop"
+msgstr "Procesar plan en cultivo "
+
+#: operation/admin/technical_plan.py:30
+msgid "Duplicate Technical Plan"
+msgstr "Duplicar plan tecnico"
+
+#: operation/admin/work_order.py:15
+msgid "Inputs"
+msgstr "Insumos"
+
+#: operation/admin/work_order.py:30
+msgid "Print work orders"
+msgstr "Imprimir ordenes de trabajo"
+
+#: operation/apps.py:7 producer/models/lot.py:24
+msgid "operations"
+msgstr "Operaciones"
+
+#: operation/models/activity.py:12
+msgid "description"
+msgstr "Descripción"
+
+#: operation/models/activity.py:13 parameter/models/specie.py:14
+msgid "specie"
+msgstr "Especie"
+
+#: operation/models/activity.py:14
+msgid "is agricultural"
+msgstr "Es agricola"
+
+#: operation/models/activity.py:15
+msgid "is livestock"
+msgstr "Es ganadera"
+
+#: operation/models/activity.py:22 operation/models/crop.py:23
+#: operation/models/stage.py:10
+msgid "activity"
+msgstr "Actividad"
+
+#: operation/models/activity.py:23
+msgid "activities"
+msgstr "Actividad"
+
+#: operation/models/crop.py:19
+msgid "campaing"
+msgstr "Campaña"
+
+#: operation/models/crop.py:20 producer/models/country_side.py:30
+#: producer/models/lot.py:17
+msgid "countryside"
+msgstr "Campos"
+
+#: operation/models/crop.py:21 operation/models/technical_plan.py:19
+#: parameter/models/area.py:14 producer/models/lot.py:18
+msgid "area"
+msgstr "Zona"
+
+#: operation/models/crop.py:22 producer/models/lot.py:42
+msgid "lot"
+msgstr "Lote"
+
+#: operation/models/crop.py:24 producer/models/country_side.py:16
+#: producer/models/lot.py:19
+msgid "responsible"
+msgstr "Responsable"
+
+#: operation/models/crop.py:25 producer/models/staff.py:31
+msgid "state"
+msgstr "Estado"
+
+#: operation/models/crop.py:26 producer/models/lot.py:21
+msgid "hectares productive"
+msgstr "Hectareas productivas"
+
+#: operation/models/crop.py:27
+msgid "hectares planted"
+msgstr "Hectareas plantadas"
+
+#: operation/models/crop.py:28
+msgid "hectares unplanted"
+msgstr "Hectareas sin plantar"
+
+#: operation/models/crop.py:29
+msgid "hectares harvested"
+msgstr "Hectareas cosechadas"
+
+#: operation/models/crop.py:30
+msgid "hectares not harvested"
+msgstr "Hectareas sin cosechar"
+
+#: operation/models/crop.py:31
+msgid "inpute bills"
+msgstr "Imputar gasto"
+
+#: operation/models/crop.py:32 parameter/models/port.py:17
+msgid "port"
+msgstr "Puerto"
+
+#: operation/models/crop.py:33 operation/models/work_order.py:23
+#: parameter/models/campaign.py:10
+msgid "date init"
+msgstr "Fecha de inicio"
+
+#: operation/models/crop.py:34
+msgid "freight estimate"
+msgstr "Estimación de flete"
+
+#: operation/models/crop.py:35
+msgid "estimate saranda"
+msgstr "Estimación de saranda"
+
+#: operation/models/crop.py:36
+msgid "estimate secada"
+msgstr "Estimación de secada"
+
+#: operation/models/crop.py:44 operation/models/crop_yields.py:13
+#: operation/models/partner_crop.py:13
+#: operation/models/technical_crop_detail.py:14
+#: operation/models/work_order.py:27
+msgid "crop"
+msgstr "Cultivo"
+
+#: operation/models/crop_yields.py:14
+msgid "date estimate"
+msgstr "Fecha estimada"
+
+#: operation/models/crop_yields.py:15
+msgid "yields estimate"
+msgstr "Rindes estimados"
+
+#: operation/models/crop_yields.py:16
+msgid "date real"
+msgstr "Fecha real"
+
+#: operation/models/crop_yields.py:17
+msgid "yields real"
+msgstr "Rinde real"
+
+#: operation/models/crop_yields.py:29
+msgid "yields crop"
+msgstr "Rinde de cultivo"
+
+#: operation/models/crop_yields.py:30
+msgid "yields crops"
+msgstr "Risdes de cultivo"
+
+#: operation/models/input_work_order.py:9 operation/models/work_order.py:50
+msgid "work order"
+msgstr "Orden de trabajo"
+
+#: operation/models/input_work_order.py:11
+msgid "planned dose"
+msgstr "Dosis planeada"
+
+#: operation/models/input_work_order.py:12
+msgid "dose applied"
+msgstr "Dosis aplicada"
+
+#: operation/models/input_work_order.py:13
+msgid "details"
+msgstr "Detalles"
+
+#: operation/models/input_work_order.py:19
+msgid "input work order"
+msgstr "Insumo de ordenenes de trabajo"
+
+#: operation/models/input_work_order.py:20
+msgid "inputs work orders"
+msgstr "Insumos de ordenes de trabajo"
+
+#: operation/models/partner_crop.py:14
+#: operation/models/technical_plan_detail.py:23
+#: operation/models/work_order.py:39
+msgid "partner"
+msgstr "Socio"
+
+#: operation/models/partner_crop.py:24
+msgid "partner in crop"
+msgstr "Socios en cultivos"
+
+#: operation/models/partner_crop.py:25
+msgid "partners in crops"
+msgstr "Socios en cultivos"
+
+#: operation/models/service.py:11
+msgid "type of service"
+msgstr "Tipo de servicios"
+
+#: operation/models/service.py:17 operation/models/technical_plan_detail.py:17
+#: operation/models/work_order.py:31
+msgid "service"
+msgstr "Servicio"
+
+#: operation/models/service.py:18
+msgid "services"
+msgstr "Servicos"
+
+#: operation/models/service_type.py:14
+msgid "service type"
+msgstr "Tipo de servicos"
+
+#: operation/models/service_type.py:15
+msgid "service types"
+msgstr "Tipos de servicios"
+
+#: operation/models/stage.py:11
+msgid "order"
+msgstr "Orden"
+
+#: operation/models/stage.py:17 operation/models/technical_plan_detail.py:16
+#: operation/models/work_order.py:30
+msgid "stage"
+msgstr "Estadio"
+
+#: operation/models/stage.py:18
+msgid "stages"
+msgstr "Estadios"
+
+#: operation/models/technical_crop_detail.py:26
+msgid "Crop technical detail"
+msgstr "Detalle tecnico de cultivo"
+
+#: operation/models/technical_crop_detail.py:27
+msgid "Crop technical details"
+msgstr "Detalles tecnicos de cultivo"
+
+#: operation/models/technical_plan.py:14 operation/models/work_order.py:21
+msgid "code"
+msgstr "Codigo"
+
+#: operation/models/technical_plan.py:17
+msgid "proportion of hectares"
+msgstr "Proporción de hectareas"
+
+#: operation/models/technical_plan.py:18
+msgid "activity "
+msgstr "Actividad"
+
+#: operation/models/technical_plan.py:21
+#: operation/models/technical_plan_detail.py:19 parameter/models/campaign.py:12
+#: producer/models/staff.py:15
+msgid "active"
+msgstr "Aciva"
+
+#: operation/models/technical_plan.py:28
+#: operation/models/technical_plan_detail.py:14
+#: operation/models/technical_plan_input.py:15
+msgid "technical plan"
+msgstr "Plan tecnico"
+
+#: operation/models/technical_plan.py:29
+msgid "technical plans"
+msgstr "Planes tecnicos"
+
+#: operation/models/technical_plan_detail.py:15
+msgid "secuence"
+msgstr "Secuencia"
+
+#: operation/models/technical_plan_detail.py:18
+msgid "days estimate"
+msgstr "Dias estimados"
+
+#: operation/models/technical_plan_detail.py:20
+msgid "subcontracted"
+msgstr "Subcontratado"
+
+#: operation/models/technical_plan_detail.py:21
+#: operation/models/work_order.py:37
+msgid "contractor"
+msgstr "Contratista"
+
+#: operation/models/technical_plan_detail.py:22
+msgid "with partner"
+msgstr "Con socio"
+
+#: operation/models/technical_plan_detail.py:30
+#: operation/models/technical_plan_detail.py:31
+#: operation/models/technical_plan_input.py:16
+msgid "technical plan detail"
+msgstr "Detalle del plan tecnico"
+
+#: operation/models/technical_plan_input.py:18
+msgid "dose"
+msgstr "Dosis"
+
+#: operation/models/technical_plan_input.py:26
+msgid "technical plan input"
+msgstr "Insumo del plan tecnico"
+
+#: operation/models/technical_plan_input.py:27
+msgid "technical plan inputs"
+msgstr "Insumos del plan tecnico"
+
+#: operation/models/work_order.py:22
+msgid "date emission"
+msgstr "Fecha de emision"
+
+#: operation/models/work_order.py:24
+msgid "date fin"
+msgstr "Fecha de fin"
+
+#: operation/models/work_order.py:26 parameter/models/campaign.py:18
+msgid "campaign"
+msgstr "Campaña"
+
+#: operation/models/work_order.py:28
+msgid "are"
+msgstr "Zona"
+
+#: operation/models/work_order.py:32
+msgid "state ot"
+msgstr "Estado de ordenes de trabajo"
+
+#: operation/models/work_order.py:33 parameter/models/var_crop_technique.py:11
+#: producer/models/staff.py:27
+msgid "type"
+msgstr "Tipo"
+
+#: operation/models/work_order.py:35 producer/models/staff.py:40
+#: producer/models/staff.py:41
+msgid "staff"
+msgstr "Personal"
+
+#: operation/models/work_order.py:51
+msgid "work orders"
+msgstr "Orden de trabajo"
+
+#: parameter/apps.py:7
+msgid "parameters"
+msgstr "Parametros"
+
+#: parameter/models/action.py:9
+msgid "send email"
+msgstr "Enviar email"
+
+#: parameter/models/action.py:10
+msgid "send notification"
+msgstr "Enviar notificación"
+
+#: parameter/models/action.py:16
+msgid "action"
+msgstr "Acción"
+
+#: parameter/models/action.py:17 parameter/models/cultivation_state.py:10
+#: parameter/models/ot_state.py:10
+msgid "actions"
+msgstr "Acciones"
+
+#: parameter/models/area.py:15
+msgid "areas"
+msgstr "Zonas"
+
+#: parameter/models/campaign.py:11
+msgid "date final"
+msgstr "Fecha de fin"
+
+#: parameter/models/campaign.py:19
+msgid "campaigns"
+msgstr "Campañas"
+
+#: parameter/models/city.py:11 parameter/models/province.py:17
+msgid "province"
+msgstr "Provincia"
+
+#: parameter/models/city.py:18
+msgid "cities"
+msgstr "Ciudades"
+
+#: parameter/models/country.py:14 parameter/models/province.py:11
+msgid "country"
+msgstr "Pais"
+
+#: parameter/models/country.py:15
+msgid "countries"
+msgstr "Paises"
+
+#: parameter/models/countryside_condition.py:14
+#: producer/models/country_side.py:14
+msgid "countryside condition"
+msgstr "Condición del campo"
+
+#: parameter/models/countryside_condition.py:15
+msgid "ficountrysideeld conditions"
+msgstr "Condiciones del campo"
+
+#: parameter/models/cultivation_state.py:15
+msgid "cultivation state"
+msgstr "Estado del cultivo"
+
+#: parameter/models/cultivation_state.py:16
+msgid "cultivation states"
+msgstr "Estados del cultivo"
+
+#: parameter/models/currency.py:15
+msgid "currencies"
+msgstr "Monedas"
+
+#: parameter/models/exchange_rate.py:10
+msgid "currency origin"
+msgstr "Moneda origen"
+
+#: parameter/models/exchange_rate.py:11
+msgid "currency destination"
+msgstr "Modeda destino"
+
+#: parameter/models/exchange_rate.py:13
+msgid "rate"
+msgstr "Tasa"
+
+#: parameter/models/exchange_rate.py:19
+msgid "exchange rate"
+msgstr "Tasa de cambio"
+
+#: parameter/models/exchange_rate.py:20
+msgid "exchange rates"
+msgstr "Tasas de camnio"
+
+#: parameter/models/gender.py:14 producer/models/staff.py:28
+msgid "gender"
+msgstr "Genero"
+
+#: parameter/models/gender.py:15
+msgid "genders"
+msgstr "Generos"
+
+#: parameter/models/lot_rating.py:14
+msgid "lot rating"
+msgstr "Calificacion de lote"
+
+#: parameter/models/lot_rating.py:15
+msgid "lot ratings"
+msgstr "Calificaciones de Lotes"
+
+#: parameter/models/measure_unit.py:9
+msgid "is reference unit"
+msgstr "Es referenciada"
+
+#: parameter/models/measure_unit.py:10
+msgid "referenced unit"
+msgstr "Unidad de medida referenciada"
+
+#: parameter/models/measure_unit.py:11
+msgid "multiplier"
+msgstr "Multiplicador"
+
+#: parameter/models/measure_unit.py:19
+msgid "units of measure"
+msgstr "Unidades de medida"
+
+#: parameter/models/ot_state.py:11
+msgid "is default"
+msgstr "Predeterminado"
+
+#: parameter/models/ot_state.py:21
+msgid "state of work order"
+msgstr "estado de la orden de trabajo"
+
+#: parameter/models/ot_state.py:22
+msgid "states of work orders"
+msgstr "Estados de las ordenes de trabajo"
+
+#: parameter/models/port.py:18
+msgid "ports"
+msgstr "Puertos"
+
+#: parameter/models/province.py:18
+msgid "provinces"
+msgstr "Provincia"
+
+#: parameter/models/specie.py:15
+msgid "species"
+msgstr "Especies"
+
+#: parameter/models/type_var_crop_technique.py:14
+msgid "type variable crop technique"
+msgstr "Tipo de variables tecnicas de cultivo"
+
+#: parameter/models/type_var_crop_technique.py:15
+msgid "types variables crop techniques"
+msgstr "Tipos de variables tecnicas de cultivo"
+
+#: parameter/models/var_crop_technique.py:12
+msgid "is manual"
+msgstr "Es manual"
+
+#: parameter/models/var_crop_technique.py:12
+msgid ""
+"Indicates if the variable is entered manually or calculated automatically"
+msgstr "Indique si la variable se carga manual o automaticamente"
+
+#: parameter/models/var_crop_technique.py:18
+msgid "variable crop technique"
+msgstr "Variable técnica de cultivo"
+
+#: parameter/models/var_crop_technique.py:19
+msgid "variables crop techniques"
+msgstr "Variables técnicas de cultivo"
+
+#: producer/apps.py:7
+msgid "producers"
+msgstr "Productores"
+
+#: producer/models/cost_center.py:14
+msgid "center of cost"
+msgstr "Centro de costo"
+
+#: producer/models/cost_center.py:15
+msgid "centes of cost"
+msgstr "Centros de costo"
+
+#: producer/models/country_side.py:15 producer/models/lot.py:20
+msgid "hectares"
+msgstr "Hectareas"
+
+#: producer/models/country_side.py:23
+msgid "observation"
+msgstr "Observación"
+
+#: producer/models/country_side.py:31
+msgid "countrysides"
+msgstr "Campos"
+
+#: producer/models/lot.py:23
+msgid "observatios"
+msgstr "Observaciones"
+
+#: producer/models/lot.py:25
+msgid "lotRating"
+msgstr "Calificación de lote"
+
+#: producer/models/lot.py:26
+msgid "Last operation"
+msgstr "Ultima operación"
+
+#: producer/models/lot.py:35
+msgid "is main lot"
+msgstr "Lote principal"
+
+#: producer/models/lot.py:35
+msgid ""
+"Indicates if this lot is the main lot of the staff. Only one lot can be the "
+"main lot for a staff."
+msgstr ""
+"Indica si este lote es el lote principal del personal. Solo un lote puede "
+"ser el lote principal de un empleado."
+
+#: producer/models/lot.py:43
+msgid "lots"
+msgstr "Lotes"
+
+#: producer/models/staff.py:16
+msgid "inactive"
+msgstr "Aciva"
+
+#: producer/models/staff.py:17 producer/models/staff.py:32
+msgid "discharged"
+msgstr "Baja"
+
+#: producer/models/staff.py:21
+msgid "surname"
+msgstr "Apellido"
+
+#: producer/models/staff.py:29
+msgid "date of birth"
+msgstr "Fecha de nacimiento"
+
+#: producer/models/staff.py:30
+msgid "date of entry"
+msgstr "Fecha de entrada"
+
+#: producer/models/staff.py:34 user/models/notification.py:11
+msgid "user"
+msgstr "Usuario"
+
+#: producer/models/staff.py:34
+msgid "User associated with the staff member."
+msgstr "Usuario asociado al personal"
+
+#: producer/models/store.py:18
+msgid "Store"
+msgstr "Almacen"
+
+#: producer/models/store.py:19
+msgid "Stores"
+msgstr "Almacenes"
+
+#: producer/models/typeStaff.py:16
+msgid "type of staff"
+msgstr "Tipo de personal"
+
+#: producer/models/typeStaff.py:17
+msgid "types of staff"
+msgstr "Tipos de personal"
+
+#: sale/apps.py:7
+msgid "sales"
+msgstr "Ventas"
+
+#: sale/models/carrier_provider.py:13
+msgid "Carrier"
+msgstr "Transportista"
+
+#: sale/models/carrier_provider.py:14
+msgid "Carriers"
+msgstr "Transportista"
+
+#: sale/models/driver.py:17
+msgid "carrier"
+msgstr "Transportista"
+
+#: sale/models/driver.py:24 sale/models/sales_receipt.py:30
+msgid "driver"
+msgstr "Chofer"
+
+#: sale/models/driver.py:25
+msgid "drivers"
+msgstr "Choferes"
+
+#: sale/models/sales_receipt.py:18 sale/models/type_sales_receipt.py:14
+msgid "type of sales receipt"
+msgstr "Tipo de comprobantes de venta"
+
+#: sale/models/sales_receipt.py:21
+msgid "custom"
+msgstr "Cliente"
+
+#: sale/models/sales_receipt.py:22
+msgid "cuil of custom"
+msgstr "Cuil del cliente"
+
+#: sale/models/sales_receipt.py:25
+msgid "especie"
+msgstr "Especie"
+
+#: sale/models/sales_receipt.py:27
+msgid "subtotal"
+msgstr "subtotal"
+
+#: sale/models/sales_receipt.py:37
+msgid "sales receipt"
+msgstr "Cromprobante de ventas"
+
+#: sale/models/sales_receipt.py:38
+msgid "sales receipts"
+msgstr "Comprobantes de ventas"
+
+#: sale/models/type_sales_receipt.py:15
+msgid "types of sales receipt"
+msgstr "Tipos de comprobantes de venta"
+
+#: templates/account/email_confirm.html:6
+#: templates/account/email_confirm.html:12
+msgid "Confirm E-mail Address"
+msgstr "Confirmar dirección de email"
+
+#: templates/account/email_confirm.html:18
+#, python-format
+msgid ""
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
+"address for user %(user_display)s."
+msgstr ""
+"Por favor confirma que <a href=\"mailto:%(email)s\">%(email)s</a> es la "
+"dirección de email para el usuario %(user_display)s. "
+
+#: templates/account/email_confirm.html:22
+msgid "Confirm"
+msgstr "Confirmada"
+
+#: templates/account/email_confirm.html:29
+#, python-format
+msgid ""
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+msgstr ""
+"Este enlace de confirmación por correo electrónico ha caducado o no es "
+"válido. Por favor, <a href=\"%(email_url)s\">envíe una nueva solicitud de "
+"confirmación por correo electrónico</a>."
+
+#: templates/account/logout.html:4 templates/account/logout.html:9
+#: templates/account/logout.html:17
+msgid "Sign Out"
+msgstr "Cerrar sesión"
+
+#: templates/account/logout.html:10
+msgid "Are you sure you want to sign out?"
+msgstr "Estas seguro que queres cerrar sesión?"
+
+#: templates/account/password_change.html:5
+#: templates/account/password_change.html:10
+#: templates/account/password_change.html:35
+#: templates/account/password_reset_from_key.html:5
+#: templates/account/password_reset_from_key.html:9
+#: templates/account/password_reset_from_key_done.html:5
+#: templates/account/password_reset_from_key_done.html:10
+msgid "Change Password"
+msgstr "Cambiar contraseña"
+
+#: templates/account/password_reset.html:6
+#: templates/account/password_reset.html:11
+#: templates/account/password_reset_done.html:11
+msgid "Password Reset"
+msgstr "Resetear contraseña"
+
+#: templates/account/password_reset.html:18
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll send you "
+"an e-mail allowing you to reset it."
+msgstr ""
+"¿Has olvidado tu contraseña? Introduce tu dirección de correo electrónico a "
+"continuación y te enviaremos un correo para que puedas restablecerla."
+
+#: templates/account/password_reset.html:45
+msgid "Please contact us if you have any trouble resetting your password."
+msgstr ""
+"Póngase en contacto con nosotros si tiene algún problema para restablecer su "
+"contraseña."
+
+#: templates/account/password_reset_done.html:6
+msgid "Password Reset Done"
+msgstr "Restablecimiento de contraseña hecho"
+
+#: templates/account/password_reset_done.html:15
+msgid ""
+"We have sent you an e-mail. Please contact us if you do not receive it "
+"within a few minutes."
+msgstr ""
+"Le hemos enviado un correo electrónico. Por favor, póngase en contacto con "
+"nosotros si no lo recibe en unos minutos."
+
+#: templates/account/password_reset_from_key.html:9
+msgid "Bad Token"
+msgstr "Token erroneo"
+
+#: templates/account/password_reset_from_key.html:14
+#, python-format
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
+"a>."
+msgstr ""
+"El enlace para restablecer la contraseña no es válido, posiblemente porque "
+"ya se ha utilizado. Por favor, solicite un <a href=\"%(passwd_reset_url)s\"> "
+"nuevo restablecimiento de contraseña</a>."
+
+#: templates/account/password_reset_from_key.html:36
+msgid "change password"
+msgstr "Cambiar contraseña"
+
+#: templates/account/password_reset_from_key.html:40
+#: templates/account/password_reset_from_key_done.html:16
+msgid "Your password is now changed."
+msgstr "Tu contraseña ha sido cambiada."
+
+#: templates/account/password_set.html:5 templates/account/password_set.html:11
+#: templates/account/password_set.html:33
+msgid "Set Password"
+msgstr "Establecer contraseña"
+
+#: templates/account/verification_sent.html:6
+#: templates/account/verification_sent.html:11
+msgid "Verify Your E-mail Address"
+msgstr "Verifica tu dirección de correo electrónico"
+
+#: templates/account/verification_sent.html:17
+msgid ""
+"We have sent an e-mail to you for verification. Follow the link provided to "
+"finalize the signup process. Please contact us if you do not receive it "
+"within a few minutes."
+msgstr ""
+"Te hemos enviado un correo electrónico para verificar tu identidad. Sigue el "
+"enlace proporcionado para finalizar el proceso de registro. Ponte en "
+"contacto con nosotros si no lo recibes en unos minutos."
+
+#: user/apps.py:7
+msgid "users"
+msgstr "Usuarios"
+
+#: user/models/notification.py:19
+msgid "notification"
+msgstr "Notificación"
+
+#: user/models/notification.py:20
+msgid "notifications"
+msgstr "Notificaciones"
+
+#: user/models/user_extend.py:70
+msgid "General administration"
+msgstr "Administrador General"
+
+#: user/models/user_extend.py:71
+msgid "Organization"
+msgstr "Organización"
+
+#: user/models/user_extend.py:72
+msgid "Producer"
+msgstr "Productor"
+
+#: user/models/user_extend.py:73
+msgid "Staff"
+msgstr "Personal"
+
+#: user/models/user_extend.py:79
+msgid "userType"
+msgstr "Tipo de usuario"
+
+#: user/models/user_organization.py:13
+msgid "company_name"
+msgstr "Nombre de la compania"
+
+#: user/models/user_organization.py:14
+msgid "identification_number"
+msgstr "RUT"
+
+#: user/models/user_organization.py:18
+msgid "userOrganization"
+msgstr "Organización"
+
+#: user/models/user_organization.py:19
+msgid "usersOrganizations"
+msgstr "Organizaciones"
+
+#: user/models/user_producer.py:19
+msgid "organization"
+msgstr "Organización"
+
+#: user/models/user_producer.py:20
+msgid "prefix"
+msgstr "prefijo"
+
+#: user/models/user_producer.py:21
+msgid "sequence"
+msgstr "Secuencia"
+
+#: user/models/user_producer.py:24
+msgid "userProducer"
+msgstr "Productor"
+
+#: user/models/user_producer.py:25
+msgid "usersProducers"
+msgstr "Productores"
+
+#: weather/apps.py:7 weather/models/weather_data.py:44
+#: weather/models/weather_data.py:45
+msgid "weather data"
+msgstr "Datos climatológicos"
+
+#: weather/models/station_weather.py:8
+msgid "passkey"
+msgstr "Passkey"
+
+#: weather/models/station_weather.py:9
+msgid "latitude"
+msgstr "Latitud"
+
+#: weather/models/station_weather.py:10
+msgid "longitude"
+msgstr "Longitud"
+
+#: weather/models/station_weather.py:17
+msgid "weather stations"
+msgstr "Estaciones meteorologicas"
+
+#: weather/models/weather_data.py:9
+msgid "timestamp"
+msgstr "Fecha y hora"
+
+#: weather/models/weather_data.py:13
+msgid "temperature"
+msgstr "Temperatura"
+
+#: weather/models/weather_data.py:17
+msgid "humidity"
+msgstr "Humedad"
+
+#: weather/models/weather_data.py:23
+msgid "wind speed"
+msgstr "Velocidad del viento"
+
+#: weather/models/weather_data.py:24
+msgid "wind gust"
+msgstr "Rafaga actual"
+
+#: weather/models/weather_data.py:25
+msgid "wind gust max"
+msgstr "Ráfaga maxima"
+
+#: weather/models/weather_data.py:26
+msgid "wind direction"
+msgstr "Dirección del viento"
+
+#: weather/models/weather_data.py:29
+msgid "rain rate"
+msgstr "Intendidad de lluvia"
+
+#: weather/models/weather_data.py:30
+msgid "rain total"
+msgstr "LLuvia total"
+
+#: weather/models/weather_data.py:31
+msgid "rain week"
+msgstr "Lluvia semanal"
+
+#: weather/models/weather_data.py:35
+msgid "solar radiation"
+msgstr "Radiación solar"
+
+#: weather/models/weather_data.py:38
+msgid "raw data"
+msgstr "Datos"
+
+#~ msgid "feels like"
+#~ msgstr "Sensaciín térmica"
+
+#~ msgid "uv"
+#~ msgstr "UV"
+
+#~ msgid "category"
+#~ msgstr "Categoria"
+
+#~ msgid "Pending work orders"
+#~ msgstr "Imprimir ordenes pendientes"
+
+#~ msgid "state of OT"
+#~ msgstr "Estado de una orden de trabajo"
+
+#~ msgid "states"
+#~ msgstr "Estados de las ordenes de trabajo"
+
+#~ msgid "operation"
+#~ msgstr "Operaciones"
+
+#~ msgid "key"
+#~ msgstr "Clave"
+
+#~ msgid "Data of waybill"
+#~ msgstr "Detalle de una carta de porte"
+
+#~ msgid "technical plan details"
+#~ msgstr "Detalles del plan tecnico"
+
+#~ msgid "crop estimate"
+#~ msgstr "Rinde estimado"
+
+#~ msgid "crop real"
+#~ msgstr "Rinde real"
+
+#~ msgid "technical plans detail"
+#~ msgstr "Detalles del plan tecnico"

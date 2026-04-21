@@ -39,11 +39,8 @@ urlpatterns = [
     path('json/', calendar_json, name='calendar_json'),
     path('calendar/', calendar_view, name='calendar_view'),
     #path('dashboard/', views.dashboard, name='dashboard'),
-    
 
-
-    path("api/report/", weather_ingest),  #OBTENER CLIMA DESDE LA API EXTERNA Y GUARDARLO EN LA BASE DE DATOS
-
+    path("api/report/", weather_ingest),  # OBTENER CLIMA DESDE LA API EXTERNA Y GUARDARLO EN LA BASE DE DATOS
 
     # Dashboard
     path('', include('agro_system.urls_dashboard'), name='dashboard'),

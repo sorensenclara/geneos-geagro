@@ -8,7 +8,7 @@ from .staff import Staff
 from .cost_center import CostCenter
 from parameter.models.lot_rating import LotRating
 from operation.models.activity import Activity
-
+from weather.models.station_weather import WeatherStation
 
 
 class Lot(geomodels.Model):
@@ -16,10 +16,9 @@ class Lot(geomodels.Model):
     name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
     countryside = models.ForeignKey(Countryside, models.CASCADE,verbose_name = _('countryside'))
     area = models.ForeignKey(Area, models.CASCADE,verbose_name = _('area'))
-    condition = models.ForeignKey(CountrysideCondition, models.CASCADE, verbose_name = _('countryside condition'))
     responsible = models.ForeignKey(Staff, models.CASCADE,verbose_name = _('responsible'))
-    hectares = models.IntegerField(default=0, verbose_name = _('hectares'))
-    hectares_productive = models.IntegerField(default=0, verbose_name = _('hectares productive'))
+    hectares = models.FloatField(default=0, verbose_name = _('hectares'))
+    hectares_productive = models.FloatField(default=0, verbose_name = _('hectares productive'))
     cost_center = models.ForeignKey(CostCenter, models.CASCADE, verbose_name = _('cost center'))
     observations = models.TextField(blank=True, null=True, verbose_name = _('observatios'))
     activity = models.ManyToManyField(Activity, verbose_name = _('operations'))
@@ -29,6 +28,9 @@ class Lot(geomodels.Model):
     # Campos geográficos
     ubication = geomodels.PointField(srid=4326, blank=True, null=True)
     delimitation = geomodels.PolygonField(srid=4326, blank=True, null=True)
+
+    # Estacion meteorológica
+    station = models.ForeignKey(WeatherStation, models.SET_NULL, blank=True, null=True, verbose_name = _('weather station'))
 
     is_main = models.BooleanField(default=False, verbose_name = _('is main lot'), help_text=_('Indicates if this lot is the main lot of the staff. Only one lot can be the main lot for a staff.'))
     

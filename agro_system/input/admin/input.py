@@ -9,7 +9,6 @@ from django.utils.translation import gettext_lazy as _
 class PurchaseInline(admin.StackedInline):
     model = PurchaseOrderDetail
     can_delete = False
-    can_add = False
     extra = 0
     fields = ['date_order', 'amount', 'price_unit']
     readonly_fields = ['date_order', 'amount', 'price_unit']
@@ -22,11 +21,16 @@ class PurchaseInline(admin.StackedInline):
     verbose_name_plural = _("Purchases")
     verbose_name = _("Purchase")
 
+    def has_add_permission(self, request, obj=None):
+        return False
+
 
 class InputAdmin(admin.ModelAdmin):
     search_fields = ['name'] 
-    #inlines = [PurchaseInline]
+    inlines = [PurchaseInline]
     list_display = ['name', 'type', 'cost', 'stock', 'pending']
-    list_filter = ['type', 'category', 'unit_measure', 'currency']
+    list_filter = ['type', 'unit_measure', 'currency']
+    readonly_fields = ['pending']
+
 
 adminSite.register(Input, InputAdmin)

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import WeatherData
+from weather.models.weather_data import WeatherData
 from user.admin.adminSite import adminSite
 
 

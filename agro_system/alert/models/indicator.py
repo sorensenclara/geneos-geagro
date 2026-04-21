@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from parameter.models.var_crop_technique import VarCropTechnique
 from user.models.user_extend import UserExtend
+from operation.models.crop import Crop
 
 class Indicator(models.Model):
 
@@ -19,6 +20,7 @@ class Indicator(models.Model):
     min_var_three = models.FloatField(verbose_name = _('min variable three'), null=True, blank=True,)
     report_user = models.ManyToManyField(UserExtend, verbose_name = _('user alert'), blank=True)
     report_mails = models.TextField(verbose_name = _('report mails'), blank=True, null=True)
+    crops = models.ForeignKey(Crop, verbose_name = _('crops'), blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.name}"
