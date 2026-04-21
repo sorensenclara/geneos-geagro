@@ -10,7 +10,7 @@ class WeatherStation(models.Model):
     longitude = models.FloatField(verbose_name= _('longitude'))
 
     def __str__(self):
-        return self.name + self.lot.name if self.lot else ""
+        return self.name
 
     class Meta:
         verbose_name = _('weather station')
