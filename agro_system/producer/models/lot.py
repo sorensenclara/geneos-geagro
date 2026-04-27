@@ -31,8 +31,6 @@ class Lot(geomodels.Model):
 
     # Estacion meteorológica
     station = models.ForeignKey(WeatherStation, models.SET_NULL, blank=True, null=True, verbose_name = _('weather station'))
-
-    is_main = models.BooleanField(default=False, verbose_name = _('is main lot'), help_text=_('Indicates if this lot is the main lot of the staff. Only one lot can be the main lot for a staff.'))
     
     
     def __str__(self):

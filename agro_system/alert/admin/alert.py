@@ -6,9 +6,9 @@ from alert.models.alert import Alert
 
 class AlertAdmin(admin.ModelAdmin):
 
-    list_display = ('name', 'indicator', 'date')
-    search_fields = ('name', 'indicator__name')
-    list_filter = ('indicator', 'date')
+    list_display = ('name', 'crop', 'date')
+    search_fields = ('name', 'crop__name')
+    list_filter = ('crop', 'date')
     ordering = ('-date',)
 
 adminSite.register(Alert, AlertAdmin)

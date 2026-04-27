@@ -13,8 +13,8 @@ from operation.models.work_order import WorkOrder
 from operation.models.crop import Crop
 from producer.models.staff import Staff
 from django.utils import timezone
-from weather.models import WeatherData
-
+from weather.models.weather_data import WeatherData
+from weather.models.station_weather import WeatherStation
 
 # Panel principal
 @login_required
@@ -24,71 +24,77 @@ def DashboardView(request):
     countryside_id = request.GET.get('countryside')
     lot_id = request.GET.get('lot')
     campaing_id = request.GET.get('campaing')
-    lot = None
+    crop_id = request.GET.get('crop')
+
     user = request.user
+    staff = None
     if user.type == 'Staff':
         staff = Staff.objects.filter(user=user).first()
         country_sides = Countryside.objects.filter(producer=user.producer)
-        work_orders = WorkOrder.objects.filter(producer=user.producer)
-        lot = Lot.objects.filter(countryside__in=country_sides, staffuser__id=staff.id)
-    if user.type == 'Producer':
+        crops = Crop.objects.filter(responsible=staff)
+    elif user.type == 'Producer':
         country_sides = Countryside.objects.filter(producer=user)
-        work_orders = WorkOrder.objects.filter(producer=user)
-
+        crops = Crop.objects.filter(producer=user)
     elif user.type == 'Administration':
         country_sides = Countryside.objects.all()
-        work_orders = WorkOrder.objects.all()
-
+        crops = Crop.objects.all()
     else:
         country_sides = Countryside.objects.none()
-        work_orders = WorkOrder.objects.none()
+        crops = Crop.objects.none()
 
     lots = Lot.objects.filter(countryside__in=country_sides)
 
-    # Busco lote principal  del staff para mostrarlo por defecto en el dashboard
-    if lot: 
-        for l in lots:
-            if l.is_main:
-                lot = l
-                break
-            else:
-                lot = lots.first()
-
-    # Filtros
-
-    if countryside_id:
-       lots = lots.filter(countryside=countryside_id)
-       crops = Crop.objects.filter(countryside__in=country_sides)
-       work_orders = work_orders.filter(crops__in=crops)
-   
-    if lot_id:
-        crops = Crop.objects.filter(lot=lot_id)
-        work_orders = work_orders.filter(crops__in=crops)
-
-    # TODO todas o la activa?
-    # Referencia a las campañas
+    # Filtros de campañas
     campaings = Campaing.objects.all()
+
+    # Filtro de cultivos por campaña, viñedo, lote
     if campaing_id:
-        work_orders = work_orders.filter(campaing_id=campaing_id)
-    elif campaings.filter(active=True).first():
-        work_orders = work_orders.filter(campaing=campaings.filter(active=True).first())
+        crops = crops.filter(campaing_id=campaing_id)
+    if countryside_id:
+        crops = crops.filter(countryside_id=countryside_id)
+        lots = lots.filter(countryside_id=countryside_id)
+    if lot_id:
+        crops = crops.filter(lot_id=lot_id)
+        lots = lots.filter(id=lot_id)
 
-    # Las proximas 3 ordenes a realizar
-    today = timezone.now().date()
-    work_orders = work_orders.filter(date_init__gte=today).order_by('date_init')[:3]
+    # Cultivo seleccionado o principal
+    crop_selected = None
+    if crop_id:
+        crop_selected = crops.filter(id=crop_id).first()
+    else:
+        crop_selected = crops.filter(is_main=True).first() or crops.first()
 
-    weather_data = WeatherData.objects.last() 
+    # Filtrar work_orders solo del cultivo seleccionado
+    work_orders = WorkOrder.objects.none()
+    if crop_selected:
+        work_orders = WorkOrder.objects.filter(crop=crop_selected)
+        # Filtro de campaña en work_orders
+        if campaing_id:
+            work_orders = work_orders.filter(campaing_id=campaing_id)
+        # Solo próximas 3 órdenes
+        today = timezone.now().date()
+        work_orders = work_orders.filter(date_init__gte=today).order_by('date_init')[:3]
+
+    # Clima de la estación del lote del cultivo seleccionado
+    weather_data = None
+    station = None
+    if crop_selected and crop_selected.lot and crop_selected.lot.station:
+        station = crop_selected.lot.station
+        weather_data = WeatherData.objects.filter(station=station).last()
+
     data = {
-        'country_sides': country_sides,
-        'lots': lots,
-        'lot_main': lot,    
+        'country_sides': country_sides, # Viñedos
+        'lots': lots,  # Lotes
+        'crop_main': crop_selected, # Cultivo principal o seleccionado
+        'crops': crops, # Cultivos filtrados
         'campaings': campaings,
         'campaing_active': campaings.filter(active=True).first(),
         'work_orders': work_orders,
         'selected_countryside': countryside_id,
         'selected_lot': lot_id,
         'selected_campaing': campaing_id,
-        'weather_data': weather_data
+        'weather_data': weather_data,
+        'station': station,
     }
     return render(request, 'pages/dashboard.html', data)
 

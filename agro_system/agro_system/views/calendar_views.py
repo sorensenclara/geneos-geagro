@@ -14,43 +14,64 @@ def CalendarView(request):
     countryside_id = request.GET.get('countryside')
     lot_id = request.GET.get('lot')
     campaing_id = request.GET.get('campaing')
+    crop_id = request.GET.get('crop')
 
     user = request.user
     if user.type == 'Producer':
-        work_orders = WorkOrder.objects.filter(producer=user)  
         country_sides = Countryside.objects.filter(producer=user)
-
+        crops = Crop.objects.filter(producer=user)
+    elif user.type == 'Staff':
+        country_sides = Countryside.objects.filter(producer=user.producer)
+        crops = Crop.objects.filter(responsible__user=user)
     elif user.type == 'Administration':
-        work_orders = WorkOrder.objects.all()
+        country_sides = Countryside.objects.all()
+        crops = Crop.objects.all()
+    else:
+        country_sides = Countryside.objects.none()
+        crops = Crop.objects.none()
 
-    orders = []
     lots = Lot.objects.filter(countryside__in=country_sides)
     campaings = Campaing.objects.all()
 
-    if countryside_id:
-        crops = Crop.objects.filter(countryside__in=country_sides)
-        work_orders = work_orders.filter(crops__in=crops)
-
-    if lot_id:
-        crops = Crop.objects.filter(lot=lot_id)
-        work_orders = work_orders.filter(crops__in=crops)
-
+    # Filtros de cultivos por campaña, viñedo, lote
     if campaing_id:
-        work_orders = work_orders.filter(campaing_id=campaing_id)
+        crops = crops.filter(campaing_id=campaing_id)
+    if countryside_id:
+        crops = crops.filter(countryside_id=countryside_id)
+        lots = lots.filter(countryside_id=countryside_id)
+    if lot_id:
+        crops = crops.filter(lot_id=lot_id)
+        lots = lots.filter(id=lot_id)
 
+    # Cultivo seleccionado o principal
+    crop_selected = None
+    if crop_id:
+        crop_selected = crops.filter(id=crop_id).first()
+    else:
+        crop_selected = crops.filter(is_main=True).first() or crops.first()
+
+    # Filtrar work_orders solo del cultivo seleccionado
+    work_orders = WorkOrder.objects.none()
+    if crop_selected:
+        work_orders = WorkOrder.objects.filter(crop=crop_selected)
+        if campaing_id:
+            work_orders = work_orders.filter(campaing_id=campaing_id)
+
+    orders = []
     for order in work_orders:
         input_work_orders = InputWorkOrder.objects.filter(work_order=order)
         data_order = {
             'work_order': order,
             'input_work_orders': input_work_orders,
         }
-
         orders.append(data_order)
 
     data = {
         'data_work_orders': orders,
         'country_sides': country_sides,
         'lots': lots,
+        'crops': crops,
+        'crop_main': crop_selected,
         'campaings': campaings,
     }
 

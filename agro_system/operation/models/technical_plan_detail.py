@@ -16,6 +16,7 @@ class TechnicalPlanDetail(models.Model):
     stage = models.ForeignKey(Stage, on_delete=models.CASCADE, verbose_name= _('stage'))
     service = models.ForeignKey(Service, on_delete=models.CASCADE, verbose_name= _('service'))
     days_estimate = models.IntegerField( verbose_name= _('days estimate'))
+    cant_persons = models.IntegerField(verbose_name= _('cant persons'), blank=True, null=True)
     active = models.BooleanField(default=True, verbose_name= _('active'))
     subcontracted = models.BooleanField(default=False, verbose_name= _('subcontracted'))
     contractor = models.ForeignKey(UserProducer, on_delete=models.CASCADE, null=True, blank=True, verbose_name= _('contractor'), related_name='contractor')

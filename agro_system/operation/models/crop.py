@@ -35,7 +35,9 @@ class Crop(models.Model):
     estimate_saranda = models.FloatField(blank=True, null=True, verbose_name = _('estimate saranda'))
     estimate_secada = models.FloatField(blank=True, null=True, verbose_name = _('estimate secada'))
     producer = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, verbose_name = _('producer'))
-    
+    indicators = models.ManyToManyField('alert.Indicator', verbose_name = _('indicators'), null=True, blank=True)
+    is_main = models.BooleanField(default=False, verbose_name = _('is main crop'), help_text=_('Indicates if this crop is the main crop of the staff. Only one crop can be the main crop for a staff.'))
+
 
     def __str__(self):
         return f"{self.campaing} - {self.countryside} / {self.lot} - {self.activity}"    
