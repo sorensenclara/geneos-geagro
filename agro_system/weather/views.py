@@ -44,7 +44,7 @@ def weather_ingest(request):
     
     # TODO La estacion manda un POST, si se prueba con url hay que cambiar a GET
     data = request.POST.dict()
-    temp_f = to_float(data.get("tempf") or data.get("indoortempf"))
+    temp_f = to_float(data.get("tempf") if data.get("tempf") else data.get("tempinf"))
     widn_dir_deg = to_float(data.get("winddir"))
     data["winddir"] = deg_to_cardinal(widn_dir_deg)
     date_str = data.get("dateutc")
@@ -64,7 +64,7 @@ def weather_ingest(request):
         station=station,
         timestamp=timestamp,
         temp=f_to_c(temp_f),
-        humidity=to_float(data.get("humidity") or data.get("indoorhumidity")),
+        humidity=to_float(data.get("humidity") or data.get("humidityin")),
         #pressure=to_float(data.get("baromrelin")),
         wind_speed=to_float(data.get("windspeedmph")),
         wind_gust=to_float(data.get("windgustmph")),

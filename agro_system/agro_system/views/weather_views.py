@@ -1,14 +1,13 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from weather.models import WeatherData
+from operation.models.crop import Crop
 
 @login_required
 def WeatherView(request):
     
     crop_id = request.GET.get('crop')
-    from operation.models.crop import Crop
-    from producer.models.lot import Lot
-    from weather.models.station_weather import WeatherStation
+  
 
     user = request.user
     if user.type == 'Producer':
