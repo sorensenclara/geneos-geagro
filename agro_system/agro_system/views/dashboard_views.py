@@ -279,6 +279,8 @@ def DashboardView(request):
         'insumos_faltantes': insumos_faltantes,
         'insumos_count': len(insumos_faltantes),
         'insumos_total_cost': total_cost,
+
+        'today': today,
     }
 
     return render(request, 'pages/dashboard.html', data)

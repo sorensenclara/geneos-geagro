@@ -353,9 +353,12 @@
             {% for order in work_orders %}
               <li class="feed-item">
                 <div class="feed-item-list">
-                  <span class="date">
+                    <span class="date {% if order.date_init == today %}is-today{% endif %}">
+                    {% if order.date_init == today %}
+                        HOY ·
+                    {% endif %}
                     {{ order.date_init|date:"d/m/Y" }} · {{ order.stateOT|default:"-" }}
-                  </span>
+                    </span>
                   <span class="activity-text">{{ order.service|default:"Orden de trabajo" }}</span>
                   <span class="activity-text">Estadio: {{ order.stage|default:"-" }}</span>
                 </div>
