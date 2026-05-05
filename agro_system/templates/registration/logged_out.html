@@ -1,0 +1,29 @@
+{% extends "registration/base.html" %}
+{% load static i18n %}
+
+{% block content %}
+
+<!-- Logo dentro de la card -->
+<div class="text-center geagro-login-brand mb-3">
+    <img src="{% static 'img/logo-GEAGRO-vid.svg' %}" alt="GEAGRO VID">
+</div>
+
+<!-- Mensaje -->
+<p class="login-box-msg">
+    Sesión finalizada correctamente
+</p>
+
+<p class="text-center text-muted">
+    Gracias por utilizar GEAGRO VID
+</p>
+
+<!-- Botón -->
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="{% url 'admin:login' %}" class="btn btn-primary btn-block">
+            Iniciar sesión nuevamente
+        </a>
+    </div>
+</div>
+
+{% endblock %}

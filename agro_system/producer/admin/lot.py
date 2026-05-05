@@ -2,15 +2,16 @@ from django.contrib import admin
 from user.admin.adminSite import adminSite
 from producer.models.country_side import Countryside
 from user.models.user_producer import UserProducer
-#from producer.models.staff import Staff
+# from producer.models.staff import Staff
 from producer.models.lot import Lot
-from leaflet.admin import LeafletGeoAdmin
+# from leaflet.admin import LeafletGeoAdmin
 
 # Register your models here.
-class LotAdmin(LeafletGeoAdmin):
+class LotAdmin(admin.ModelAdmin):
     list_display = ['name', 'countryside', 'responsible', 'hectares_productive', 'cost_center']
     list_filter = ['responsible']
     search_fields = ['name']
+
 
         
     # def formfield_for_foreignkey(self, db_field, request, **kwargs):

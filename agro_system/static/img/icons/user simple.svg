@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="uuid-fdae21a3-caa5-4251-a535-53b07d89baf3" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 103.5 102.2">
+  <!-- Generator: Adobe Illustrator 29.4.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 152)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #6b406e;
+      }
+
+      .st1 {
+        fill: url(#Degradado_sin_nombre_8);
+      }
+
+      .st2 {
+        fill: url(#Degradado_sin_nombre_81);
+      }
+
+      .st3 {
+        fill: url(#Degradado_sin_nombre_82);
+      }
+
+      .st4 {
+        fill: url(#Degradado_sin_nombre_83);
+      }
+    </style>
+    <linearGradient id="Degradado_sin_nombre_8" data-name="Degradado sin nombre 8" x1="68.4" y1="49.7" x2="87.4" y2="49.7" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#118137"/>
+      <stop offset="1" stop-color="#48b071"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_81" data-name="Degradado sin nombre 8" x1="73.3" y1="69.1" x2="89.7" y2="69.1" xlink:href="#Degradado_sin_nombre_8"/>
+    <linearGradient id="Degradado_sin_nombre_82" data-name="Degradado sin nombre 8" x1="16.1" x2="35.1" xlink:href="#Degradado_sin_nombre_8"/>
+    <linearGradient id="Degradado_sin_nombre_83" data-name="Degradado sin nombre 8" x1="13.6" y1="68.4" x2="30" y2="68.4" xlink:href="#Degradado_sin_nombre_8"/>
+  </defs>
+  <path class="st0" d="M51.7,52.7c-9.4,0-17.1-7.7-17.1-17.1s7.7-17.1,17.1-17.1,17.1,7.7,17.1,17.1-7.7,17.1-17.1,17.1ZM51.7,23.9c-6.5,0-11.7,5.2-11.7,11.7s5.2,11.7,11.7,11.7,11.7-5.2,11.7-11.7-5.2-11.7-11.7-11.7Z"/>
+  <g>
+    <path class="st1" d="M77.9,59.2c-5.2,0-9.5-4.3-9.5-9.5s4.3-9.5,9.5-9.5,9.5,4.3,9.5,9.5-4.3,9.5-9.5,9.5ZM77.9,45.6c-2.2,0-4.1,1.8-4.1,4.1s1.8,4.1,4.1,4.1,4.1-1.8,4.1-4.1-1.8-4.1-4.1-4.1Z"/>
+    <path class="st2" d="M87.1,76.1h-8.4c-1.5,0-2.7-1.2-2.7-2.7s1.2-2.7,2.7-2.7h5.1c-1.1-2.7-3.7-4.6-6.8-4.6h-1c-1.5,0-2.7-1.2-2.7-2.7s1.2-2.7,2.7-2.7h1c7,0,12.7,5.7,12.7,12.7s-1.2,2.7-2.7,2.7h.1Z"/>
+    <path class="st3" d="M25.6,59.2c-5.2,0-9.5-4.3-9.5-9.5s4.3-9.5,9.5-9.5,9.5,4.3,9.5,9.5-4.3,9.5-9.5,9.5ZM25.6,45.6c-2.2,0-4.1,1.8-4.1,4.1s1.8,4.1,4.1,4.1,4.1-1.8,4.1-4.1-1.8-4.1-4.1-4.1Z"/>
+    <path class="st4" d="M24.7,76.1h-8.4c-1.5,0-2.7-1.2-2.7-2.7,0-7,5.7-12.7,12.7-12.7h1c1.5,0,2.7,1.2,2.7,2.7s-1.2,2.7-2.7,2.7h-1c-3.1,0-5.7,1.9-6.8,4.6h5.1c1.5,0,2.7,1.2,2.7,2.7s-1.2,2.7-2.7,2.7h.1Z"/>
+  </g>
+  <path class="st0" d="M68.2,83.5c-1.5,0-2.7-1.2-2.7-2.7v-7.3c0-7.6-6.2-13.8-13.8-13.8s-13.8,6.2-13.8,13.8v7.3c0,1.5-1.2,2.7-2.7,2.7s-2.7-1.2-2.7-2.7v-7.3c0-10.6,8.6-19.2,19.2-19.2s19.2,8.6,19.2,19.2v7.3c0,1.5-1.2,2.7-2.7,2.7Z"/>
+</svg>

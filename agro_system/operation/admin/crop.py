@@ -108,13 +108,16 @@ def process_plan(modeladmin, request, queryset):
 
 
 class CropAdmin(admin.ModelAdmin):
-    list_display = ['name','campaing', 'countryside', 'lot', 'activity']
-    list_filter = ['campaing', 'activity', 'countryside']
-    search_fields = ['name']
-    ordering = ['campaing', 'activity', 'name']
-    inlines = [TechnicalCropDetailInline, CropYieldsInline, PartnerCropInline]
+    # --- Maria Clara DEBUG LOCAL ---
+    # SQLite límite de joins (64). Admin mínimo temporal.
 
-    actions = [process_plan]
+    list_display = ['id', 'name']
+    list_filter = []
+    search_fields = ['name']
+    ordering = ['id']
+
+    # inlines = [TechnicalCropDetailInline, CropYieldsInline, PartnerCropInline]
+    actions = []
 
 
     def save_model(self, request, obj, form, change):

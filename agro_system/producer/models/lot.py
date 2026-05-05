@@ -1,4 +1,4 @@
-from django.contrib.gis.db import models as geomodels
+# from django.contrib.gis.db import models as geomodels
 from django.db import models
 from .country_side import Countryside
 from parameter.models.area import Area
@@ -11,7 +11,7 @@ from operation.models.activity import Activity
 from weather.models.station_weather import WeatherStation
 
 
-class Lot(geomodels.Model):
+class Lot(models.Model):
 
     name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
     countryside = models.ForeignKey(Countryside, models.CASCADE,verbose_name = _('countryside'))
@@ -26,8 +26,8 @@ class Lot(geomodels.Model):
     last_activity = models.ForeignKey(Activity, models.CASCADE, related_name="lot_uact", blank=True, null=True, verbose_name = _('Last operation'))
 
     # Campos geográficos
-    ubication = geomodels.PointField(srid=4326, blank=True, null=True)
-    delimitation = geomodels.PolygonField(srid=4326, blank=True, null=True)
+    ubication = models.TextField(blank=True, null=True, verbose_name = _('ubication'))
+    delimitation = models.TextField(blank=True, null=True, verbose_name = _('delimitation'))
 
     # Estacion meteorológica
     station = models.ForeignKey(WeatherStation, models.SET_NULL, blank=True, null=True, verbose_name = _('weather station'))

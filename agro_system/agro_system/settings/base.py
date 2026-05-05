@@ -48,7 +48,7 @@ DJANGO_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites', # Necesario para dj-rest-auth
-    'django.contrib.gis',
+#    'django.contrib.gis',
 ]
 
 THIRD_PARTY_APPS = [
@@ -58,7 +58,7 @@ THIRD_PARTY_APPS = [
     'dj_rest_auth', # login
     'corsheaders', # Cors
     "ckeditor",
-    "leaflet",
+#    "leaflet",
     
     "crispy_forms",
     "crispy_bootstrap5",
@@ -127,13 +127,9 @@ AUTHENTICATION_BACKENDS = [
 
 DATABASES = {
     'default': {
-       'ENGINE': 'django.contrib.gis.db.backends.postgis',
-       'NAME':  env('DATABASE_NAME'),
-       'USER': env('DATABASE_USER'),
-       'PASSWORD': env('DATABASE_PASS'),
-       'HOST': env('DATABASE_HOST'),
-       'PORT': env('DATABASE_PORT'),
-   }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 
@@ -210,9 +206,9 @@ JAZZMIN_SETTINGS = {
     "site_brand": "GEAGRO",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "img/iso_logo.png",
+    "site_logo": "img/logo-sm-GEAGRO-vid.svg",
 
-    "login_logo": "img/logo.png",
+    "login_logo": "img/logo-GEAGRO-vid.svg",
 
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
@@ -224,7 +220,7 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
 
     # Welcome text on the login screen
-    "welcome_sign": "Bienvenidos a la intranet de GEAGRO",
+    "welcome_sign": "Bienvenidos a la gestión técnica GEAGRO VID",
 
     # Copyright on the footer
     "copyright": "Cooperativa Geneos",
@@ -296,22 +292,35 @@ JAZZMIN_SETTINGS = {
         ]
     },
 
-    # Custom icons for side menu apps/models See https://fontawesome.com/icons?d=gallery&m=free&v=5.0.0,5.0.1,5.0.10,5.0.11,5.0.12,5.0.13,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,5.0.9,5.1.0,5.1.1,5.2.0,5.3.0,5.3.1,5.4.0,5.4.1,5.4.2,5.13.0,5.12.0,5.11.2,5.11.1,5.10.0,5.9.0,5.8.2,5.8.1,5.7.2,5.7.1,5.7.0,5.6.3,5.5.0,5.4.2
-    # for the full list of 5.13.0 free icon classes
+    # Iconos personalizados del menú lateral
+    # Se vinculan con clases CSS en jazzmin_custom.css
     "icons": {
-        "auth": "png-icon-configuracion",
-        "auth.user": "png-icon-configuracion",
-        "auth.Group": "png-icon-configuracion",
-        "producer": "png-icon-producer",
-        "input": "png-icon-insumos",
-        "operation": "png-icon-operaciones",
-        "parameter": "png-icon-parametros",
-        "sale": "png-icon-ventas",
-        "user": "png-icon-configuracion",
+        # Panel principal
+        "core": "icon-dashboard",
+
+        # Autenticación / permisos
+        "auth": "icon-auth",
+
+        # Usuarios
+        "user": "icon-user",
+        "user.user": "icon-user",
+
+        # Módulos del sistema
+        "producer": "icon-producer",
+        "input": "icon-insumos",
+        "operation": "icon-operaciones",
+        "parameter": "icon-parametros",
+        "sale": "icon-ventas",
+
+        # Alertas / clima
+        "alert": "icon-alertas",
+        "weather": "icon-clima",
     },
-    # Icons that are used when one is not manually specified
+
+    # Iconos por defecto cuando Jazzmin no encuentra uno personalizado
+    # Uso uno más pequeño para que los submenús no queden tan pesados
     "default_icon_parents": "fas fa-chevron-circle-right",
-    "default_icon_children": "fas fa-circle",
+    "default_icon_children": "far fa-circle",
 
     #################
     # Related Modal #
@@ -330,7 +339,7 @@ JAZZMIN_SETTINGS = {
     # Whether to link font from fonts.googleapis.com (use custom_css to supply font otherwise)
     "use_google_fonts_cdn": True,
     # Whether to show the UI customizer on the sidebar
-    "show_ui_builder": True,
+    "show_ui_builder": False,
 
 
     "changeform_fixed_submit_buttons": True,
