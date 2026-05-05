@@ -725,3 +725,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   border-radius: 999px;
   background: #6b3f6e;
 }
+
+.geagro-card-inputs {
+  border-left: 4px solid #dc3545;
+}
