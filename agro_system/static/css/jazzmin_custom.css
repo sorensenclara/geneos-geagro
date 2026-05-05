@@ -1,123 +1,450 @@
-/* Estilo Base: Oculta el texto de Font Awesome y establece el tamaño base */
-.main-sidebar .nav-sidebar .nav-icon.png-icon-user,
-.main-sidebar .nav-sidebar .nav-icon.png-icon-post,
-.main-sidebar .nav-sidebar .nav-icon.png-icon-producto {
-    /* Oculta el marcador de texto de Font Awesome */
+/* =========================================================
+   GEAGRO VID - CUSTOM ADMIN
+   Ajustes UI / UX sobre Django + Jazzmin
+   Autor: Coop GENEOS Ltda.
+========================================================= */
+
+
+/* =========================================================
+   1. TIPOGRAFÍA GLOBAL
+   - Titillium Web para mantener coherencia con GEAGRO VID
+   - Se excluyen clases de FontAwesome para no romper iconos
+========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap');
+
+html,
+body,
+body :not(.fa):not(.fas):not(.far):not(.fab) {
+    font-family: 'Titillium Web', sans-serif;
+}
+
+
+/* =========================================================
+   2. VARIABLES VISUALES GEAGRO VID
+========================================================= */
+:root {
+    --geagro-purple-900: #3F2642;
+    --geagro-purple-700: #6b3f6e;
+
+    --geagro-green-900: #0b3422;
+    --geagro-green-800: #0f3725;
+    --geagro-green-700: #113f2a;
+    --geagro-green-600: #118237;
+    --geagro-green-500: #1E7D3B;
+    --geagro-green-400: #22b24c;
+
+    --geagro-muted: #64748b;
+
+    --geagro-radius-pill: 32px;
+
+    --geagro-shadow-sm: 0 10px 24px rgba(15,23,42,.06);
+    --geagro-shadow-md: 0 18px 50px rgba(15,23,42,.16);
+}
+
+
+/* =========================================================
+   3. LOGIN / LOGOUT
+   - Fondo institucional GEAGRO VID
+   - Se usa violeta como identidad principal del acceso
+========================================================= */
+body.login-page,
+body.jazzmin-login-page {
+    background: linear-gradient(135deg, var(--geagro-purple-900), var(--geagro-green-500));
+}
+
+/* Oculto el logo default de Jazzmin para evitar duplicado */
+.login-logo {
+    display: none;
+}
+
+/* Logo custom dentro de la card */
+.geagro-login-brand {
+    margin-bottom: 22px;
+}
+
+.geagro-login-brand img {
+    max-width: 170px;
+    height: auto;
+}
+
+/* Inputs login */
+.login-box input {
+    border-radius: 8px;
+}
+
+.login-box input:focus,
+.login-box .form-control:focus {
+    border-color: var(--geagro-purple-700);
+    box-shadow: 0 0 0 2px rgba(107, 63, 110, 0.15);
+    outline: none;
+}
+
+/* Iconos lineales dentro de los inputs */
+.login-box .input-group-text {
+    background: #f8fafc;
+    border-left: 1px solid #e5e7eb;
+}
+
+.login-box .input-group-text i {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--geagro-muted);
+}
+
+/* Botones login / logout */
+body.login-page .login-box .btn-primary,
+body.login-page .login-box a.btn-primary,
+.login-box input[type="submit"],
+.login-box button[type="submit"],
+.login-box .btn,
+.login-box a.btn {
+    background-color: var(--geagro-purple-700);
+    border-color: var(--geagro-purple-700);
+    color: #fff;
+    border-radius: var(--geagro-radius-pill);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    padding: 12px;
+    transition: all 0.2s ease;
+}
+
+/* Estados de botones login / logout */
+body.login-page .login-box .btn-primary:hover,
+body.login-page .login-box a.btn-primary:hover,
+.login-box .btn:hover,
+.login-box a.btn:hover,
+.login-box input[type="submit"]:hover,
+.login-box button[type="submit"]:hover {
+    background-color: var(--geagro-purple-900);
+    border-color: var(--geagro-purple-900);
+    transform: translateY(-1px);
+    box-shadow: var(--geagro-shadow-md);
+}
+
+body.login-page .login-box .btn-primary:focus,
+body.login-page .login-box .btn-primary:active,
+body.login-page .login-box .btn-primary:not(:disabled):not(.disabled):active,
+body.login-page .login-box a.btn-primary:focus,
+body.login-page .login-box a.btn-primary:active {
+    background-color: var(--geagro-purple-700);
+    border-color: var(--geagro-purple-700);
+    color: #fff;
+    box-shadow: 0 0 0 2px rgba(107, 63, 110, 0.25);
+}
+
+
+/* =========================================================
+   4. ADMIN - DIFERENCIACIÓN VISUAL
+   - Verde para indicar modo administrador / técnico
+   - Violeta en topbar para mantener identidad GEAGRO VID
+========================================================= */
+
+/* Sidebar admin */
+.main-sidebar {
+    background-color: var(--geagro-green-700);
+}
+
+.brand-link {
+    background-color: var(--geagro-green-700);
+}
+
+/* Topbar violeta */
+.main-header {
+    background-color: var(--geagro-purple-700);
+    color: #fff;
+}
+
+.brand-link {
+        background-color: var(--geagro-purple-900)!important;
+}
+
+/* Logo / brand */
+.brand-link {
+    background-color: var(--geagro-purple-900);
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+/* Links de navbar en blanco */
+.navbar-light .navbar-nav .nav-link {
+    color: #fff;
+}
+
+/* Texto menú lateral */
+.nav-sidebar .nav-link p {
+    font-size: 15px;
+}
+
+/* Hover menú lateral */
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link:hover,
+.nav-sidebar > .nav-item:hover > .nav-link,
+.nav-sidebar > .nav-item > .nav-link:focus {
+    background-color: var(--geagro-green-900);
+    color: #fff;
+}
+
+/* Estado activo / abierto */
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active,
+.nav-sidebar > .nav-item.menu-open > .nav-link {
+    background-color: var(--geagro-purple-700);
+    color: #fff;
+}
+
+
+/* =========================================================
+   5. BOTONES GENERALES ADMIN
+========================================================= */
+.btn-primary {
+    background-color: var(--geagro-green-500);
+    border-color: var(--geagro-green-500);
+    border-radius: var(--geagro-radius-pill);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--geagro-green-600);
+    border-color: var(--geagro-green-600);
+}
+
+.btn-success, .btn-info, .btn-danger, .btn-secondary{
+    border-radius: var(--geagro-radius-pill);
+}
+
+/* Acciones secundarias: guardar y añadir / continuar */
+.btn-info {
+    background-color: var(--geagro-purple-700) !important;
+    border-color: var(--geagro-purple-700) !important;
+    color: #fff !important;
+}
+
+/* Eliminar / acción destructiva */
+.btn-danger {
+    background-color: #D97706 !important;
+    border-color: #D97706 !important;
+    color: #fff !important;
+}
+
+/* Histórico / acción neutra */
+.btn-secondary {
+    background-color: #94A3B8 !important;
+    border-color: #94A3B8 !important;
+    color: #fff !important;
+}
+
+/* Focus general de botones */
+.btn:focus,
+.btn:active,
+button:focus,
+button:active {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(107, 63, 110, 0.25);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--geagro-shadow-md);
+}
+
+
+/* =========================================================
+   6. LINKS / ACCENTS ADMIN
+========================================================= */
+.accent-primary .btn-link,
+.accent-primary .nav-tabs .nav-link,
+.accent-primary a:not(.dropdown-item):not(.btn-app):not(.nav-link):not(.brand-link):not(.page-link):not(.btn) {
+    color: var(--geagro-green-400);
+}
+
+.main-footer strong {
+    color: var(--geagro-green-500);
+}
+
+
+/* =========================================================
+   7. ICONOS SIDEBAR PERSONALIZADOS
+   - Reemplazo de iconos FontAwesome por SVG propios
+========================================================= */
+/* Base */
+.main-sidebar .nav-sidebar .nav-icon[class*="icon-"] {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 22px;
+    height: 22px;
     display: inline-block;
-    color: transparent !important; /* Esconde el color del texto del icono si aparece */
-    width: 20px; /* Ancho para el PNG */
-    height: 20px; /* Altura para el PNG */
-    text-align: center;
-    line-height: 20px;
-    position: relative;
-    /* Necesario para ocultar cualquier residuo de la fuente */
-    font-family: initial !important; 
+    vertical-align: middle;
+    color: transparent;
+    font-size: 0;
+    opacity: 0.9;
+}
+
+/* CORE NEGOCIO
+========================= */
+
+.icon-producer {
+    background-image: url("/static/img/icons/producer.svg");
+}
+
+.icon-insumos {
+    background-image: url("/static/img/icons/insumos.svg");
+}
+
+.icon-operaciones {
+    background-image: url("/static/img/icons/operaciones.svg");
+}
+
+.icon-parametros {
+    background-image: url("/static/img/icons/parametros.svg");
+}
+
+.icon-ventas {
+    background-image: url("/static/img/icons/ventas.svg");
+}
+
+
+/* SISTEMA / ADMIN
+========================= */
+
+.icon-user {
+    background-image: url("/static/img/icons/user.svg");
+}
+
+.icon-auth {
+    background-image: url("/static/img/icons/authentication.svg");
+}
+
+.icon-configuracion {
+    background-image: url("/static/img/icons/configuracion.svg");
+}
+
+.icon-dashboard {
+    background-image: url("/static/img/icons/dashboard.svg");
+}
+
+
+/* ICONO DASHBOARD GLOBAL (SIDEBAR + NAVBAR)
+========================================================= */
+
+/* Sidebar - Panel de control */
+.main-sidebar .nav-sidebar > .nav-item:first-child > .nav-link {
+    display: flex;
+    align-items: center;
+}
+
+.main-sidebar .nav-sidebar > .nav-item:first-child > .nav-link .nav-icon.fa-th-large {
+    background-image: url("/static/img/icons/dashboard.svg");
+    background-size: 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+
+    display: inline-block;
+    flex: 0 0 22px;
+
+    margin-right: 12px;
+    line-height: 22px;
+
+    color: transparent;
     font-size: 0;
 }
 
-/* Icono personalizado para producer en el menú */
-.main-sidebar .nav-sidebar .nav-icon.png-icon-producer {
-    background-image: url("/static/img/icons/producer.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 30px;
-    height: 30px;
-    display: inline-block;
-    color: transparent !important;
-    font-size: 0 !important;
-    vertical-align: middle;
+.main-sidebar .nav-sidebar > .nav-item:first-child > .nav-link p {
+    margin: 0;
+    line-height: 22px;
 }
 
-/* Icono personalizado para insumos en el menú */
-.main-sidebar .nav-sidebar .nav-icon.png-icon-insumos {
-    background-image: url("/static/img/icons/insumos.png");
-    background-size: contain;
+
+/* Navbar (botón hamburguesa) */
+.main-header .fa-th-large {
+    background-image: url("/static/img/icons/dashboard.svg");
+    background-size: 18px;
     background-repeat: no-repeat;
     background-position: center;
-    width: 30px;
-    height: 30px;
+
+    width: 20px;
+    height: 20px;
     display: inline-block;
-    color: transparent !important;
-    font-size: 0 !important;
-    vertical-align: middle;
+
+    color: transparent;
+    font-size: 0;
+    line-height: 1;
 }
 
-/* Icono personalizado para insumos en el menú */
-.main-sidebar .nav-sidebar .nav-icon.png-icon-parametros {
-    background-image: url("/static/img/icons/parametros.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 30px;
-    height: 30px;
-    display: inline-block;
-    color: transparent !important;
-    font-size: 0 !important;
-    vertical-align: middle;
+
+
+/* AGRONÓMICO
+========================= */
+
+.icon-clima {
+    background-image: url("/static/img/icons/weather.svg");
 }
 
-/* Icono personalizado para insumos en el menú */
-.main-sidebar .nav-sidebar .nav-icon.png-icon-ventas {
-    background-image: url("/static/img/icons/ventas.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 30px;
-    height: 30px;
-    display: inline-block;
-    color: transparent !important;
-    font-size: 0 !important;
-    vertical-align: middle;
+.icon-alertas {
+    background-image: url("/static/img/icons/alert.svg");
 }
 
-/* Icono personalizado para insumos en el menú */
-.main-sidebar .nav-sidebar .nav-icon.png-icon-operaciones {
-    background-image: url("/static/img/icons/operaciones.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 30px;
-    height: 30px;
-    display: inline-block;
-    color: transparent !important;
-    font-size: 0 !important;
-    vertical-align: middle;
+/* UX INTERACCIÓN
+========================= */
+
+.main-sidebar .nav-sidebar .nav-item:hover .nav-icon {
+    opacity: 1;
 }
 
-/* Icono personalizado para insumos en el menú */
-.main-sidebar .nav-sidebar .nav-icon.png-icon-configuracion {
-    background-image: url("/static/img/icons/configuracion.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 30px;
-    height: 30px;
-    display: inline-block;
-    color: transparent !important;
-    font-size: 0 !important;
-    vertical-align: middle;
+.main-sidebar .nav-sidebar .nav-link.active .nav-icon {
+    opacity: 1;
 }
 
-/* Fija los botones de acciones en la parte inferior del formulario */
-.changeform-actions {
-    position: fixed !important;
-    left: 0;
-    right: 0;
-    bottom: 0;
+/* Submenú Jazzmin: puntos internos más chicos */
+.main-sidebar .nav-treeview .nav-icon.far,
+.main-sidebar .nav-treeview .nav-icon.fas {
+    font-size: 7px;
+    width: 16px;
+    min-width: 16px;
+    opacity: .55;
+}
+
+.main-sidebar .nav-treeview .nav-link {
+    display: flex;
+    align-items: center;
+}
+
+/* =========================================================
+   8. PANEL DE ACCIONES STICKY
+========================================================= */
+
+/* Contenedor derecho donde están los botones */
+.col-lg-3,
+.col-md-3 {
+    position: sticky;
+    top: 90px; /* altura del header */
+    align-self: flex-start;
+}
+
+/* Estilo visual del bloque */
+.col-lg-3 .card,
+.col-md-3 .card {
     background: #fff;
-    z-index: 9999;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
-    padding: 16px 24px;
-    border-top: 1px solid #eee;
-    width: 100%;
+    border-radius: 16px;
+    box-shadow: var(--geagro-shadow-sm);
+    padding: 12px;
 }
 
-/* Asegura que el contenedor padre permita sticky */
+
+/* =========================================================
+   9. FIX SCROLL / CONTENEDORES ADMIN
+========================================================= */
 #content-main {
     position: relative;
 }
 
-#content-main, .content, .main-content, .card-body {
-    overflow: visible !important;
+#content-main,
+.content,
+.main-content,
+.card-body {
+    overflow: visible;
 }

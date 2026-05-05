@@ -12,8 +12,9 @@ class exchangeRate(models.Model):
     date = models.DateField(verbose_name=_('date'))
     rate = models.FloatField( verbose_name=_('rate'))
 
+    # Clara: representación legible de la tasa en el admin
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.currency_origin} → {self.currency_destination} | {self.rate}"
 
     class Meta:
         verbose_name = _('exchange rate')

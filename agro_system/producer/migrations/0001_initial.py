@@ -2,7 +2,7 @@
 
 import agro_system.validacions
 import datetime
-import django.contrib.gis.db.models.fields
+# import django.contrib.gis.db.models.fields Clara
 import django.db.models.deletion
 from django.db import migrations, models
 
@@ -35,8 +35,8 @@ class Migration(migrations.Migration):
                 ('hectares', models.IntegerField(default=0, verbose_name='hectares')),
                 ('hectares_productive', models.IntegerField(default=0, verbose_name='hectares productive')),
                 ('observations', models.TextField(blank=True, null=True, verbose_name='observatios')),
-                ('ubication', django.contrib.gis.db.models.fields.PointField(blank=True, null=True, srid=4326)),
-                ('delimitation', django.contrib.gis.db.models.fields.PolygonField(blank=True, null=True, srid=4326)),
+                ('ubication', models.TextField(blank=True, null=True, verbose_name='ubication')),
+                ('delimitation', models.TextField(blank=True, null=True, verbose_name='delimitation')),
             ],
             options={
                 'verbose_name': 'lot',

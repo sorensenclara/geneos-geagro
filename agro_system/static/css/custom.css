@@ -153,7 +153,7 @@ body[data-sidebar="dark"]{
 .geagro-filterbar-btn .val{
   font-size: 13px;
   color:#0f172a;
-  font-weight: 800;
+  font-weight: 700;
 }
 .geagro-filterbar-btn .sep{
   width: 1px;
@@ -183,7 +183,7 @@ body[data-sidebar="dark"]{
   box-shadow: var(--geagro-shadow-md);
 }
 .geagro-filterbar-menu .form-label{
-  font-weight: 800;
+  font-weight: 700;
   color:#0f172a;
 }
 .geagro-filterbar-menu .form-text{
@@ -225,7 +225,7 @@ body[data-sidebar="dark"]{
 
 .geagro-kpi .card-title{
   font-size: var(--kpi-title);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.2px;
   margin: 0;
 }
@@ -247,13 +247,13 @@ body[data-sidebar="dark"]{
 /* Main values */
 .geagro-kpi .geagro-kpi-value{
   font-size: var(--kpi-main);
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.05;
   margin: 4px 0 10px;
 }
 .geagro-kpi .geagro-kpi-h4{
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.15;
   margin: 4px 0 10px;
 }
@@ -316,7 +316,7 @@ body[data-sidebar="dark"]{
 }
 .risk-value{
   font-size: 24px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.05;
   margin: 6px 0 10px;
 }
@@ -373,7 +373,7 @@ body[data-sidebar="dark"]{
 
 .geagro-weather-temp{
   font-size: var(--kpi-main);
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.05;
   margin: 4px 0 10px;
   color:#111827;
@@ -450,7 +450,7 @@ body[data-sidebar="dark"]{
 }
 
 .geagro-alertbar-title{
-  font-weight: 900;
+  font-weight: 700;
   color:#fff;
   display:flex;
   align-items:center;
@@ -483,14 +483,14 @@ body[data-sidebar="dark"]{
   border-radius:999px;
   background: rgba(255,255,255,.16);
   color:#fff;
-  font-weight:800;
+  font-weight:700;
   font-size:12px;
 }
 
 .geagro-alert-pill i{ color:#fff; font-size: 14px; }
 
 .geagro-alertbar-link{
-  font-weight: 900;
+  font-weight: 700;
   color:#fff;
   text-decoration:none;
   white-space:nowrap;
@@ -525,7 +525,7 @@ body[data-sidebar="dark"]{
   border-radius: 32px;
   padding: 12px 24px;
 
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .3px;
 
   transition: 
@@ -567,7 +567,7 @@ body[data-sidebar="dark"]{
 /* CTA secundarios en footer de cards */
 .geagro-kpi .geagro-card-footer a{
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--bs-primary);
   text-decoration: none;
 
@@ -607,4 +607,86 @@ body[data-sidebar="dark"]{
   .geagro-card-action .geagro-kpi-h4{
     font-size: 20px;
   }
+}
+
+/* ==========================================================
+   11) Family Font
+   ========================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap');
+
+html,
+body,
+body :not(.fa):not(.fas):not(.far):not(.fab) {
+    font-family: 'Titillium Web', sans-serif;
+}
+
+/* ==========================================================
+   12) TOP BAR — filtro compacto productor
+   ========================================================== */
+
+#page-topbar .geagro-filterbar {
+  padding-top: 0;
+  display: flex;
+  align-items: center;
+}
+
+#page-topbar .geagro-filterbar-btn {
+  height: 54px;
+  min-width: 520px;
+  max-width: 620px;
+  padding: 6px 8px 6px 22px;
+  gap: 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(107,63,110,.20);
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(15,23,42,.08);
+  overflow: visible;
+}
+
+#page-topbar .geagro-filterbar-btn .seg {
+  padding: 0;
+  min-width: 150px;
+}
+
+#page-topbar .geagro-filterbar-btn .lbl {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+#page-topbar .geagro-filterbar-btn .sep {
+  width: 1px;
+  height: 32px;
+  background: #e5e7eb;
+}
+
+#page-topbar .geagro-topbar-select {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  height: 20px;
+  line-height: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  outline: none;
+  cursor: pointer;
+  max-width: 170px;
+}
+
+#page-topbar .geagro-filterbar-icon {
+  border: 0;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  margin: 0 0 0 auto;
+  border-radius: 999px;
+  background: #f1e8f2;
+  color: #6f4071;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
