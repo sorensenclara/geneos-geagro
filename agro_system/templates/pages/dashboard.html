@@ -92,8 +92,8 @@
               <img src="{% static 'images/icon/technical_plan_color.svg' %}" class="dashboard-icon-img" />
             </div>
 
-            {% if work_orders %}
-              {% with order=work_orders.0 %}
+            {% if next_work_order %}
+            {% with order=next_work_order %}
                 <div class="geagro-kpi-h4">{{ order.service|default:"Orden de trabajo" }}</div>
                 <div class="geagro-kpi-meta">
                   Inicio: {{ order.date_init|date:"d/m/Y" }}<br>
@@ -199,107 +199,124 @@
 
     <!-- RESUMEN PRODUCTIVO -->
     <div class="col-xl-4">
-      <div class="card h-100">
+    <div class="card h-100">
         <div class="card-body">
 
-          <div class="d-flex align-items-start justify-content-between mb-3">
+        <div class="d-flex align-items-start justify-content-between mb-3">
             <div>
-              <h4 class="card-title mb-1">Resumen productivo</h4>
-              <div class="text-muted">Contexto general del cultivo</div>
+            <h4 class="card-title mb-1">Resumen productivo</h4>
+            <div class="text-muted">Estado de campaña y superficie</div>
             </div>
             <i class="mdi mdi-chart-box-outline font-size-24 text-primary"></i>
-          </div>
+        </div>
 
-          <div class="row g-3">
+        <div class="row g-3">
 
             <div class="col-sm-6">
-              <div class="p-3 rounded-3 border">
+            <div class="p-3 rounded-3 border">
                 <div class="text-muted mb-1">Campaña</div>
                 <div class="h5 mb-0">
-                  {% if selected_campaing %}
+                {% if selected_campaing %}
                     {{ selected_campaing.name }}
-                  {% elif campaign_active %}
+                {% elif campaign_active %}
                     {{ campaign_active.name }}
-                  {% else %}
+                {% else %}
                     -
-                  {% endif %}
+                {% endif %}
                 </div>
-              </div>
+            </div>
             </div>
 
             <div class="col-sm-6">
-              <div class="p-3 rounded-3 border">
-                <div class="text-muted mb-1">Lote principal</div>
+            <div class="p-3 rounded-3 border">
+                <div class="text-muted mb-1">Cultivo</div>
                 <div class="h5 mb-0">
-                  {% if selected_crop and selected_crop.lot %}
-                    {{ selected_crop.lot }}
-                  {% elif selected_lot %}
-                    {{ selected_lot.name }}
-                  {% elif lot_main %}
-                    {{ lot_main.name }}
-                  {% else %}
-                    -
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-
-            <div class="col-sm-6">
-              <div class="p-3 rounded-3 border">
-                <div class="text-muted mb-1">Campo</div>
-                <div class="h5 mb-0">
-                  {% if selected_crop and selected_crop.countryside %}
-                    {{ selected_crop.countryside }}
-                  {% elif selected_lot %}
-                    {{ selected_lot.countryside|default:"-" }}
-                  {% elif lot_main %}
-                    {{ lot_main.countryside|default:"-" }}
-                  {% else %}
-                    -
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-
-            <div class="col-sm-6">
-              <div class="p-3 rounded-3 border">
-                <div class="text-muted mb-1">Actividad</div>
-                <div class="h5 mb-0">
-                  {% if selected_crop %}
+                {% if selected_crop %}
                     {{ selected_crop.activity|default:"-" }}
-                  {% else %}
+                {% else %}
                     -
-                  {% endif %}
+                {% endif %}
                 </div>
-              </div>
+            </div>
             </div>
 
             <div class="col-sm-6">
-              <div class="p-3 rounded-3 border">
-                <div class="text-muted mb-1">Has. productivas</div>
-                <div class="h4 mb-0">
-                  {{ crop_hectares_productive|default:"0" }} ha
+            <div class="p-3 rounded-3 border">
+                <div class="text-muted mb-1">Lote</div>
+                <div class="h5 mb-0">
+                {% if selected_crop and selected_crop.lot %}
+                    {{ selected_crop.lot }}
+                {% elif selected_lot %}
+                    {{ selected_lot.name }}
+                {% elif lot_main %}
+                    {{ lot_main.name }}
+                {% else %}
+                    -
+                {% endif %}
                 </div>
-              </div>
+            </div>
             </div>
 
             <div class="col-sm-6">
-              <div class="p-3 rounded-3 border">
-                <div class="text-muted mb-1">Has. totales</div>
-                <div class="h4 mb-0">
-                  {{ crop_hectares_total|default:"0" }} ha
-                </div>
-              </div>
+            <div class="p-3 rounded-3 border">
+                <div class="text-muted mb-1">Superficie total</div>
+                <div class="h4 mb-0">{{ lot_hectares_total|default:"0" }} ha</div>
+            </div>
             </div>
 
-          </div>
+            <div class="col-sm-6">
+            <div class="p-3 rounded-3 border">
+                <div class="text-muted mb-1">Plantadas</div>
+                <div class="h4 mb-0">{{ crop_hectares_planted|default:"0" }} ha</div>
+            </div>
+            </div>
 
-          <div class="mt-4 text-center">
-            <a href="#" class="btn btn-sm btn-primary">Ver detalle</a>
-          </div>
+            <div class="col-sm-6">
+            <div class="p-3 rounded-3 border">
+                <div class="text-muted mb-1">Sin plantar</div>
+                <div class="h4 mb-0">{{ crop_hectares_without_plant|default:"0" }} ha</div>
+            </div>
+            </div>
 
         </div>
-      </div>
+
+        <!-- BARRAS DE AVANCE -->
+        <div class="geagro-progress-summary mt-4">
+
+            <div class="progress-row">
+            <div class="d-flex justify-content-between mb-1">
+                <span>Avance de plantación</span>
+                <strong>{{ planted_percent|default:"0" }}%</strong>
+            </div>
+            <div class="progress-track">
+                <span style="width: {{ planted_percent|default:'0' }}%;"></span>
+            </div>
+            <div class="text-muted small mt-1">
+                {{ crop_hectares_planted|default:"0" }} ha plantadas de {{ lot_hectares_total|default:"0" }} ha totales
+            </div>
+            </div>
+
+            <div class="progress-row mt-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span>Avance de cosecha</span>
+                <strong>{{ harvested_percent|default:"0" }}%</strong>
+            </div>
+            <div class="progress-track">
+                <span style="width: {{ harvested_percent|default:'0' }}%;"></span>
+            </div>
+            <div class="text-muted small mt-1">
+                {{ crop_hectares_harvested|default:"0" }} ha cosechadas de {{ crop_hectares_planted|default:"0" }} ha plantadas
+            </div>
+            </div>
+
+        </div>
+
+        <div class="mt-4 text-center">
+            <a href="#" class="btn btn-sm btn-primary">Ver detalle</a>
+        </div>
+
+        </div>
+    </div>
     </div>
 
     <!-- PRÓXIMAS ACTIVIDADES -->
