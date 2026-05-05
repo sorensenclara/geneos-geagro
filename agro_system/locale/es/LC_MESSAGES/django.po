@@ -810,7 +810,7 @@ msgstr "Tasa de cambio"
 
 #: parameter/models/exchange_rate.py:20
 msgid "exchange rates"
-msgstr "Tasas de camnio"
+msgstr "Tasas de cambio"
 
 #: parameter/models/gender.py:14 producer/models/staff.py:28
 msgid "gender"

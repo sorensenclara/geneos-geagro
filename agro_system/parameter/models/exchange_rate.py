@@ -13,7 +13,7 @@ class exchangeRate(models.Model):
     rate = models.FloatField( verbose_name=_('rate'))
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.currency_origin} → {self.currency_destination} | {self.rate}"
 
     class Meta:
         verbose_name = _('exchange rate')
