@@ -188,6 +188,40 @@ def DashboardView(request):
         next_work_order = base_qs.order_by('-date_init').first()
 
     # =========================
+    # CLARA - Insumos faltantes (próximas 3 órdenes)
+    # =========================
+
+    from operation.models.input_work_order import InputWorkOrder
+
+    insumos_faltantes = []
+    total_cost = 0
+
+    if work_orders:
+        next_orders = work_orders[:3]
+
+        for order in next_orders:
+            insumos_ot = InputWorkOrder.objects.filter(work_order=order)
+
+            for io in insumos_ot:
+                input_obj = io.input
+                requerido = io.dose or 0
+                stock = input_obj.stock or 0
+
+                if stock < requerido:
+                    faltante = requerido - stock
+                    costo = (input_obj.cost or 0) * faltante
+
+                    insumos_faltantes.append({
+                        'name': input_obj.name,
+                        'faltante': faltante,
+                        'costo': costo,
+                        'currency': input_obj.currency,
+                    })
+
+                    total_cost += costo
+
+
+    # =========================
     # CLARA - Si hay órdenes, usar el cultivo real de la primera orden
     # Esto corrige cuando selected_crop queda vacío pero work_orders sí trae datos.
     # =========================
@@ -298,7 +332,12 @@ def DashboardView(request):
         'crop_hectares_without_harvest': crop_hectares_without_harvest,
         'planted_percent': planted_percent,
         'harvested_percent': harvested_percent,
+
         'next_work_order': next_work_order,
+
+        'insumos_faltantes': insumos_faltantes,
+        'insumos_count': len(insumos_faltantes),
+        'insumos_total_cost': total_cost,
     }
 
     return render(request, 'pages/dashboard.html', data)

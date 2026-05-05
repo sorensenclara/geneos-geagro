@@ -121,37 +121,54 @@
         </div>
       </div>
 
-      <!-- 3. ESTADO DEL CULTIVO -->
-      <div class="col-xl-3 col-md-6 geagro-kpi">
-        <div class="card h-100 geagro-card-status">
-          <div class="card-body">
+    <!-- 3. INSUMOS A COMPRAR -->
+    <div class="col-xl-3 col-md-6 geagro-kpi">
+    <div class="card h-100 geagro-card-inputs">
+        <div class="card-body">
 
-            <div class="geagro-card-header">
-              <h5 class="card-title">Estado del cultivo</h5>
-              <img src="{% static 'images/icon/vinedos-color.svg' %}" class="dashboard-icon-img" />
+        <div class="geagro-card-header">
+            <h5 class="card-title">Insumos a comprar</h5>
+            <i class="mdi mdi-cart-outline geagro-card-icon"></i>
+        </div>
+
+        {% if insumos_count > 0 %}
+            <div class="geagro-kpi-h4">
+            {{ insumos_count }} insumo{{ insumos_count|pluralize }}
             </div>
 
-            {% if selected_crop %}
-              <div class="geagro-kpi-h4">{{ selected_crop.state|default:"Sin estado" }}</div>
-              <div class="geagro-kpi-meta">
-                Cultivo: <strong>{{ selected_crop.activity|default:"-" }}</strong><br>
-                Lote: {{ selected_crop.lot|default:"-" }}
-              </div>
-            {% else %}
-              <div class="geagro-kpi-h4">Sin cultivo</div>
-              <div class="geagro-kpi-meta">
-                No hay cultivo activo para esta campaña.
-              </div>
-            {% endif %}
+            <div class="geagro-kpi-meta">
+            Faltantes para próximas órdenes
+            </div>
+
+            <div class="mt-2">
+            {% for insumo in insumos_faltantes|slice:":2" %}
+                <div class="small">
+                {{ insumo.name }} → {{ insumo.faltante }}
+                </div>
+            {% endfor %}
+            </div>
 
             <div class="geagro-card-footer">
-              <span class="geagro-badge geagro-badge-primary">Cultivo</span>
-              <a href="#" class="small">Ver detalle</a>
+            <span class="geagro-badge geagro-badge-danger">
+                $ {{ insumos_total_cost|floatformat:0 }}
+            </span>
+            <a href="#" class="small">Ver detalle</a>
             </div>
 
-          </div>
+        {% else %}
+            <div class="geagro-kpi-h4">Stock suficiente</div>
+            <div class="geagro-kpi-meta">
+            No faltan insumos para próximas órdenes
+            </div>
+
+            <div class="geagro-card-footer">
+            <span class="geagro-badge geagro-badge-success">OK</span>
+            </div>
+        {% endif %}
+
         </div>
-      </div>
+    </div>
+    </div>
 
       <!-- 4. CAMPAÑA ACTIVA -->
       <div class="col-xl-3 col-md-6 geagro-kpi">
