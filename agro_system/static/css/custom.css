@@ -729,3 +729,24 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 .geagro-card-inputs {
   border-left: 4px solid #dc3545;
 }
+
+/* ======================================
+   Card: Próximas actividades
+   Destacado: orden del día (HOY)
+====================================== */
+
+.activity-feed .date.is-today {
+  color: #ffffff;
+  font-weight: 600;
+  background-color: var(--bs-info);
+  border-radius: 32px;
+}
+
+.activity-feed .date.is-today + .activity-text {
+  font-weight: 600;
+}
+
+.activity-feed .date.is-today::before {
+  content: "● ";
+  color: #6b3f6e;
+}
