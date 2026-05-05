@@ -145,26 +145,47 @@ def DashboardView(request):
         work_orders = work_orders.filter(date_init__gte=today).order_by('date_init')[:3]
     """
 
+   # =========================
+    # CLARA - Órdenes reales + próxima acción inteligente
     # =========================
-    # CLARA - Órdenes reales por campaña + cultivo
-    # =========================
+    today = timezone.now().date()
+
     work_orders = WorkOrder.objects.none()
+    next_work_order = None
+    base_qs = WorkOrder.objects.none()
 
     if selected_crop:
-        work_orders = WorkOrder.objects.filter(crop=selected_crop)
+        base_qs = WorkOrder.objects.filter(crop=selected_crop)
 
         if selected_campaing:
-            work_orders = work_orders.filter(campaing=selected_campaing)
-
-        work_orders = work_orders.order_by('date_init')[:3]
+            base_qs = base_qs.filter(campaing=selected_campaing)
 
     elif selected_campaing:
-        work_orders = WorkOrder.objects.filter(campaing=selected_campaing)
+        base_qs = WorkOrder.objects.filter(campaing=selected_campaing)
 
         if lots.exists():
-            work_orders = work_orders.filter(crop__lot__in=lots)
+            base_qs = base_qs.filter(crop__lot__in=lots)
 
-        work_orders = work_orders.order_by('date_init')[:3]
+    # Timeline
+    work_orders = base_qs.order_by('date_init')[:3]
+
+    # Próxima acción:
+    # 1. Pendiente desde hoy en adelante
+    next_work_order = base_qs.filter(
+        date_init__gte=today
+    ).exclude(
+        stateOT__name__iexact="Finalizada"
+    ).order_by('date_init').first()
+
+    # 2. Si no hay, cualquier pendiente
+    if not next_work_order:
+        next_work_order = base_qs.exclude(
+            stateOT__name__iexact="Finalizada"
+        ).order_by('date_init').first()
+
+    # 3. Si no hay, última finalizada
+    if not next_work_order:
+        next_work_order = base_qs.order_by('-date_init').first()
 
     # =========================
     # CLARA - Si hay órdenes, usar el cultivo real de la primera orden
@@ -203,8 +224,6 @@ def DashboardView(request):
 
     # =========================
     # CLARA - Resumen productivo real
-    # Lote = superficie estructural
-    # Cultivo = estado de campaña
     # =========================
     lot_hectares_total = 0
     crop_hectares_planted = 0
@@ -222,9 +241,9 @@ def DashboardView(request):
 
         # Datos propios del cultivo / campaña
         crop_hectares_planted = selected_crop.hectares_planted or 0
-        crop_hectares_without_plant = selected_crop.hectares_without_plant or 0
+        crop_hectares_without_plant = selected_crop.hectares_unplanted or 0
         crop_hectares_harvested = selected_crop.hectares_harvested or 0
-        crop_hectares_without_harvest = selected_crop.hectares_without_harvest or 0
+        crop_hectares_without_harvest = selected_crop.hectares_not_harvested or 0
 
         # % plantado sobre total del lote
         if lot_hectares_total:
@@ -269,9 +288,6 @@ def DashboardView(request):
         'selected_countryside': country_side_selected,
         'selected_lot': selected_lot,
 
-        'crop_hectares_productive': crop_hectares_productive,
-        'crop_hectares_total': crop_hectares_total,
-
         'weather_data': weather_data,
         'station': station,
 
@@ -282,6 +298,7 @@ def DashboardView(request):
         'crop_hectares_without_harvest': crop_hectares_without_harvest,
         'planted_percent': planted_percent,
         'harvested_percent': harvested_percent,
+        'next_work_order': next_work_order,
     }
 
     return render(request, 'pages/dashboard.html', data)
