@@ -2,206 +2,182 @@
 {% block topbar %}
 
 <header id="page-topbar">
-    <div class="navbar-header">
-        <div class="d-flex">
-            <!-- LOGO -->
-            <div class="navbar-brand-box">
-                <a href="{% url 'dashboard' %}" class="logo logo-dark">
-                    <span class="logo-sm">
-                        <img src="{% static 'images/logo-sm.png' %}" alt="" height="32">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="{% static 'images/logo-geagro-dark.png' %}" alt="" height="28">
-                    </span>
-                </a>
+  <div class="navbar-header">
+    <div class="d-flex">
+      <!-- LOGO -->
+      <div class="navbar-brand-box">
+        <a href="{% url 'dashboard' %}" class="logo logo-dark">
+          <span class="logo-sm">
+            <img src="{% static 'images/logo-sm.png' %}" alt="" height="32">
+          </span>
+          <span class="logo-lg">
+            <img src="{% static 'images/logo-geagro-dark.png' %}" alt="" height="28">
+          </span>
+        </a>
 
-                <a href="{% url 'dashboard' %}" class="logo logo-light">
-                    <span class="logo-sm">
-                        <img src="{% static 'images/logo-sm.svg' %}" alt="" height="32">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="{% static 'images/logo-geagro-light.svg' %}" alt="" height="28">
-                    </span>
-                </a>
-            </div>
+        <a href="{% url 'dashboard' %}" class="logo logo-light">
+          <span class="logo-sm">
+            <img src="{% static 'images/logo-sm.svg' %}" alt="" height="32">
+          </span>
+          <span class="logo-lg">
+            <img src="{% static 'images/logo-geagro-light.svg' %}" alt="" height="28">
+          </span>
+        </a>
+      </div>
 
-            <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect vertical-menu-btn">
-                <i class="mdi mdi-menu"></i>
-            </button>
-        </div>
+      <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect vertical-menu-btn">
+        <i class="mdi mdi-menu"></i>
+      </button>
+    </div>
 
-        <div class="d-flex">
+    <div class="d-flex align-items-center">
 
-    <!-- FILTRO GEAGRO: Campaña + Cultivo directo en topbar -->
-    <div class="geagro-filterbar d-none d-lg-block">
+      <!-- FILTRO GEAGRO -->
+      <div class="geagro-filterbar d-none d-lg-block">
         <form method="get" action="" class="geagro-filterbar-btn">
 
-            <span class="seg">
-                <span class="lbl">Campaña</span>
-                <select class="val geagro-topbar-select" name="campaing" onchange="this.form.submit()">
-                    <option value="">Campaña activa</option>
-                    {% for c in campaings %}
-                        <option value="{{ c.id }}"
-                            {% if selected_campaing and c.id == selected_campaing.id %}selected{% endif %}>
-                            {{ c.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </span>
+          <span class="seg">
+            <span class="lbl">Campaña</span>
+            <select class="val geagro-topbar-select" name="campaing" onchange="this.form.submit()">
+              <option value="">Activa</option>
+              {% for c in campaings %}
+                <option value="{{ c.id }}" {% if selected_campaing and c.id == selected_campaing.id %}selected{% endif %}>
+                  {{ c.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </span>
 
-            <span class="sep"></span>
+          <span class="sep"></span>
 
-            <span class="seg">
-                <span class="lbl">Cultivo</span>
-                <select class="val geagro-topbar-select" name="crop" onchange="this.form.submit()">
-                    <option value="">Todos</option>
-                    {% for c in crops %}
-                        <option value="{{ c.id }}"
-                            {% if selected_crop and c.id == selected_crop.id %}selected{% endif %}>
-                            {{ c }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </span>
+          <span class="seg">
+            <span class="lbl">Cultivo</span>
+            <select class="val geagro-topbar-select" name="crop" onchange="this.form.submit()">
+              <option value="">Todos</option>
+              {% for c in crops %}
+                <option value="{{ c.id }}" {% if selected_crop and c.id == selected_crop.id %}selected{% endif %}>
+                  {{ c.activity|default:c.name|default:c }}
+                </option>
+              {% endfor %}
+            </select>
+          </span>
 
-            <button type="submit" class="geagro-filterbar-icon">
-                <i class="mdi mdi-magnify"></i>
-            </button>
+          <button type="submit" class="geagro-filterbar-icon" aria-label="Aplicar filtros">
+            <i class="mdi mdi-magnify"></i>
+          </button>
 
         </form>
-    </div>
+      </div>
 
-            <!-- Botón filtro mobile -->
-            <div class="d-inline-block d-lg-none ms-2">
-                <button type="button" class="btn header-item noti-icon waves-effect" id="geagroMobileFilterBtn">
-                    <i class="mdi mdi-filter-variant"></i>
-                </button>
-            </div>
+      <!-- Botón filtro mobile -->
+      <div class="d-inline-block d-lg-none ms-2">
+        <button type="button" class="btn header-item noti-icon waves-effect" id="geagroMobileFilterBtn">
+          <i class="mdi mdi-filter-variant"></i>
+        </button>
+      </div>
 
-            <div class="dropdown d-none d-md-block ms-2">
-                <button type="button" class="btn header-item waves-effect" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img class="me-2" src="{% static 'images/flags/arg_flag.jpg' %}" alt="Header Language" height="16">
-                    Español <span class="mdi mdi-chevron-down"></span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end">
-                    <a href="javascript:void(0);" class="dropdown-item notify-item">
-                        <img src="{% static 'images/flags/us_flag.jpg' %}" alt="user-image" class="me-1" height="12">
-                        <span class="align-middle"> Inglés </span>
-                    </a>
+      <!-- Fullscreen -->
+      <div class="dropdown d-none d-lg-inline-block">
+        <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen">
+          <i class="mdi mdi-fullscreen font-size-24"></i>
+        </button>
+      </div>
+
+      <!-- Notificaciones -->
+      <div class="dropdown d-inline-block ms-1">
+        <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
+          data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="mdi mdi-bell-outline"></i>
+          <span class="badge text-bg-primary rounded-pill">2</span>
+        </button>
+
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+          aria-labelledby="page-header-notifications-dropdown">
+
+          <div class="p-3">
+            <h5 class="m-0">Notificaciones (2)</h5>
+          </div>
+
+          <div data-simplebar style="max-height: 230px;">
+            <a href="javascript:void(0);" class="text-reset notification-item">
+              <div class="d-flex">
+                <div class="flex-shrink-0 me-3">
+                  <div class="avatar-xs">
+                    <span class="avatar-title border-success rounded-circle">
+                      <i class="mdi mdi-billboard"></i>
+                    </span>
+                  </div>
                 </div>
-            </div>
-
-            <div class="dropdown d-none d-lg-inline-block">
-                <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen">
-                    <i class="mdi mdi-fullscreen font-size-24"></i>
-                </button>
-            </div>
-
-            <div class="dropdown d-inline-block ms-1">
-                <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
-                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="ti-bell"></i>
-                    <span class="badge text-bg-primary rounded-pill">2</span>
-                </button>
-
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
-                    aria-labelledby="page-header-notifications-dropdown">
-
-                    <div class="p-3">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h5 class="m-0">Notificaciones (2)</h5>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div data-simplebar style="max-height: 230px;">
-                        <a href="javascript:void(0);" class="text-reset notification-item">
-                            <div class="d-flex">
-                                <div class="flex-shrink-0 me-3">
-                                    <div class="avatar-xs">
-                                        <span class="avatar-title border-success rounded-circle">
-                                            <i class="mdi mdi-billboard"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">Nuevo plan de acción</h6>
-                                    <div class="text-muted">
-                                        <p class="mb-1">Campaña 2026</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a href="javascript:void(0);" class="text-reset notification-item">
-                            <div class="d-flex">
-                                <div class="flex-shrink-0 me-3">
-                                    <div class="avatar-xs">
-                                        <span class="avatar-title border-warning rounded-circle">
-                                            <i class="mdi mdi-alert-circle-outline"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">Alerta y avisos</h6>
-                                    <div class="text-muted">
-                                        <p class="mb-1">Alertas heladas (48hs)</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div class="p-2 border-top">
-                        <a class="btn btn-sm btn-link font-size-14 w-100 text-center" href="javascript:void(0)">
-                            Ver todas
-                        </a>
-                    </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">Nuevo plan de acción</h6>
+                  <div class="text-muted">
+                    <p class="mb-1">Campaña 2026</p>
+                  </div>
                 </div>
-            </div>
+              </div>
+            </a>
 
-            <div class="dropdown d-inline-block">
-                <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
-                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img class="rounded-circle header-profile-user" src="{% static 'images/users/user-4.jpg' %}"
-                        alt="Header Avatar">
-                </button>
-
-                <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" href="#">
-                        <i class="mdi mdi-account-circle font-size-17 text-muted align-middle me-1"></i>
-                        Perfil
-                    </a>
-
-                    <a class="dropdown-item" href="#">
-                        <i class="mdi mdi-cog font-size-17 text-muted align-middle me-1"></i>
-                        Configuración
-                    </a>
-
-                    <div class="dropdown-divider"></div>
-
-                    {% if user.is_authenticated %}
-                        <a class="dropdown-item" href="{% url 'account_change_password' %}">
-                            <i class="mdi mdi-key text-muted fs-16 align-middle me-1"></i>
-                            <span class="align-middle" data-key="t-change-password">Cambiar la contraseña</span>
-                        </a>
-
-                        <a class="dropdown-item text-danger" href="{% url 'account_logout' %}">
-                            <i class="mdi mdi-power font-size-17 text-muted align-middle me-1 text-danger"></i>
-                            Cerrar sesión
-                        </a>
-                    {% else %}
-                        <a class="dropdown-item" href="{% url 'account_login' %}">
-                            <i class="mdi mdi-key text-muted fs-16 align-middle me-1"></i>
-                            <span class="align-middle" data-key="t-login">Iniciar sesión</span>
-                        </a>
-                    {% endif %}
+            <a href="javascript:void(0);" class="text-reset notification-item">
+              <div class="d-flex">
+                <div class="flex-shrink-0 me-3">
+                  <div class="avatar-xs">
+                    <span class="avatar-title border-warning rounded-circle">
+                      <i class="mdi mdi-alert-circle-outline"></i>
+                    </span>
+                  </div>
                 </div>
-            </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">Alerta y avisos</h6>
+                  <div class="text-muted">
+                    <p class="mb-1">Alertas heladas (48hs)</p>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
 
+          <div class="p-2 border-top">
+            <a class="btn btn-sm btn-link font-size-14 w-100 text-center" href="javascript:void(0)">
+              Ver todas
+            </a>
+          </div>
         </div>
+      </div>
+
+      <!-- Usuario -->
+      <div class="dropdown d-inline-block">
+        <button type="button" class="btn header-item waves-effect geagro-user-btn" id="page-header-user-dropdown"
+          data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+            <span class="geagro-user-avatar">
+            <i class="mdi mdi-account-outline"></i>
+            </span>
+        </button>
+
+        <div class="dropdown-menu dropdown-menu-end">
+          {% if user.is_authenticated %}
+            <a class="dropdown-item" href="{% url 'account_change_password' %}">
+              <i class="mdi mdi-key text-muted fs-16 align-middle me-1"></i>
+              Cambiar contraseña
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <a class="dropdown-item text-danger" href="{% url 'account_logout' %}">
+              <i class="mdi mdi-power font-size-17 align-middle me-1 text-danger"></i>
+              Cerrar sesión
+            </a>
+          {% else %}
+            <a class="dropdown-item" href="{% url 'account_login' %}">
+              <i class="mdi mdi-login text-muted fs-16 align-middle me-1"></i>
+              Iniciar sesión
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
     </div>
+  </div>
 </header>
 
 {% endblock topbar %}

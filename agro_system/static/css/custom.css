@@ -159,7 +159,7 @@ body[data-sidebar="dark"]{
   background: rgba(15,23,42,.10);
 }
 .geagro-filterbar-icon{
-  margin-left: auto;
+  margin-left: 4px;
   width: 34px;
   height: 34px;
   border-radius: 999px;
@@ -626,11 +626,12 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   padding-top: 0;
   display: flex;
   align-items: center;
+  margin-top: 8px;
 }
 
 #page-topbar .geagro-filterbar-btn {
   height: 54px;
-  min-width: 520px;
+  min-width: 500px;
   max-width: 620px;
   padding: 6px 8px 6px 22px;
   gap: 18px;
@@ -643,7 +644,11 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 
 #page-topbar .geagro-filterbar-btn .seg {
   padding: 0;
-  min-width: 150px;
+  min-width: 130px;
+}
+
+#page-topbar .geagro-filterbar-btn .seg:nth-child(3) {
+  min-width: 160px;
 }
 
 #page-topbar .geagro-filterbar-btn .lbl {
@@ -672,21 +677,96 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   outline: none;
   cursor: pointer;
   max-width: 170px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+#page-topbar .geagro-filterbar-btn {
+  height: 54px;
+  min-width: 500px;
+  max-width: 620px;
+  padding: 6px 8px 6px 22px;
+
+  display: flex;
+  align-items: center;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(15,23,42,.08);
+  overflow: visible;
+}
+
+#page-topbar .geagro-filterbar-btn .seg {
+  flex: 1 1 0;
 }
 
 #page-topbar .geagro-filterbar-icon {
-  border: 0;
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  margin: 0 0 0 auto;
-  border-radius: 999px;
-  background: #f1e8f2;
-  color: #6f4071;
-  font-size: 20px;
-  display: flex;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#page-topbar .geagro-filterbar-icon:focus,
+#page-topbar .geagro-filterbar-icon:active,
+#page-topbar .geagro-filterbar-icon:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+/* Notificaciones */
+#page-header-notifications-dropdown {
+  position: relative;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+#page-header-notifications-dropdown i {
+  display: inline-block !important;
+  color: #5b6472;
+  font-size: 22px;
+  line-height: 1;
+}
+
+#page-header-notifications-dropdown .badge {
+  position: absolute;
+  top: 8px;
+  right: 6px;
+}
+
+/* Avatar usuario sin foto */
+.geagro-user-btn {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.geagro-user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: #f1e8f2;
+  color: var(--bs-primary);
+  border: 1px solid rgba(107,63,110,.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 8px 22px rgba(107,63,110,.12);
+}
+
+.geagro-user-avatar i {
+  font-size: 26px;
+  line-height: 1;
+}
+
+/* Ocultar selector idioma si queda en otro template */
+.language-switch,
+.language-dropdown,
+.header-language {
+  display: none !important;
 }
 
 /* ==========================================================

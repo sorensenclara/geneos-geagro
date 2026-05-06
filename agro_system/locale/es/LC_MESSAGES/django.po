@@ -1184,7 +1184,7 @@ msgstr "Cerrar sesión"
 
 #: templates/account/logout.html:10
 msgid "Are you sure you want to sign out?"
-msgstr "Estas seguro que queres cerrar sesión?"
+msgstr "¿Estás seguro que queres cerrar sesión?"
 
 #: templates/account/password_change.html:5
 #: templates/account/password_change.html:10
