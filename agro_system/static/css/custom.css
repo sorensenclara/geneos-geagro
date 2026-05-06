@@ -746,9 +746,98 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 
 .activity-feed .date.is-today + .activity-text {
   font-weight: 600;
+  font-size: 16px !important;
 }
 
 .activity-feed .date.is-today::before {
   content: "● ";
   color: #6b3f6e;
+}
+
+/* Segunda fila: cards iguales y CTA siempre abajo */
+.geagro-dashboard > .row .card {
+  height: 100%;
+}
+
+.geagro-dashboard > .row .card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.geagro-dashboard > .row .card-body > .text-center.mt-3,
+.geagro-dashboard > .row .card-body > .text-center.mt-4 {
+  margin-top: auto !important;
+  padding-top: 24px;
+}
+
+.activity-feed .feed-item.is-current .feed-item-list {
+  background: rgba(107, 63, 110, .08);
+  border: 1px solid rgba(107, 63, 110, .22);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.activity-feed .feed-item.is-current .date {
+  color: var(--bs-primary);
+  font-weight: 800;
+}
+
+.activity-feed .feed-item.is-current .activity-text {
+  font-weight: 600;
+  font-size: 16px !important;
+}
+
+.geagro-card-risk.risk-low .geagro-card-icon { color: var(--risk-low); }
+.geagro-card-risk.risk-med .geagro-card-icon { color: var(--risk-med); }
+.geagro-card-risk.risk-high .geagro-card-icon { color: var(--risk-high); }
+
+.geagro-dashboard-title {
+  margin-bottom: 28px;
+}
+
+.geagro-dashboard-title h1 {
+  font-size: clamp(22px, 4vw, 32px);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  color: #1f2433;
+  margin: 0 0 18px;
+}
+
+.geagro-dashboard-context {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: clamp(15px, 2vw, 24px);
+  line-height: 1.2;
+  font-weight: 600;
+  color: #1f2433;
+}
+
+.geagro-dashboard-context i {
+  font-size: .9em;
+  color: #5b6472;
+}
+
+.geagro-dashboard-context span {
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (max-width: 576px) {
+  .geagro-dashboard-title {
+    margin-bottom: 20px;
+  }
+
+  .geagro-dashboard-title h1 {
+    font-size: 34px;
+    letter-spacing: -.6px;
+    margin-bottom: 12px;
+  }
+
+  .geagro-dashboard-context {
+    font-size: 18px;
+    gap: 8px;
+  }
 }
