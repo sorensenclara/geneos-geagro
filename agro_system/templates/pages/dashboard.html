@@ -5,12 +5,29 @@
 
 {% block content %}
 
-{% block pagetitle %}
-  {% include "partials/page-title.html" with pagetitle="Dashboard" subtitle="Panel productivo" title="GEAGRO VID" %}
-{% endblock pagetitle %}
+<div class="geagro-dashboard-title mb-4">
+  <h1>Panel productivo</h1>
+
+  <div class="geagro-dashboard-context">
+    <span>
+      CAMPAÑA:
+      {% if selected_campaing %}
+        {{ selected_campaing.name }}
+      {% elif campaign_active %}
+        {{ campaign_active.name }}
+      {% else %}
+        Sin campaña activa
+      {% endif %}
+    </span>
+
+    {% if selected_crop %}
+      <i class="mdi mdi-chevron-right"></i>
+      <span>CULTIVO: {{ selected_crop.activity|default:"-" }}</span>
+    {% endif %}
+  </div>
+</div>
 
 <div class="geagro-dashboard">
-
   <!-- FRANJA DE ALERTAS -->
   <div class="geagro-alertbar mb-4">
     <div class="geagro-alertbar-inner">
@@ -338,7 +355,7 @@
 
           <ol class="activity-feed mb-0">
             {% for order in work_orders %}
-              <li class="feed-item">
+              <li class="feed-item {% if order.stateOT.name == 'EN CURSO' or order.stateOT == 'EN CURSO' %}is-current{% endif %}">
                 <div class="feed-item-list">
                     <span class="date {% if order.date_init == today %}is-today{% endif %}">
                     {% if order.date_init == today %}
@@ -351,12 +368,14 @@
                 </div>
               </li>
             {% empty %}
-              <li class="feed-item">
+            <li class="feed-item">
                 <div class="feed-item-list">
-                  <span class="date">Sin próximas actividades</span>
-                  <span class="activity-text">No hay órdenes cargadas para esta campaña.</span>
+                <span class="date">Sin próximas actividades</span>
+                <span class="activity-text">
+                    No hay órdenes cargadas para esta campaña.
+                </span>
                 </div>
-              </li>
+            </li>
             {% endfor %}
           </ol>
 
@@ -393,7 +412,7 @@
             </div>
 
             <div class="text-muted">
-            órdenes completadas
+            ÓRDENES COMPLETADAS
             </div>
 
         </div>
