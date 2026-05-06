@@ -48,7 +48,7 @@ DJANGO_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites', # Necesario para dj-rest-auth
-#    'django.contrib.gis',
+    'django.contrib.gis',
 ]
 
 THIRD_PARTY_APPS = [
@@ -58,7 +58,7 @@ THIRD_PARTY_APPS = [
     'dj_rest_auth', # login
     'corsheaders', # Cors
     "ckeditor",
-#    "leaflet",
+    "leaflet",
     
     "crispy_forms",
     "crispy_bootstrap5",
@@ -126,10 +126,20 @@ AUTHENTICATION_BACKENDS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+
+     'default': {
+       'ENGINE': 'django.contrib.gis.db.backends.postgis',
+       'NAME':  env('DATABASE_NAME'),
+       'USER': env('DATABASE_USER'),
+       'PASSWORD': env('DATABASE_PASS'),
+       'HOST': env('DATABASE_HOST'),
+       'PORT': env('DATABASE_PORT'),
+   }
+   # BASE CLARA
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
 }
 
 

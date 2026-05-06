@@ -22,9 +22,6 @@ from alert.models.alert import Alert
 @login_required
 def DashboardView(request):
 
-    # =========================
-    # CLARA - Filtros GET nuevos
-    # =========================
     countryside_id = request.GET.get('countryside')
     lot_id = request.GET.get('lot')
     campaing_id = request.GET.get('campaing')
@@ -33,9 +30,6 @@ def DashboardView(request):
     user = request.user
     staff = None
 
-    # =========================
-    # DEV ORIGINAL (SIN CAMBIOS)
-    # =========================
     if user.type == 'Staff':
         staff = Staff.objects.filter(user=user).first()
         country_sides = Countryside.objects.filter(producer=user.producer)
@@ -55,9 +49,6 @@ def DashboardView(request):
 
     lots = Lot.objects.filter(countryside__in=country_sides)
 
-    # =========================
-    # CLARA - Campañas reales
-    # =========================
     campaings = Campaing.objects.all().order_by('-date_init')
     campaign_active = campaings.filter(active=True).first() or campaings.first()
 
@@ -66,23 +57,7 @@ def DashboardView(request):
     else:
         selected_campaing = campaign_active
 
-    # =========================
-    # DEV ORIGINAL (comentado)
-    # =========================
-    """
-    if campaing_id:
-        crops = crops.filter(campaing_id=campaing_id)
-    if countryside_id:
-        crops = crops.filter(countryside_id=countryside_id)
-        lots = lots.filter(countryside_id=countryside_id)
-    if lot_id:
-        crops = crops.filter(lot_id=lot_id)
-        lots = lots.filter(id=lot_id)
-    """
 
-    # =========================
-    # CLARA - Filtros corregidos
-    # =========================
     if selected_campaing:
         crops = crops.filter(campaing=selected_campaing)
 
@@ -100,20 +75,7 @@ def DashboardView(request):
     else:
         selected_lot = None
 
-    # =========================
-    # DEV ORIGINAL (comentado)
-    # =========================
-    """
-    crop_selected = None
-    if crop_id:
-        crop_selected = crops.filter(id=crop_id).first()
-    else:
-        crop_selected = crops.filter(is_main=True).first() or crops.first()
-    """
 
-    # =========================
-    # CLARA - Cultivo real / activo
-    # =========================
     if crop_id:
         selected_crop = crops.filter(id=crop_id).first()
     else:
@@ -132,22 +94,7 @@ def DashboardView(request):
     else:
         lot_main = lots.order_by('-id').first()
 
-    # =========================
-    # DEV ORIGINAL (comentado)
-    # =========================
-    """
-    work_orders = WorkOrder.objects.none()
-    if crop_selected:
-        work_orders = WorkOrder.objects.filter(crop=crop_selected)
-        if campaing_id:
-            work_orders = work_orders.filter(campaing_id=campaing_id)
-        today = timezone.now().date()
-        work_orders = work_orders.filter(date_init__gte=today).order_by('date_init')[:3]
-    """
 
-    # =========================
-    # CLARA - Órdenes reales por campaña + cultivo
-    # =========================
     work_orders = WorkOrder.objects.none()
 
     if selected_crop:
@@ -166,10 +113,6 @@ def DashboardView(request):
 
         work_orders = work_orders.order_by('date_init')[:3]
 
-    # =========================
-    # CLARA - Si hay órdenes, usar el cultivo real de la primera orden
-    # Esto corrige cuando selected_crop queda vacío pero work_orders sí trae datos.
-    # =========================
     if not selected_crop and work_orders:
         first_work_order = work_orders.first()
 
@@ -186,11 +129,6 @@ def DashboardView(request):
             # Asegurar que el listado de cultivos no quede vacío
             crops = Crop.objects.filter(campaing=selected_campaing)
 
-    # =========================
-    # CLARA - Alertas reales
-    # IMPORTANTE: Alert no tiene campo campaing directo.
-    # Se filtra por crop o por crop__campaing.
-    # =========================
     alerts = Alert.objects.none()
 
     if selected_crop:
@@ -201,11 +139,6 @@ def DashboardView(request):
 
     alerts_count = alerts.count()
 
-    # =========================
-    # CLARA - Resumen productivo real
-    # Lote = superficie estructural
-    # Cultivo = estado de campaña
-    # =========================
     lot_hectares_total = 0
     crop_hectares_planted = 0
     crop_hectares_without_plant = 0
@@ -221,10 +154,11 @@ def DashboardView(request):
             lot_hectares_total = selected_crop.lot.hectares or 0
 
         # Datos propios del cultivo / campaña
+        crop_hectares_without_plant = (selected_crop.hectares_productive - selected_crop.hectares_planted) or 0
         crop_hectares_planted = selected_crop.hectares_planted or 0
-        crop_hectares_without_plant = selected_crop.hectares_without_plant or 0
+        #crop_hectares_without_plant = selected_crop.hectares_without_plant or 0
         crop_hectares_harvested = selected_crop.hectares_harvested or 0
-        crop_hectares_without_harvest = selected_crop.hectares_without_harvest or 0
+        crop_hectares_without_harvest = selected_crop.hectares_not_harvested or 0
 
         # % plantado sobre total del lote
         if lot_hectares_total:
@@ -234,9 +168,7 @@ def DashboardView(request):
         if crop_hectares_planted:
             harvested_percent = round((crop_hectares_harvested / crop_hectares_planted) * 100)
 
-    # =========================
-    # DEV ORIGINAL (sin cambios)
-    # =========================
+
     weather_data = None
     station = None
 
@@ -244,9 +176,6 @@ def DashboardView(request):
         station = selected_crop.lot.station
         weather_data = WeatherData.objects.filter(station=station).last()
 
-    # =========================
-    # CLARA - Contexto final limpio
-    # =========================
     data = {
         'country_sides': country_sides,
         'lots': lots,
@@ -269,8 +198,8 @@ def DashboardView(request):
         'selected_countryside': country_side_selected,
         'selected_lot': selected_lot,
 
-        'crop_hectares_productive': crop_hectares_productive,
-        'crop_hectares_total': crop_hectares_total,
+        #crop_hectares_productive': crop_hectares_productive,
+        #crop_hectares_total': crop_hectares_total,
 
         'weather_data': weather_data,
         'station': station,

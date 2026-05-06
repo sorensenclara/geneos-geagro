@@ -50,9 +50,6 @@ class MiAdmin(AdminSite):
         extra_context['product_receipt'] = list_product_receipt
         extra_context['ammount_receipt'] = list_product_ammount
 
-        # =========================================================
-        # CLARA - Dashboard agronómico admin
-        # =========================================================
 
         campaing_id = request.GET.get("campaing")
         crop_id = request.GET.get("crop")

@@ -38,13 +38,13 @@ def download_pdf(modeladmin, request, queryset):
     return HttpResponseRedirect(url)
 
 class WorkOrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'code']
-    list_filter = []
+    list_display = ['code', 'crop', 'stage', 'date_init', 'stateOT', 'type']
+    list_filter = ['campaing','stage','stateOT']
     search_fields = ['code']
-    ordering = ['id']
-
-    inlines = [InputWorkOrderInline]  # Clara: reactivado para cargar insumos en OT
-    actions = []
+    ordering = ['code']
+    search_fields = ['name']
+    inlines = [InputWorkOrderInline]
+    actions = [finish_order, download_pdf]
 
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado
