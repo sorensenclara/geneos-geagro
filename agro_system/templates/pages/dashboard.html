@@ -302,7 +302,7 @@
 
             <div class="progress-row">
             <div class="d-flex justify-content-between mb-1">
-                <span>Avance de plantación</span>
+                <span>Implantación realizada</span>
                 <strong>{{ planted_percent|default:"0" }}%</strong>
             </div>
             <div class="progress-track">
@@ -310,19 +310,6 @@
             </div>
             <div class="text-muted small mt-1">
                 {{ crop_hectares_planted|default:"0" }} ha plantadas de {{ lot_hectares_total|default:"0" }} ha totales
-            </div>
-            </div>
-
-            <div class="progress-row mt-3">
-            <div class="d-flex justify-content-between mb-1">
-                <span>Avance de cosecha</span>
-                <strong>{{ harvested_percent|default:"0" }}%</strong>
-            </div>
-            <div class="progress-track">
-                <span style="width: {{ harvested_percent|default:'0' }}%;"></span>
-            </div>
-            <div class="text-muted small mt-1">
-                {{ crop_hectares_harvested|default:"0" }} ha cosechadas de {{ crop_hectares_planted|default:"0" }} ha plantadas
             </div>
             </div>
 
@@ -381,42 +368,92 @@
       </div>
     </div>
 
-    <!-- CULTIVOS / LOTES -->
+
+    <!-- EJECUCIÓN DE ÓRDENES -->
     <div class="col-xl-4">
-      <div class="card h-100">
+    <div class="card h-100">
         <div class="card-body">
 
-          <div class="d-flex align-items-start justify-content-between mb-3">
+        <div class="d-flex align-items-start justify-content-between mb-3">
             <div>
-              <h4 class="card-title mb-1">Cultivos / lotes</h4>
-              <div class="text-muted">Cultivos disponibles de la campaña</div>
+            <h4 class="card-title mb-1">Ejecución de órdenes</h4>
+            <div class="text-muted">
+                Estado operativo de la campaña
             </div>
-            <i class="mdi mdi-map-marker-radius-outline font-size-24 text-success"></i>
-          </div>
-
-          {% for crop in crops|slice:":5" %}
-            <div class="d-flex justify-content-between border-bottom py-2">
-              <div>
-                <strong>{{ crop.activity|default:"Cultivo" }}</strong><br>
-                <span class="text-muted small">{{ crop.lot|default:"Sin lote" }}</span>
-              </div>
-              <div class="text-end">
-                <span class="text-muted small">{{ crop.hectares_productive|default:"0" }} ha prod.</span><br>
-                <span class="geagro-badge geagro-badge-primary">
-                  {{ crop.state|default:"Planificado" }}
-                </span>
-              </div>
             </div>
-          {% empty %}
-            <p class="text-muted">No hay cultivos cargados para esta campaña.</p>
-          {% endfor %}
 
-          <div class="text-center mt-3">
-            <a href="#" class="btn btn-sm btn-primary">Ver detalle</a>
-          </div>
+            <i class="mdi mdi-chart-donut font-size-24 text-success"></i>
+        </div>
+
+        <!-- KPI PRINCIPAL -->
+        <div class="text-center mb-4">
+
+            <div class="display-5 fw-bold text-primary">
+            {{ work_orders_completed_percent|default:"0" }}%
+            </div>
+
+            <div class="text-muted">
+            órdenes completadas
+            </div>
 
         </div>
-      </div>
+
+        <!-- BARRA -->
+        <div class="geagro-progress-summary mb-4">
+
+            <div class="progress-track">
+            <span style="width: {{ work_orders_completed_percent|default:'0' }}%;"></span>
+            </div>
+
+            <div class="d-flex justify-content-between mt-2 small text-muted">
+            <span>
+                {{ work_orders_completed|default:"0" }} finalizadas
+            </span>
+
+            <span>
+                {{ work_orders_pending|default:"0" }} pendientes
+            </span>
+            </div>
+
+        </div>
+
+        <!-- DATOS -->
+        <div class="row g-3">
+
+            <div class="col-6">
+            <div class="p-3 rounded-3 border text-center">
+                <div class="text-muted mb-1">
+                Total órdenes
+                </div>
+
+                <div class="h3 mb-0">
+                {{ work_orders_total|default:"0" }}
+                </div>
+            </div>
+            </div>
+
+            <div class="col-6">
+            <div class="p-3 rounded-3 border text-center">
+                <div class="text-muted mb-1">
+                Días restantes
+                </div>
+
+                <div class="h3 mb-0">
+                {{ campaign_days_remaining|default:"0" }}
+                </div>
+            </div>
+            </div>
+
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'technical-plan' %}" class="btn btn-sm btn-primary">
+            Ver órdenes
+            </a>
+        </div>
+
+        </div>
+    </div>
     </div>
 
   </div>

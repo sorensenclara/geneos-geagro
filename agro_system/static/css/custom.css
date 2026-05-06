@@ -1,7 +1,5 @@
 /*!
  * GEAGRO UI — Custom overrides (FIXED)
- * Basado en el CSS antiguo (layout compacto de KPIs) + tokens/orden del nuevo
- * Objetivo: recuperar el look "Viejo" sin perder variables y mejoras de especificidad.
  */
 
 /* ==========================================================
@@ -692,7 +690,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 }
 
 /* ==========================================================
-   Resumen productivo / barras de avance
+   13) Dashboard — Resumen productivo / barras de avance
    ========================================================== */
 
 .geagro-progress-summary {
@@ -726,14 +724,18 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   background: #6b3f6e;
 }
 
+/* ==========================================================
+   14) Dashboard — Card Insumos faltantes
+   ========================================================== */
+
 .geagro-card-inputs {
   border-left: 4px solid #dc3545;
 }
 
-/* ======================================
-   Card: Próximas actividades
+/* ==========================================================
+   15) Dashboard — Próximas actividades
    Destacado: orden del día (HOY)
-====================================== */
+   ========================================================== */
 
 .activity-feed .date.is-today {
   color: #ffffff;
