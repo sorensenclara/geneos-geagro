@@ -16,7 +16,7 @@ from weather.models.weather_data import WeatherData
 from weather.models.station_weather import WeatherStation
 
 from alert.models.alert import Alert
-
+from operation.models.input_work_order import InputWorkOrder
 
 # Panel principal
 @login_required
@@ -95,9 +95,6 @@ def DashboardView(request):
         lot_main = lots.order_by('-id').first()
 
 
-   # =========================
-    # CLARA - Órdenes reales + próxima acción inteligente
-    # =========================
     today = timezone.now().date()
 
     work_orders = WorkOrder.objects.none()
@@ -137,11 +134,6 @@ def DashboardView(request):
     if not next_work_order:
         next_work_order = base_qs.order_by('-date_init').first()
 
-    # =========================
-    # CLARA - Insumos faltantes (próximas 3 órdenes)
-    # =========================
-
-    from operation.models.input_work_order import InputWorkOrder
 
     insumos_faltantes = []
     total_cost = 0
@@ -201,9 +193,6 @@ def DashboardView(request):
 
     alerts_count = alerts.count()
 
-    # =========================
-    # CLARA - Resumen productivo real
-    # =========================
     lot_hectares_total = 0
     crop_hectares_planted = 0
     crop_hectares_without_plant = 0
@@ -219,7 +208,6 @@ def DashboardView(request):
             lot_hectares_total = selected_crop.lot.hectares or 0
 
         # Datos propios del cultivo / campaña
-        crop_hectares_without_plant = (selected_crop.hectares_productive - selected_crop.hectares_planted) or 0
         crop_hectares_planted = selected_crop.hectares_planted or 0
         crop_hectares_without_plant = selected_crop.hectares_unplanted or 0
         crop_hectares_harvested = selected_crop.hectares_harvested or 0
