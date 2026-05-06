@@ -166,8 +166,47 @@ def DashboardView(request):
         if lots.exists():
             base_qs = base_qs.filter(crop__lot__in=lots)
 
-    # Timeline
+    # =========================
+    # CLARA - Timeline próximas actividades
+    # Solo muestra 3 órdenes en la card central
+    # =========================
     work_orders = base_qs.order_by('date_init')[:3]
+
+
+    # =========================
+    # CLARA - Métricas reales de ejecución
+    # Se calculan sobre TODAS las órdenes del cultivo/campaña,
+    # no solo sobre las 3 que se muestran en la timeline.
+    # =========================
+    work_orders_total = base_qs.count()
+
+    work_orders_completed = base_qs.filter(
+        stateOT__name__iexact="Finalizada"
+    ).count()
+
+    work_orders_pending = base_qs.exclude(
+        stateOT__name__iexact="Finalizada"
+    ).count()
+
+    work_orders_completed_percent = 0
+
+    if work_orders_total > 0:
+        work_orders_completed_percent = int(
+            (work_orders_completed / work_orders_total) * 100
+        )
+
+
+    # =========================
+    # CLARA - Días restantes de campaña
+    # =========================
+    campaign_days_remaining = 0
+    campaign_reference = selected_campaing or campaign_active
+
+    if campaign_reference and campaign_reference.date_final:
+        campaign_days_remaining = (campaign_reference.date_final - today).days
+
+        if campaign_days_remaining < 0:
+            campaign_days_remaining = 0
 
     # Próxima acción:
     # 1. Pendiente desde hoy en adelante
@@ -340,6 +379,12 @@ def DashboardView(request):
         'insumos_total_cost': total_cost,
 
         'today': today,
+
+        'work_orders_total': work_orders_total,
+        'work_orders_completed': work_orders_completed,
+        'work_orders_pending': work_orders_pending,
+        'work_orders_completed_percent': work_orders_completed_percent,
+        'campaign_days_remaining': campaign_days_remaining,
     }
 
     return render(request, 'pages/dashboard.html', data)
