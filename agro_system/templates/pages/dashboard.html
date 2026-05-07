@@ -119,7 +119,7 @@
 
                 <div class="geagro-card-footer">
                   <span class="geagro-badge geagro-badge-primary">{{ order.stateOT|default:"Pendiente" }}</span>
-                  <a href="{% url 'technical-plan' %}" class="small">Ver plan</a>
+                  <a href="{% url 'technical-plan' %}?campaing={{ selected_campaing.id }}&crop={{ selected_crop.id }}" class="small">Ver plan</a>
                 </div>
               {% endwith %}
             {% else %}
@@ -130,7 +130,7 @@
 
               <div class="geagro-card-footer">
                 <span class="geagro-badge geagro-badge-success">Al día</span>
-                <a href="{% url 'technical-plan' %}" class="small">Ver plan</a>
+                <a href="{% url 'technical-plan' %}?campaing={{ selected_campaing.id }}&crop={{ selected_crop.id }}" class="small">Ver plan</a>
               </div>
             {% endif %}
 
@@ -380,7 +380,7 @@
           </ol>
 
           <div class="text-center mt-3">
-            <a href="{% url 'technical-plan' %}" class="btn btn-sm btn-primary">Ir a plan técnico</a>
+            <a href="{% url 'technical-plan' %}?campaing={{ selected_campaing.id }}&crop={{ selected_crop.id }}" class="btn btn-sm btn-primary">Ir a plan técnico</a>
           </div>
 
         </div>
@@ -466,7 +466,7 @@
         </div>
 
         <div class="text-center mt-4">
-            <a href="{% url 'technical-plan' %}" class="btn btn-sm btn-primary">
+            <a href="{% url 'technical-plan' %}?campaing={{ selected_campaing.id }}&crop={{ selected_crop.id }}" class="btn btn-sm btn-primary">
             Ver órdenes
             </a>
         </div>
