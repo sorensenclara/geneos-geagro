@@ -1,16 +1,21 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from datetime import date
 
 from operation.models.work_order import WorkOrder
 from operation.models.input_work_order import InputWorkOrder
 from operation.models.crop import Crop
+from operation.models.technical_plan import TechnicalPlan
+from operation.models.technical_plan_detail import TechnicalPlanDetail
 
 from producer.models.country_side import Countryside
 from producer.models.lot import Lot
 
 from parameter.models.campaign import Campaing
 
-from django.db.models import Q
+from alert.models.alert import Alert
+
 
 @login_required
 def TechnicalPlanView(request):
@@ -57,7 +62,6 @@ def TechnicalPlanView(request):
 
     # =========================================================
     # CLARA - fallback para desarrollo/local
-    # Si por permisos no trae cultivos, no romper topbar.
     # =========================================================
     if not crops_base.exists():
         crops_base = Crop.objects.all()
@@ -75,7 +79,6 @@ def TechnicalPlanView(request):
     if selected_campaing:
         crops = crops.filter(campaing_id=selected_campaing.id)
 
-    # fallback si el cruce campaña/usuario no devuelve nada
     if selected_campaing and not crops.exists():
         crops = Crop.objects.filter(campaing_id=selected_campaing.id)
 
@@ -89,8 +92,6 @@ def TechnicalPlanView(request):
 
     # =========================================================
     # CLARA - cultivo seleccionado
-    # 1. Si viene desde Dashboard/topbar, usar ese.
-    # 2. Si no viene, tomar último cultivo de la campaña.
     # =========================================================
     if crop_id:
         selected_crop = crops.filter(id=crop_id).first()
@@ -126,25 +127,21 @@ def TechnicalPlanView(request):
             'input_work_orders': input_work_orders,
         })
 
-
     # =========================================================
-    # CLARA - métricas de órdenes para Plan Técnico
+    # CLARA - próxima acción real
     # =========================================================
-    work_orders_total = work_orders.count()
+    today = date.today()
 
-    work_orders_completed = work_orders.filter(
-        stateOT__name__icontains='COMPLET'
-    ).count()
+    next_work_order = work_orders.filter(
+        date_init__gte=today
+    ).order_by('date_init').first()
 
-    work_orders_pending = work_orders_total - work_orders_completed
-
-    if work_orders_total > 0:
-        work_orders_completed_percent = round(
-            (work_orders_completed / work_orders_total) * 100
-        )
-    else:
-        work_orders_completed_percent = 0
-
+    if not next_work_order:
+        next_work_order = work_orders.exclude(
+            Q(stateOT__name__icontains='COMPLET') |
+            Q(stateOT__name__icontains='FINALIZ') |
+            Q(stateOT__name__icontains='REALIZ')
+        ).order_by('date_init').first()
 
     # =========================================================
     # CLARA - métricas de órdenes como Dashboard
@@ -166,6 +163,94 @@ def TechnicalPlanView(request):
     else:
         work_orders_completed_percent = 0
 
+    # =========================================================
+    # CLARA - alertas reales del cultivo
+    # =========================================================
+    alerts = Alert.objects.none()
+
+    if selected_crop:
+        alerts = Alert.objects.filter(
+            crop=selected_crop
+        ).order_by('-date')
+
+    alerts_count = alerts.count()
+
+    # =========================================================
+    # CLARA - explicación simple de próxima acción
+    # IMPORTANTE: va después de cargar alerts
+    # =========================================================
+    next_alert = alerts.first()
+    why_now_title = "Según planificación técnica"
+    why_now_text = "Esta acción está programada dentro del plan técnico del cultivo."
+
+    if next_alert:
+        why_now_title = next_alert.name
+        why_now_text = next_alert.detail
+
+    elif next_work_order:
+        why_now_title = "Orden planificada"
+        why_now_text = (
+            f"La labor {next_work_order.service} está prevista para el estadio "
+            f"{next_work_order.stage} y tiene fecha de inicio "
+            f"{next_work_order.date_init.strftime('%d/%m/%Y')}."
+        )
+
+    # =========================================================
+    # CLARA - timeline fenológico real
+    # =========================================================
+    timeline = []
+    technical_plan = None
+
+    if selected_crop:
+        technical_plan = TechnicalPlan.objects.filter(
+            activity=selected_crop.activity,
+            area=selected_crop.area,
+            active=True
+        ).first()
+
+    if technical_plan:
+        plan_details = TechnicalPlanDetail.objects.filter(
+            technical_plan=technical_plan,
+            active=True
+        ).select_related(
+            'stage',
+            'service'
+        ).order_by('secuence')
+
+        for detail in plan_details:
+
+            stage_orders = work_orders.filter(
+                stage=detail.stage,
+                service=detail.service
+            )
+
+            total_orders = stage_orders.count()
+
+            completed_orders = stage_orders.filter(
+                Q(stateOT__name__icontains='COMPLET') |
+                Q(stateOT__name__icontains='FINALIZ') |
+                Q(stateOT__name__icontains='REALIZ')
+            ).count()
+
+            if total_orders > 0 and completed_orders == total_orders:
+                status = 'completed'
+
+            elif completed_orders > 0:
+                status = 'active'
+
+            else:
+                status = 'pending'
+
+            timeline.append({
+                'detail': detail,
+                'stage': detail.stage,
+                'service': detail.service,
+                'status': status,
+                'total_orders': total_orders,
+                'completed_orders': completed_orders,
+                'orders': stage_orders,
+            })
+
     data = {
         'data_work_orders': orders,
         'work_orders': work_orders,
@@ -185,10 +270,18 @@ def TechnicalPlanView(request):
         'work_orders_pending': work_orders_pending,
         'work_orders_completed_percent': work_orders_completed_percent,
 
-        'work_orders_total': work_orders_total,
-        'work_orders_completed': work_orders_completed,
-        'work_orders_pending': work_orders_pending,
-        'work_orders_completed_percent': work_orders_completed_percent,
+        'alerts': alerts[:5],
+        'alerts_count': alerts_count,
+
+        'timeline': timeline,
+        'technical_plan': technical_plan,
+
+        'next_work_order': next_work_order,
+        'today': today,
+
+        'next_alert': next_alert,
+        'why_now_title': why_now_title,
+        'why_now_text': why_now_text,
     }
 
     return render(request, 'pages/plan.html', data)
