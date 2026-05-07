@@ -20,9 +20,6 @@ from alert.models.alert import Alert
 @login_required
 def TechnicalPlanView(request):
 
-    # =========================================================
-    # CLARA - filtros desde topbar/dashboard
-    # =========================================================
     countryside_id = request.GET.get('countryside')
     lot_id = request.GET.get('lot')
     campaing_id = request.GET.get('campaing')
@@ -30,9 +27,6 @@ def TechnicalPlanView(request):
 
     user = request.user
 
-    # =========================================================
-    # DEV ORIGINAL - visibilidad según tipo de usuario
-    # =========================================================
     if user.type == 'Producer':
         country_sides = Countryside.objects.filter(producer=user)
         crops_base = Crop.objects.filter(producer=user)
@@ -52,17 +46,13 @@ def TechnicalPlanView(request):
     campaings = Campaing.objects.all()
     campaign_active = campaings.filter(active=True).first()
 
-    # =========================================================
-    # CLARA - campaña seleccionada / activa
-    # =========================================================
+
     if campaing_id:
         selected_campaing = campaings.filter(id=campaing_id).first()
     else:
         selected_campaing = campaign_active or campaings.first()
 
-    # =========================================================
-    # CLARA - fallback para desarrollo/local
-    # =========================================================
+
     if not crops_base.exists():
         crops_base = Crop.objects.all()
 
@@ -71,9 +61,7 @@ def TechnicalPlanView(request):
 
     lots = Lot.objects.filter(countryside__in=country_sides)
 
-    # =========================================================
-    # CLARA - cultivos disponibles para topbar
-    # =========================================================
+
     crops = crops_base
 
     if selected_campaing:
@@ -90,9 +78,7 @@ def TechnicalPlanView(request):
         crops = crops.filter(lot_id=lot_id)
         lots = lots.filter(id=lot_id)
 
-    # =========================================================
-    # CLARA - cultivo seleccionado
-    # =========================================================
+
     if crop_id:
         selected_crop = crops.filter(id=crop_id).first()
     else:
@@ -103,9 +89,7 @@ def TechnicalPlanView(request):
             campaing_id=selected_campaing.id
         ).order_by('-id').first()
 
-    # =========================================================
-    # CLARA - órdenes de trabajo reales del cultivo seleccionado
-    # =========================================================
+
     work_orders = WorkOrder.objects.none()
 
     if selected_crop:
@@ -114,9 +98,7 @@ def TechnicalPlanView(request):
         if selected_campaing:
             work_orders = work_orders.filter(campaing_id=selected_campaing.id)
 
-    # =========================================================
-    # DEV ORIGINAL - armado de órdenes
-    # =========================================================
+
     orders = []
 
     for order in work_orders:
@@ -127,9 +109,7 @@ def TechnicalPlanView(request):
             'input_work_orders': input_work_orders,
         })
 
-    # =========================================================
-    # CLARA - próxima acción real
-    # =========================================================
+
     today = date.today()
 
     next_work_order = work_orders.filter(
@@ -143,9 +123,7 @@ def TechnicalPlanView(request):
             Q(stateOT__name__icontains='REALIZ')
         ).order_by('date_init').first()
 
-    # =========================================================
-    # CLARA - métricas de órdenes como Dashboard
-    # =========================================================
+
     work_orders_total = work_orders.count()
 
     work_orders_completed = work_orders.filter(
@@ -163,9 +141,7 @@ def TechnicalPlanView(request):
     else:
         work_orders_completed_percent = 0
 
-    # =========================================================
-    # CLARA - alertas reales del cultivo
-    # =========================================================
+
     alerts = Alert.objects.none()
 
     if selected_crop:
@@ -175,10 +151,6 @@ def TechnicalPlanView(request):
 
     alerts_count = alerts.count()
 
-    # =========================================================
-    # CLARA - explicación simple de próxima acción
-    # IMPORTANTE: va después de cargar alerts
-    # =========================================================
     next_alert = alerts.first()
     why_now_title = "Según planificación técnica"
     why_now_text = "Esta acción está programada dentro del plan técnico del cultivo."
@@ -195,9 +167,7 @@ def TechnicalPlanView(request):
             f"{next_work_order.date_init.strftime('%d/%m/%Y')}."
         )
 
-    # =========================================================
-    # CLARA - timeline fenológico real
-    # =========================================================
+
     timeline = []
     technical_plan = None
 
