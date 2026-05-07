@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-21 12:27+0000\n"
+"POT-Creation-Date: 2026-05-07 17:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,15 +19,19 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
 
-#: agro_system/settings/base.py:170
+#: agro_system/settings/base.py:177
 msgid "Español"
-msgstr ""
+msgstr "Español"
 
-#: alert/apps.py:7 alert/models/alert.py:20
+#: agro_system/settings/base.py:309
+msgid "Stock Charts"
+msgstr "Gráficos de Stock"
+
+#: alert/apps.py:7 alert/models/alert.py:22
 msgid "alerts"
 msgstr "Alertas"
 
-#: alert/models/alert.py:10 alert/models/indicator.py:11
+#: alert/models/alert.py:10 alert/models/indicator.py:10
 #: alert/models/variable_register.py:10 input/models/category_input.py:9
 #: input/models/input.py:12 input/models/type_input.py:10
 #: input/models/type_provider.py:10 operation/models/activity.py:11
@@ -50,7 +54,7 @@ msgstr "Alertas"
 msgid "name"
 msgstr "Nombre"
 
-#: alert/models/alert.py:11 alert/models/indicator.py:29
+#: alert/models/alert.py:11 alert/models/indicator.py:27
 msgid "indicator"
 msgstr "Indicador"
 
@@ -62,7 +66,7 @@ msgstr "Indicador"
 msgid "date"
 msgstr "Fecha"
 
-#: alert/models/alert.py:13 alert/models/variable_register.py:14
+#: alert/models/alert.py:13 alert/models/variable_register.py:15
 #: operation/models/crop_yields.py:18
 #: operation/models/technical_crop_detail.py:18
 #: operation/models/technical_plan.py:15
@@ -70,59 +74,62 @@ msgstr "Fecha"
 msgid "detail"
 msgstr "detalles"
 
-#: alert/models/alert.py:19
+#: alert/models/alert.py:14 operation/models/crop.py:46
+#: operation/models/crop_yields.py:13 operation/models/partner_crop.py:13
+#: operation/models/technical_crop_detail.py:14
+#: operation/models/work_order.py:27
+msgid "crop"
+msgstr "Cultivo"
+
+#: alert/models/alert.py:21
 msgid "alert"
 msgstr "Alerta"
 
-#: alert/models/indicator.py:12
+#: alert/models/indicator.py:11
 msgid "variable one"
 msgstr "Primera variable"
+
+#: alert/models/indicator.py:12
+msgid "min variable one"
+msgstr "Minimo de la primera variable"
 
 #: alert/models/indicator.py:13
 msgid "max variable one"
 msgstr "Maximo de la primera variable"
 
 #: alert/models/indicator.py:14
-msgid "min variable one"
-msgstr "Minimo de la primera variable"
-
-#: alert/models/indicator.py:15
 msgid "variable two"
 msgstr "Segunda variable"
+
+#: alert/models/indicator.py:15
+msgid "min variable two"
+msgstr "Minimo de la segunda variable"
 
 #: alert/models/indicator.py:16
 msgid "max variable two"
 msgstr "Maximo de la segunda variable"
 
 #: alert/models/indicator.py:17
-msgid "min variable two"
-msgstr "Minimo de la segunda variable"
-
-#: alert/models/indicator.py:18
 msgid "variable three"
 msgstr "Tercera variable"
+
+#: alert/models/indicator.py:18
+msgid "min variable three"
+msgstr "Minimo de tercera variable"
 
 #: alert/models/indicator.py:19
 msgid "max variable three"
 msgstr "Maximo de tercera variable"
 
 #: alert/models/indicator.py:20
-msgid "min variable three"
-msgstr "Minimo de tercera variable"
-
-#: alert/models/indicator.py:21
 msgid "user alert"
 msgstr "Usuarios a reportar"
 
-#: alert/models/indicator.py:22
+#: alert/models/indicator.py:21
 msgid "report mails"
 msgstr "Emails a notificar"
 
-#: alert/models/indicator.py:23 operation/models/crop.py:45
-msgid "crops"
-msgstr "Cultivos"
-
-#: alert/models/indicator.py:30
+#: alert/models/indicator.py:28 operation/models/crop.py:38
 msgid "indicators"
 msgstr "Indicadores"
 
@@ -131,41 +138,86 @@ msgstr "Indicadores"
 msgid "variable"
 msgstr "Variable"
 
-#: alert/models/variable_register.py:13 operation/models/partner_crop.py:15
+#: alert/models/variable_register.py:13
+msgid "hour"
+msgstr "Hora"
+
+#: alert/models/variable_register.py:14 operation/models/partner_crop.py:15
 #: operation/models/technical_crop_detail.py:16
 msgid "value"
 msgstr "Valor"
 
-#: alert/models/variable_register.py:15 producer/models/lot.py:33
+#: alert/models/variable_register.py:16 producer/models/lot.py:33
 #: weather/models/station_weather.py:16 weather/models/weather_data.py:10
 msgid "weather station"
 msgstr "Estación meteorologica"
 
-#: alert/models/variable_register.py:21
+#: alert/models/variable_register.py:22
 msgid "variable register"
 msgstr "Registro de variables"
 
-#: alert/models/variable_register.py:22
+#: alert/models/variable_register.py:23
 msgid "variable registers"
 msgstr "Registros de variables"
 
-#: input/admin/input.py:19
+#: input/admin/input.py:22
 msgid "Order Date"
 msgstr "Fecha de orden"
 
-#: input/admin/input.py:21
+#: input/admin/input.py:24
 msgid "Purchases"
 msgstr "Compras"
 
-#: input/admin/input.py:22
+#: input/admin/input.py:25
 msgid "Purchase"
 msgstr "Compra"
 
-#: input/admin/purchase_order.py:12
+#: input/admin/input.py:70
+#, python-format
+msgid ""
+"Automatic Reorder: A new pending order has been created for %s based on "
+"history."
+msgstr "Reorden automático: Se ha creado una nueva orden pendiente para %s basada en el historial."
+
+#: input/admin/input.py:87
+#, python-format
+msgid ""
+"Automatic Reorder: A new pending order has been created for %s using "
+"defaults."
+msgstr "Reorden automático: Se ha creado una nueva orden pendiente para %s usando valores predeterminados."
+
+#: input/admin/input.py:89
+#, python-format
+msgid "Automatic Reorder Failed for %s: No default provider or store found."
+msgstr "Reorden automático fallido para %s: No se encontró proveedor predeterminado o almacén."
+
+#: input/admin/purchase_order.py:13
 msgid "Process Purchase Order"
 msgstr "Procesar orden de compra"
 
-#: input/admin/purchase_order.py:23
+#: input/admin/purchase_order.py:17
+#, python-format
+msgid "The order %s is already confirmed."
+msgstr "La orden %s ya está confirmada."
+
+#: input/admin/purchase_order.py:30
+#, fuzzy
+#| msgid "Process Purchase Order"
+msgid "Cancel Purchase Order"
+msgstr "Procesar orden de compra"
+
+#: input/admin/purchase_order.py:35
+#, python-format
+msgid ""
+"Order %s cannot be cancelled because it already has associated receptions."
+msgstr "La orden %s no puede ser cancelada porque ya tiene recepciones asociadas."
+
+#: input/admin/purchase_order.py:48
+#, python-format
+msgid "Order %s has been successfully cancelled."
+msgstr "La orden %s ha sido cancelada exitosamente."
+
+#: input/admin/purchase_order.py:51
 msgid "Pending purchases"
 msgstr "Imprimir compras pendientes"
 
@@ -173,7 +225,11 @@ msgstr "Imprimir compras pendientes"
 msgid "Process Reception"
 msgstr "Procesar recepción de compras"
 
-#: input/apps.py:7 input/models/input.py:28
+#: input/admin/purchase_reception.py:30
+msgid "Only receptions that are not already confirmed can be processed."
+msgstr "Solo se pueden procesar las recepciones que aún no están confirmadas."
+
+#: input/apps.py:7 input/models/input.py:30
 msgid "inputs"
 msgstr "Insumos"
 
@@ -214,16 +270,29 @@ msgstr "Control de stock"
 msgid "stock"
 msgstr "Stock"
 
-#: input/models/input.py:20 input/models/purchase_order.py:14
+#: input/models/input.py:20
+msgid "reorder point"
+msgstr "Punto de reorden"
+
+#: input/models/input.py:21 input/models/purchase_order.py:14
 #: input/models/purchase_reception.py:11
 msgid "pending"
 msgstr "Pendiente"
 
-#: input/models/input.py:21
+#: input/models/input.py:22
 msgid "control of lot"
 msgstr "Control de lote"
 
-#: input/models/input.py:27 input/models/purchase_order_detail.py:15
+#: input/models/input.py:23 input/models/provider.py:20
+#: input/models/purchase_order.py:26 input/models/purchase_reception.py:21
+#: operation/models/crop.py:37 operation/models/technical_plan.py:22
+#: operation/models/work_order.py:40 producer/models/country_side.py:24
+#: producer/models/staff.py:33 producer/models/store.py:14
+#: sale/models/sales_receipt.py:31
+msgid "producer"
+msgstr "Productor"
+
+#: input/models/input.py:29 input/models/purchase_order_detail.py:15
 #: input/models/purchase_reception_detail.py:15
 #: operation/models/input_work_order.py:10
 #: operation/models/technical_plan_input.py:17
@@ -264,12 +333,18 @@ msgstr "Telefono"
 msgid "email"
 msgstr "email"
 
-#: input/models/provider.py:25 input/models/purchase_order.py:23
+#: input/models/provider.py:19 producer/models/store.py:13
+#, fuzzy
+#| msgid "is default"
+msgid "default"
+msgstr "Predeterminado"
+
+#: input/models/provider.py:27 input/models/purchase_order.py:23
 #: sale/models/sales_receipt.py:29
 msgid "provider"
 msgstr "Proveedor"
 
-#: input/models/provider.py:26
+#: input/models/provider.py:28
 msgid "providers"
 msgstr "Proveedores"
 
@@ -301,13 +376,6 @@ msgstr "Solicitante"
 #: producer/models/country_side.py:22
 msgid "store"
 msgstr "Almacen"
-
-#: input/models/purchase_order.py:26 input/models/purchase_reception.py:21
-#: operation/models/crop.py:37 operation/models/technical_plan.py:22
-#: operation/models/work_order.py:40 producer/models/country_side.py:24
-#: producer/models/staff.py:33 sale/models/sales_receipt.py:31
-msgid "producer"
-msgstr "Productor"
 
 #: input/models/purchase_order.py:33 input/models/purchase_order_detail.py:14
 #: input/models/purchase_reception.py:16
@@ -381,21 +449,38 @@ msgstr "Tipos de insumos"
 msgid "types of provider"
 msgstr "Tipos de proveedores"
 
-#: operation/admin/crop.py:21
+#: input/views.py:51
+#, fuzzy
+#| msgid "technical plan input"
+msgid "Select an input"
+msgstr "Insumo del plan tecnico"
+
+#: operation/admin/crop.py:22
 msgid "technical details"
 msgstr "Detalles tecnicos"
 
-#: operation/admin/crop.py:28
+#: operation/admin/crop.py:29
 msgid "yields"
 msgstr "Rindes"
 
-#: operation/admin/crop.py:36
+#: operation/admin/crop.py:37
 msgid "partners"
 msgstr "Socios"
 
-#: operation/admin/crop.py:39
+#: operation/admin/crop.py:40
 msgid "Process Plan in Crop"
 msgstr "Procesar plan en cultivo "
+
+#: operation/admin/crop.py:45
+#, python-format
+msgid ""
+"The crop '%s' cannot be processed because it does not have an start date."
+msgstr "El cultivo '%s' no puede ser procesado porque no tiene una fecha de inicio."
+
+#: operation/admin/crop.py:48
+#, python-format
+msgid "The crop '%s' has been successfully processed."
+msgstr "El cultivo '%s' ha sido procesado exitosamente."
 
 #: operation/admin/technical_plan.py:30
 msgid "Duplicate Technical Plan"
@@ -452,7 +537,7 @@ msgstr "Campos"
 msgid "area"
 msgstr "Zona"
 
-#: operation/models/crop.py:22 producer/models/lot.py:42
+#: operation/models/crop.py:22 producer/models/lot.py:40
 msgid "lot"
 msgstr "Lote"
 
@@ -510,12 +595,27 @@ msgstr "Estimación de saranda"
 msgid "estimate secada"
 msgstr "Estimación de secada"
 
-#: operation/models/crop.py:44 operation/models/crop_yields.py:13
-#: operation/models/partner_crop.py:13
-#: operation/models/technical_crop_detail.py:14
-#: operation/models/work_order.py:27
-msgid "crop"
-msgstr "Cultivo"
+#: operation/models/crop.py:39
+#, fuzzy
+#| msgid "is main lot"
+msgid "is main crop"
+msgstr "Lote principal"
+
+#: operation/models/crop.py:39
+#, fuzzy
+#| msgid ""
+#| "Indicates if this lot is the main lot of the staff. Only one lot can be "
+#| "the main lot for a staff."
+msgid ""
+"Indicates if this crop is the main crop of the staff. Only one crop can be "
+"the main crop for a staff."
+msgstr ""
+"Indica si este lote es el lote principal del personal. Solo un lote puede "
+"ser el lote principal de un empleado."
+
+#: operation/models/crop.py:47
+msgid "crops"
+msgstr "Cultivos"
 
 #: operation/models/crop_yields.py:14
 msgid "date estimate"
@@ -566,7 +666,7 @@ msgid "inputs work orders"
 msgstr "Insumos de ordenes de trabajo"
 
 #: operation/models/partner_crop.py:14
-#: operation/models/technical_plan_detail.py:23
+#: operation/models/technical_plan_detail.py:24
 #: operation/models/work_order.py:39
 msgid "partner"
 msgstr "Socio"
@@ -634,7 +734,7 @@ msgid "activity "
 msgstr "Actividad"
 
 #: operation/models/technical_plan.py:21
-#: operation/models/technical_plan_detail.py:19 parameter/models/campaign.py:12
+#: operation/models/technical_plan_detail.py:20 parameter/models/campaign.py:12
 #: producer/models/staff.py:15
 msgid "active"
 msgstr "Aciva"
@@ -657,21 +757,25 @@ msgstr "Secuencia"
 msgid "days estimate"
 msgstr "Dias estimados"
 
-#: operation/models/technical_plan_detail.py:20
+#: operation/models/technical_plan_detail.py:19
+msgid "cant persons"
+msgstr "Cantidad de personas a trabajar"
+
+#: operation/models/technical_plan_detail.py:21
 msgid "subcontracted"
 msgstr "Subcontratado"
 
-#: operation/models/technical_plan_detail.py:21
+#: operation/models/technical_plan_detail.py:22
 #: operation/models/work_order.py:37
 msgid "contractor"
 msgstr "Contratista"
 
-#: operation/models/technical_plan_detail.py:22
+#: operation/models/technical_plan_detail.py:23
 msgid "with partner"
 msgstr "Con socio"
 
-#: operation/models/technical_plan_detail.py:30
 #: operation/models/technical_plan_detail.py:31
+#: operation/models/technical_plan_detail.py:32
 #: operation/models/technical_plan_input.py:16
 msgid "technical plan detail"
 msgstr "Detalle del plan tecnico"
@@ -929,19 +1033,19 @@ msgstr "Calificación de lote"
 msgid "Last operation"
 msgstr "Ultima operación"
 
-#: producer/models/lot.py:35
-msgid "is main lot"
-msgstr "Lote principal"
+#: producer/models/lot.py:29
+#, fuzzy
+#| msgid "notification"
+msgid "ubication"
+msgstr "Notificación"
 
-#: producer/models/lot.py:35
-msgid ""
-"Indicates if this lot is the main lot of the staff. Only one lot can be the "
-"main lot for a staff."
-msgstr ""
-"Indica si este lote es el lote principal del personal. Solo un lote puede "
-"ser el lote principal de un empleado."
+#: producer/models/lot.py:30
+#, fuzzy
+#| msgid "description"
+msgid "delimitation"
+msgstr "Descripción"
 
-#: producer/models/lot.py:43
+#: producer/models/lot.py:41
 msgid "lots"
 msgstr "Lotes"
 
@@ -973,11 +1077,11 @@ msgstr "Usuario"
 msgid "User associated with the staff member."
 msgstr "Usuario asociado al personal"
 
-#: producer/models/store.py:18
+#: producer/models/store.py:21
 msgid "Store"
 msgstr "Almacen"
 
-#: producer/models/store.py:19
+#: producer/models/store.py:22
 msgid "Stores"
 msgstr "Almacenes"
 
@@ -1167,6 +1271,57 @@ msgstr ""
 "Te hemos enviado un correo electrónico para verificar tu identidad. Sigue el "
 "enlace proporcionado para finalizar el proceso de registro. Ponte en "
 "contacto con nosotros si no lo recibes en unos minutos."
+
+#: templates/admin/input/charts.html:29
+msgid "Input Stock Availability (Current vs Projected)"
+msgstr "Disponibilidad de insumos (Actual vs Proyectada)"
+
+#: templates/admin/input/charts.html:47
+msgid "Stock Evolution Over Time"
+msgstr "Evolución de las acciones a lo largo del tiempo"
+
+#: templates/admin/input/charts.html:51
+msgid "Select Input"
+msgstr "Seleccionar entrada"
+
+#: templates/admin/input/charts.html:53
+msgid "All"
+msgstr "Todo"
+
+#: templates/admin/input/charts.html:87
+msgid "Current Stock"
+msgstr "Stock actual"
+
+#: templates/admin/input/charts.html:93
+msgid "Projected Stock (Inc. Pending)"
+msgstr "Stock proyectado (Inc. Pendientes)"
+
+#: templates/admin/input/charts.html:122
+msgid "Stock Balance"
+msgstr "Balance de stock"
+
+#: templates/admin/input/charts.html:131
+msgid "Safety Stock"
+msgstr "Stock de seguridad"
+
+#: templates/admin/input/charts.html:145
+msgid "Quantity"
+msgstr "Cntidad"
+
+#: templates/admin/login.html:25
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr "Te has autenticado como %(username)s, pero no tienes autorización para acceder a esta página. ¿Deseas iniciar sesión con una cuenta diferente?"
+
+#: templates/admin/login.html:75
+msgid "Forgotten your password or username?"
+msgstr "Olvidaste tu contraseña o nombre de usuario"
+
+#: templates/admin/login.html:83
+msgid "Log in"
+msgstr "Iniciar sesion"
 
 #: user/apps.py:7
 msgid "users"

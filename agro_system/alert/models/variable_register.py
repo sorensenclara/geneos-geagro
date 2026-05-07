@@ -7,7 +7,7 @@ class VariableRegister(models.Model):
 
     """ Modelo para representar Registro de Variables técnicas de cultivo"""
 
-    name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
+    name = models.CharField(max_length=200, verbose_name = _('name'))
     variable = models.ForeignKey(VarCropTechnique, on_delete=models.CASCADE, verbose_name = _('variable'))
     date = models.DateField(verbose_name = _('date'))
     hour = models.TimeField(verbose_name = _('hour'), null=True, blank=True)
@@ -21,3 +21,10 @@ class VariableRegister(models.Model):
     class Meta:
         verbose_name = _('variable register')
         verbose_name_plural = _('variable registers')
+
+        unique_together = (
+            'variable',
+            'station',
+            'date',
+            'hour'
+        )

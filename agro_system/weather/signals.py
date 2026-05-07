@@ -71,13 +71,16 @@ def create_variable_registers(sender, instance, created, **kwargs):
             variable = VarCropTechnique.objects.get(name__iexact=var_name)
         except VarCropTechnique.DoesNotExist:
             continue
-
-        VariableRegister.objects.create(
-            name=f"{var_name} - {instance.timestamp}",
+        
+        VariableRegister.objects.update_or_create(
             variable=variable,
-            hour=instance.timestamp.time(),
-            date=date,
-            value=value,
             station=station,
-            detail="Auto generado desde estación meteorológica"
-        )
+            date=date,
+            hour=instance.timestamp.time(),
+
+            defaults={
+                "name": f"{var_name} - {instance.timestamp}",
+                "value": value,
+                "detail": "Auto generado desde estación meteorológica"
+            }
+)

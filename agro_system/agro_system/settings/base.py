@@ -58,7 +58,7 @@ THIRD_PARTY_APPS = [
     'dj_rest_auth', # login
     'corsheaders', # Cors
     "ckeditor",
-#    "leaflet",
+    "leaflet",
     
     "crispy_forms",
     "crispy_bootstrap5",
