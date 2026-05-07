@@ -19,7 +19,7 @@ class PurchaseOrder(models.Model):
     date =  models.DateField(default=date.today(), verbose_name = _('date'))
     delivery_date = models.DateField(null=True, blank=True, verbose_name = _('delivery date'))
     reference = models.CharField(max_length=100, null=True, blank=True, verbose_name = _('reference'))
-    applicant = models.ForeignKey(Staff, on_delete=models.CASCADE, verbose_name = _('applicant'))
+    applicant = models.ForeignKey(Staff, null=True, blank=True, on_delete=models.CASCADE, verbose_name = _('applicant'))
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE, verbose_name = _('provider'))
     state = models.CharField('Estado', max_length=7, choices=states, default='pending')
     store = models.ForeignKey(Store, on_delete=models.CASCADE,verbose_name = _('store'))

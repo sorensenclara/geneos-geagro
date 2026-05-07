@@ -1,7 +1,8 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from user.admin.adminSite import adminSite
 from input.models.purchase_order import PurchaseOrder
 from input.models.purchase_order_detail import PurchaseOrderDetail
+from input.models.purchase_reception import PurchaseReception
 from user.models.user_producer import UserProducer
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
@@ -11,14 +12,41 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 
 @admin.action(description=_("Process Purchase Order"))
 def procesar_purchase_order(modeladmin, request, queryset):
-    queryset.update(state="confirm")
-    
     for obj in queryset:
+        if obj.state == 'confirm':
+            messages.error(request, _("The order %s is already confirmed.") % obj.number)
+            continue
+
+        obj.state = "confirm"
+        obj.save()
+
         details = PurchaseOrderDetail.objects.filter(purchase_order=obj)
         for item in details:
             item.pending_amount = item.amount
+            item.input.pending += item.amount
             item.input.save()
             item.save()
+
+@admin.action(description=_("Cancel Purchase Order"))
+def cancelar_purchase_order(modeladmin, request, queryset):
+    for obj in queryset:
+        # Valida si existen recepciones asociadas a esta orden
+        if PurchaseReception.objects.filter(purchase_order=obj).exists():
+            messages.error(request, _("Order %s cannot be cancelled because it already has associated receptions.") % obj.number)
+            continue
+
+        # Si la orden estaba confirmada, restamos lo pendiente de los insumos antes de cancelar
+        if obj.state == 'confirm':
+            details = PurchaseOrderDetail.objects.filter(purchase_order=obj)
+            for item in details:
+                if item.pending_amount:
+                    item.input.pending -= item.pending_amount
+                    item.input.save()
+
+        obj.state = "cancel"
+        obj.save()
+        messages.success(request, _("Order %s has been successfully cancelled.") % obj.number)
+
 
 @admin.action(description=_("Pending purchases"))
 def input_pending_pdf(modeladmin, request, queryset):
@@ -35,12 +63,34 @@ class PurchaseOrderDetailInline(admin.StackedInline):
     readonly_fields = ['pending_amount', 'total']
     extra = 0
     
+    def has_add_permission(self, request, obj=None):
+        if obj and obj.state == 'confirm':
+            return False
+        return super().has_add_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        # obj here is the parent PurchaseReception
+        if obj and obj.state == 'confirm':
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        # obj here is the parent PurchaseReception
+        if obj and obj.state == 'confirm':
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.state == 'confirm':
+            return [field.name for field in self.model._meta.fields]
+        return super().get_readonly_fields(request, obj)
+    
 class PurchaseOrderAdmin(admin.ModelAdmin):
     list_display = ['number','date', 'provider', 'state']
     list_filter = ['state', 'provider']
     search_fields = ['number',]
     inlines = [PurchaseOrderDetailInline]
-    actions = [procesar_purchase_order, input_pending_pdf]
+    actions = [procesar_purchase_order, cancelar_purchase_order, input_pending_pdf]
 
     def changelist_view(self, request, extra_context=None):
         if 'action' in request.POST and (request.POST['action'] == 'input_pending_pdf'):
@@ -76,6 +126,9 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
         
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super().get_readonly_fields(request, obj)
+        if obj and obj.state == 'confirm':
+            return [field.name for field in obj._meta.fields]
+
         if request.user.type == 'Producer':
             return ['producer']
         return readonly_fields

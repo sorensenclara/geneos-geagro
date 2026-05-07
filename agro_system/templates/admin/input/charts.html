@@ -1,0 +1,155 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        .chart-container {
+            margin-top: 30px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chart-filter {
+            margin-left: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        <div class="row chart-container">
+            <div class="col-12">
+                <div class="card card-outline" style="border-top: 3px solid #1E7D3B;">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-bar mr-1"></i>
+                            {% trans "Input Stock Availability (Current vs Projected)" %}
+                        </h3>
+                    </div>
+                    <div class="card-body" id="barChartContainer">
+                        <div style="height: 400px;">
+                            <canvas id="inputStockChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row chart-container">
+            <div class="col-12">
+                <div class="card card-outline" style="border-top: 3px solid #6b3f6e;">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line mr-1"></i>
+                            {% trans "Stock Evolution Over Time" %}: <span id="inputNameTitle">{{ selected_input_name }}</span>
+                        </h3>
+                        <div class="chart-filter">
+                            <form method="get" action="{% url 'input:input_charts' %}">
+                                <label for="id_input_id">{% trans "Select Input" %}:</label>
+                                <select name="input_id" id="id_input_id" onchange="this.form.submit()">
+                                    <option value="">{% trans "All" %}</option>
+                                    {% for input_obj in all_inputs %}
+                                        <option value="{{ input_obj.id }}" {% if input_obj.id|stringformat:"s" == selected_input_id %}selected{% endif %}>{{ input_obj.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 400px;">
+                            <canvas id="inputTimelineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+    {{ block.super }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bar Chart
+            const ctxBar = document.getElementById('inputStockChart').getContext('2d');
+            const dataBar = JSON.parse('{{ chart_data_json|safe }}');
+            
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: dataBar.labels,
+                    datasets: [
+                        {
+                            label: '{% trans "Current Stock" %}',
+                            data: dataBar.stock,
+                            backgroundColor: dataBar.stock.map((val, i) => val <= dataBar.min_stock[i] ? '#dc3545' : '#1E7D3B'),
+                            borderWidth: 0
+                        },
+                        {
+                            label: '{% trans "Projected Stock (Inc. Pending)" %}',
+                            data: dataBar.projected,
+                            backgroundColor: '#6b3f6e',
+                            borderWidth: 0
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    },
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Line Chart (Stock Evolution)
+            const timelineDataStr = '{{ timeline_data_json|safe }}';
+            if (timelineDataStr && timelineDataStr !== 'null') {
+                const tData = JSON.parse(timelineDataStr);
+                document.getElementById('inputNameTitle').textContent = tData.name;
+                
+                const tCtx = document.getElementById('inputTimelineChart').getContext('2d');
+                new Chart(tCtx, {
+                    type: 'line',
+                    data: {
+                        labels: tData.labels,
+                        datasets: [{
+                            label: '{% trans "Stock Balance" %}',
+                            data: tData.data,
+                            borderColor: '#6b3f6e',
+                            backgroundColor: 'rgba(107, 63, 110, 0.1)',
+                            fill: true,
+                            tension: 0.1,
+                            pointRadius: 4
+                        },
+                        {
+                            label: '{% trans "Safety Stock" %}',
+                            data: Array(tData.labels.length).fill(tData.min_stock),
+                            borderColor: '#dc3545',
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                title: { display: true, text: '{% trans "Quantity" %}' }
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('inputTimelineChart').style.display = 'none'; // Hide if no data
+            }
+        });
+    </script>
+{% endblock %}

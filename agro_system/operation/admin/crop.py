@@ -1,6 +1,7 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from user.admin.adminSite import adminSite
 from operation.models.crop import Crop
+from django.utils.translation import gettext_lazy as _
 from operation.models.partner_crop import PartnerCrop
 from operation.models.technical_crop_detail import TechnicalCropDetail
 from operation.models.crop_yields import CropYields
@@ -40,6 +41,12 @@ class PartnerCropInline(admin.StackedInline):
 def process_plan(modeladmin, request, queryset):
 
     for obj in queryset:
+        if not obj.date_init:
+            messages.error(request, _("The crop '%s' cannot be processed because it does not have an start date.") % obj.name)
+            continue
+
+        messages.success(request, _("The crop '%s' has been successfully processed.") % obj.name)
+
     
         plan  = TechnicalPlan.objects.filter(activity=obj.activity).filter(area=obj.area)
         detail_plan = TechnicalPlanDetail.objects.filter(technical_plan=plan.first())

@@ -16,6 +16,8 @@ class Provider(models.Model):
     city = models.ForeignKey(City, models.CASCADE, verbose_name = _('city'))
     phone = models.CharField(max_length=20, verbose_name = _('phone'))
     email = models.EmailField(null=True, blank=True, verbose_name = _('email'))
+    default = models.BooleanField(default=False, verbose_name = _('default'))
+    producer = models.ForeignKey('user.UserProducer', on_delete=models.RESTRICT, verbose_name= _('producer'), null=True, blank=True)
 
 
     def __str__(self):

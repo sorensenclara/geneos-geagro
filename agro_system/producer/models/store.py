@@ -10,6 +10,9 @@ class Store(models.Model):
     name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
     address = models.CharField(max_length=50, verbose_name = _('address'))
     city = models.ForeignKey(City, models.CASCADE, verbose_name = _('city'))
+    default = models.BooleanField(default=False, verbose_name = _('default'))
+    producer = models.ForeignKey('user.UserProducer', on_delete=models.RESTRICT, verbose_name= _('producer'), null=True, blank=True)
+
 
     def __str__(self):
         return f"{self.name}"

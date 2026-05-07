@@ -14,20 +14,47 @@ def process_reception(modeladmin, request, queryset):
         for obj in queryset:
             details = PurchaseReceptionDetail.objects.filter(purchase_reception=obj)
             for item in details:
-                detail_po = PurchaseOrderDetail.objects.filter(purchase_order=obj.purchase_order, input=item.input)[0]
-                detail_po.pending_amount = detail_po.pending_amount - item.amount
-                detail_po.save()
-                input = Input.objects.filter(id=item.input.id)[0]
-                input.stock += item.amount
-                input.pending += detail_po.pending_amount
-                input.save()
+                input_obj = item.input
+                if obj.purchase_order:
+                    detail_po = PurchaseOrderDetail.objects.filter(purchase_order=obj.purchase_order, input=input_obj).first()
+                    if detail_po:
+                        detail_po.pending_amount -= item.amount
+                        detail_po.save()
+                        input_obj.stock += item.amount
+                        input_obj.pending -= item.amount
+                        input_obj.save()
+                else:
+                    input_obj.stock += item.amount
+                    input_obj.save()
     else:
-        return messages.error(request,"Only receptions in 'confirm' state can be processed.")
+        messages.error(request, _("Only receptions that are not already confirmed can be processed."))
 
 
 class DetalleRecepcionInline(admin.StackedInline):
     model = PurchaseReceptionDetail
     extra = 0
+
+    def has_add_permission(self, request, obj=None):
+        if obj and obj.state == 'confirm':
+            return False
+        return super().has_add_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        # obj here is the parent PurchaseReception
+        if obj and obj.state == 'confirm':
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        # obj here is the parent PurchaseReception
+        if obj and obj.state == 'confirm':
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.state == 'confirm':
+            return [field.name for field in self.model._meta.fields]
+        return super().get_readonly_fields(request, obj)
 
 class PurchaseReceptionAdmin(admin.ModelAdmin):
     list_display = ['purchase_order', 'delivery_date', 'state', 'store']
@@ -62,6 +89,9 @@ class PurchaseReceptionAdmin(admin.ModelAdmin):
     
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super().get_readonly_fields(request, obj)
+        if obj and obj.state == 'confirm':
+            return [field.name for field in obj._meta.fields]
+
         if request.user.type == 'Producer':
             return ['producer']
         return readonly_fields

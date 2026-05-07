@@ -13,7 +13,7 @@ class PurchaseReception(models.Model):
         ('cancel', _('cancel')),
     ]
     
-    purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, verbose_name= _('purchase order'))
+    purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, verbose_name= _('purchase order'), null=True, blank=True)
     delivery_date = models.DateField(null=True, blank=True, verbose_name = _('delivery date'))
     reference = models.CharField(max_length=100, null=True, blank=True, verbose_name = _('reference'))
     state = models.CharField('Estado', max_length=7, choices=states, default='pending')

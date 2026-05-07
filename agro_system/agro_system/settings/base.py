@@ -48,7 +48,7 @@ DJANGO_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites', # Necesario para dj-rest-auth
-    'django.contrib.gis',
+#    'django.contrib.gis',
 ]
 
 THIRD_PARTY_APPS = [
@@ -58,7 +58,7 @@ THIRD_PARTY_APPS = [
     'dj_rest_auth', # login
     'corsheaders', # Cors
     "ckeditor",
-    "leaflet",
+#    "leaflet",
     
     "crispy_forms",
     "crispy_bootstrap5",
@@ -141,6 +141,7 @@ DATABASES = {
     #     'NAME': BASE_DIR / 'db.sqlite3',
     # }
 }
+
 
 
 # Password validation
@@ -288,7 +289,10 @@ JAZZMIN_SETTINGS = {
     "hide_models": [],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": [],
+    "order_with_respect_to": [
+        "input.Input",
+        "operation",
+    ],
 
     # Agregar links manuales al menú del admin
     "custom_links": {
@@ -299,8 +303,18 @@ JAZZMIN_SETTINGS = {
             "icon": "fas fa-calendar-alt",
             "order": 2
         }
+        ],
+        "input": [
+            {
+                "name": _("Stock Charts"),
+                "url": "input:input_charts",
+                "icon": "fas fa-chart-bar",
+                "order": 1
+            }
         ]
     },
+    
+
 
     # Iconos personalizados del menú lateral
     # Se vinculan con clases CSS en jazzmin_custom.css
