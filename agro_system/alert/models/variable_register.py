@@ -10,6 +10,7 @@ class VariableRegister(models.Model):
     name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
     variable = models.ForeignKey(VarCropTechnique, on_delete=models.CASCADE, verbose_name = _('variable'))
     date = models.DateField(verbose_name = _('date'))
+    hour = models.TimeField(verbose_name = _('hour'), null=True, blank=True)
     value = models.FloatField(verbose_name = _('value'))
     detail = models.TextField(verbose_name = _('detail'), null=True, blank=True,)
     station = models.ForeignKey(WeatherStation, on_delete=models.SET_NULL, null=True, verbose_name = _('weather station'))

@@ -3,6 +3,7 @@ from user.admin.adminSite import adminSite
 from user.models.user_producer import UserProducer
 from producer.models.staff import Staff
 
+
 class StaffAdmin(admin.ModelAdmin):
 
 

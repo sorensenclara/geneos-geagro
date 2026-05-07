@@ -5,3 +5,6 @@ class WeatherConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'weather'
     verbose_name = _('weather data')
+
+    def ready(self):
+        import weather.signals

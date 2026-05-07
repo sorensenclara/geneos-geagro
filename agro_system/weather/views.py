@@ -60,6 +60,8 @@ def weather_ingest(request):
     station = WeatherStation.objects.get(passkey=passkey)
     rain_total = in_to_mm(to_float(data.get("dailyrainin")))
     rain_rate = in_to_mm(to_float(data.get("rainratein"))) 
+    if not station:
+        return JsonResponse({"error": "Estación no encontrada"}, status=404)
     WeatherData.objects.create(
         station=station,
         timestamp=timestamp,
@@ -76,5 +78,6 @@ def weather_ingest(request):
         solar_radiation=to_float(data.get("solarradiation")),
         raw_data=data
     )
+
 
     return JsonResponse({"status": "ok"})
