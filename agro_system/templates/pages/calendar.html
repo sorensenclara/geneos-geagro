@@ -1,173 +1,218 @@
 {% extends 'partials/base.html' %}
 {% load static %}
-{% block title %} Calendar {% endblock title %}
+{% block title %} Calendario de órdenes {% endblock title %}
 
 {% block extra_css %}
-
-    <link href="{% static 'libs/@fullcalendar/core/main.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'libs/@fullcalendar/daygrid/main.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'libs/@fullcalendar/bootstrap/main.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'libs/@fullcalendar/timegrid/main.min.css' %}" rel="stylesheet" type="text/css" />
-
+<link href="{% static 'libs/@fullcalendar/core/main.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'libs/@fullcalendar/daygrid/main.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'libs/@fullcalendar/bootstrap/main.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'libs/@fullcalendar/timegrid/main.min.css' %}" rel="stylesheet" type="text/css" />
 {% endblock extra_css %}
 
-{% block content %} 
+{% block content %}
 
-    {% block pagetitle %}
-    {% include "partials/page-title.html" with pagetitle="Lexa" subtitle="Calendar" title="Calendar"%}
-    {% endblock pagetitle %}
+<div class="geagro-dashboard-title mb-4">
+  <h1>Calendario de órdenes</h1>
 
-                        <div class="row mb-4">
-                            <div class="col-xl-3">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="d-grid">
-                                            <button class="btn btn-primary" id="btn-new-event"><i class="mdi mdi-plus-circle-outline"></i> Create New
-                                                Event</button>
-                                        </div>
-                                        
-                                        <div id="external-events">
-                                            <br>
-                                            <p class="text-muted">Drag and drop your event or click in the calendar</p>
-                                            <div class="external-event fc-event bg-success" data-class="bg-success">
-                                                <i class="mdi mdi-checkbox-blank-circle font-size-11 me-2"></i>New Event Planning
-                                            </div>
-                                            <div class="external-event fc-event bg-info" data-class="bg-info">
-                                                <i class="mdi mdi-checkbox-blank-circle font-size-11 me-2"></i>Meeting
-                                            </div>
-                                            <div class="external-event fc-event bg-warning" data-class="bg-warning">
-                                                <i class="mdi mdi-checkbox-blank-circle font-size-11 me-2"></i>Generating Reports
-                                            </div>
-                                            <div class="external-event fc-event bg-danger" data-class="bg-danger">
-                                                <i class="mdi mdi-checkbox-blank-circle font-size-11 me-2"></i>Create New theme
-                                            </div>
-                                        </div>
+  <div class="geagro-dashboard-context">
+    <span>
+      CAMPAÑA:
+      {% if selected_campaing %}
+        {{ selected_campaing.name }}
+      {% elif campaign_active %}
+        {{ campaign_active.name }}
+      {% else %}
+        Sin campaña activa
+      {% endif %}
+    </span>
 
-                                        <div class="mt-5">
-                                            <h5 class="font-size-14 mb-4">Recent activity :</h5>
+    {% if selected_crop %}
+      <i class="mdi mdi-chevron-right"></i>
+      <span>
+        CULTIVO:
+        {{ selected_crop.name|default:selected_crop.activity|default:"-" }}
+      </span>
+    {% endif %}
+  </div>
+</div>
 
-                                            <ul class="list-unstyled activity-feed ms-1">
-                                                <li class="feed-item">
-                                                    <div class="feed-item-list">
-                                                        <div>
-                                                            <div class="date">15 Jul</div>
-                                                            <p class="activity-text mb-0">Responded to need “Volunteer Activities”</p>
-                                                        </div>
-                                                    </div> 
-                                                </li>
+<div class="row mb-4">
 
-                                                <li class="feed-item">
-                                                    <div class="feed-item-list">
-                                                        <div>
-                                                            <div class="date">14 Jul</div>
-                                                            <p class="activity-text mb-0">neque porro quisquam est <a href="javascript:void(0);" class="text-success">@Christi</a> dolorem ipsum quia dolor sit amet</p>
-                                                        </div>
-                                                    </div> 
-                                                </li>
-                                                <li class="feed-item">
-                                                    <div class="feed-item-list">
-                                                        <div>
-                                                            <div class="date">14 Jul</div>
-                                                            <p class="activity-text mb-0">Sed ut perspiciatis unde omnis iste natus error sit “Volunteer Activities”</p>
-                                                        </div>
-                                                    </div> 
-                                                </li>
-                                                <li class="feed-item">
-                                                    <div class="feed-item-list">
-                                                        <div>
-                                                            <div class="date">13 Jul</div>
-                                                            <p class="activity-text mb-0">Responded to need “Volunteer Activities”</p>
-                                                        </div>
-                                                    </div> 
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> <!-- end col-->
+  <!-- IZQUIERDA: FILTROS + ACTIVIDADES DESKTOP -->
+  <div class="col-xl-3 order-1">
 
-                            <div class="col-xl-9">
-                                <div class="card mt-4 mt-xl-0 mb-0">
-                                    <div class="card-body">
-                                        <div id="calendar"></div>
-                                        
-                                    </div>
-                                </div>
-                            </div> <!-- end col -->
+    <div class="card mb-3">
+      <div class="card-body">
 
-                        </div>
-                        <!-- end row -->
+        {% comment %}
+        BTN OCULTO PROVISORIO
+        <button type="button" class="btn btn-primary btn-lg btn-block">
+          <i class="mdi mdi-plus-circle-outline me-1"></i>
+          Crear orden
+        </button>
+        {% endcomment %}
 
+        <div class="calendar-filter-panel">
+          <h5 class="font-size-14 mb-3">Filtrar órdenes</h5>
 
-                         <!-- Add New Event MODAL -->
-                         <!-- Add New Event MODAL -->
-                         <div class="modal fade" id="event-modal" tabindex="-1">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header py-3 px-4 border-bottom-0">
-                                        <h5 class="modal-title" id="modal-title">Event</h5>
+          <form method="get">
+            <input type="hidden" name="campaing" value="{{ selected_campaing.id }}">
+            <input type="hidden" name="crop" value="{{ selected_crop.id }}">
 
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-hidden="true"></button>
+            <div class="mb-3">
+              <label class="form-label">Estado</label>
+              <select name="state" class="form-select" onchange="this.form.submit()">
+                <option value="">Todas</option>
+                <option value="CURSO" {% if selected_state == "CURSO" %}selected{% endif %}>En curso</option>
+                <option value="PENDIENTE" {% if selected_state == "PENDIENTE" %}selected{% endif %}>Pendientes</option>
+                <option value="FINALIZ" {% if selected_state == "FINALIZ" %}selected{% endif %}>Finalizadas</option>
+              </select>
+            </div>
 
-                                    </div>
-                                    <div class="modal-body p-4">
-                                        <form class="needs-validation" name="event-form" id="form-event" novalidate>
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Event Name</label>
-                                                        <input class="form-control" placeholder="Insert Event Name"
-                                                            type="text" name="title" id="event-title" required value="" />
-                                                        <div class="invalid-feedback">Please provide a valid event name</div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Category</label>
-                                                        <select class="form-control custom-select" name="category"
-                                                            id="event-category">
-                                                            <option selected> --Select-- </option>
-                                                            <option value="bg-danger">Danger</option>
-                                                            <option value="bg-success">Success</option>
-                                                            <option value="bg-primary">Primary</option>
-                                                            <option value="bg-info">Info</option>
-                                                            <option value="bg-dark">Dark</option>
-                                                            <option value="bg-warning">Warning</option>
-                                                        </select>
-                                                        <div class="invalid-feedback">Please select a valid event category</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row mt-2">
-                                                <div class="col-6">
-                                                    <button type="button" class="btn btn-danger" id="btn-delete-event">Delete</button>
-                                                </div>
-                                                <div class="col-6 text-end">
-                                                    <button type="button" class="btn btn-light me-1" data-bs-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-success" id="btn-save-event">Save</button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div> <!-- end modal-content-->
-                            </div> <!-- end modal dialog-->
-                        </div>
-                        <!-- end modal-->
+            <div class="mb-0">
+              <label class="form-label">Actividad</label>
+              <select name="service" class="form-select" onchange="this.form.submit()">
+                <option value="">Todas</option>
+                {% for service in services %}
+                  <option value="{{ service.id }}" {% if selected_service == service.id|stringformat:"s" %}selected{% endif %}>
+                    {{ service.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DESKTOP -->
+    <div class="card d-none d-xl-block">
+      <div class="card-body">
+        <h5 class="font-size-14 mb-1">Próximas actividades</h5>
+        <div class="text-muted mb-4">Órdenes en curso y próximas</div>
+
+        <div class="calendar-activity-list">
+          <ul class="list-unstyled activity-feed ms-1 mb-0">
+            {% for order in recent_activities %}
+              <li class="feed-item">
+                <div class="feed-item-list">
+                  <div>
+                    <div class="date">{{ order.date_init|date:"d M" }}</div>
+
+                    <p class="activity-text mb-1 fw-semibold">
+                      {{ order.service }}
+                    </p>
+
+                    <div class="small text-muted mb-1">
+                      {{ order.crop.lot }}
+                    </div>
+
+                    {% if order.stateOT %}
+                      <span class="badge rounded-pill bg-light text-dark border">
+                        {{ order.stateOT }}
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+              </li>
+            {% empty %}
+              <li class="feed-item">
+                <div class="feed-item-list">
+                  <p class="activity-text mb-0">No hay actividades próximas.</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CALENDARIO -->
+  <div class="col-xl-9 order-2">
+    <div class="card mt-4 mt-xl-0 mb-0 calendar-main-card">
+      <div class="card-body">
+        <div id="calendar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE / TABLET -->
+  <div class="col-12 order-3 d-xl-none mt-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="font-size-14 mb-1">Próximas actividades</h5>
+        <div class="text-muted mb-4">Órdenes en curso y próximas</div>
+
+        <div class="calendar-activity-list-mobile">
+          <ul class="list-unstyled activity-feed ms-1 mb-0">
+            {% for order in recent_activities %}
+              <li class="feed-item">
+                <div class="feed-item-list">
+                  <div>
+                    <div class="date">{{ order.date_init|date:"d M" }}</div>
+
+                    <p class="activity-text mb-1 fw-semibold">
+                      {{ order.service }}
+                    </p>
+
+                    <div class="small text-muted mb-1">
+                      {{ order.crop.lot }}
+                    </div>
+
+                    {% if order.stateOT %}
+                      <span class="badge rounded-pill bg-light text-dark border">
+                        {{ order.stateOT }}
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+              </li>
+            {% empty %}
+              <li class="feed-item">
+                <div class="feed-item-list">
+                  <p class="activity-text mb-0">No hay actividades próximas.</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% comment %}
+MODAL OCULTO PROVISORIO - creación manual de eventos
+{% endcomment %}
+<div class="modal fade" id="event-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header py-3 px-4 border-bottom-0">
+        <h5 class="modal-title" id="modal-title">Evento</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
 
 {% block extra_javascript %}
+<script src="{% static 'libs/moment/min/moment.min.js' %}"></script>
+<script src="{% static 'libs/jquery-ui-dist/jquery-ui.min.js' %}"></script>
+<script src="{% static 'libs/@fullcalendar/core/main.min.js' %}"></script>
+<script src="{% static 'libs/@fullcalendar/bootstrap/main.min.js' %}"></script>
+<script src="{% static 'libs/@fullcalendar/daygrid/main.min.js' %}"></script>
+<script src="{% static 'libs/@fullcalendar/timegrid/main.min.js' %}"></script>
+<script src="{% static 'libs/@fullcalendar/interaction/main.min.js' %}"></script>
 
-    <!-- plugin js -->
-    <script src="{% static 'libs/moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'libs/jquery-ui-dist/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'libs/@fullcalendar/core/main.min.js' %}"></script>
-    <script src="{% static 'libs/@fullcalendar/bootstrap/main.min.js' %}"></script>
-    <script src="{% static 'libs/@fullcalendar/daygrid/main.min.js' %}"></script>
-    <script src="{% static 'libs/@fullcalendar/timegrid/main.min.js' %}"></script>
-    <script src="{% static 'libs/@fullcalendar/interaction/main.min.js' %}"></script>
+<script>
+  window.calendarEvents = {{ calendar_events_json|safe }};
+</script>
 
-    <!-- Calendar init -->
-    <script src="{% static 'js/pages/calendar.init.js' %}"></script>
-      
+<script src="{% static 'js/pages/calendar.init.js' %}"></script>
 {% endblock extra_javascript %}
