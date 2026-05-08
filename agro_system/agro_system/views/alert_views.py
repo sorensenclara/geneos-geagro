@@ -1,54 +1,137 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from user.models.notification import Notification
-from producer.models.staff import Staff
-from operation.models.crop import Crop
+from django.db.models import Q
+from datetime import date
+
 from alert.models.alert import Alert
+from operation.models.crop import Crop
+from producer.models.country_side import Countryside
+from producer.models.lot import Lot
+from parameter.models.campaign import Campaing
+
 
 @login_required
 def AlertView(request):
-    
+
+    # =========================================================
+    # CLARA - filtros desde topbar/dashboard
+    # =========================================================
+    countryside_id = request.GET.get('countryside')
+    lot_id = request.GET.get('lot')
+    campaing_id = request.GET.get('campaing')
     crop_id = request.GET.get('crop')
+    selected_status = request.GET.get('status')
+    search_query = request.GET.get('q')
+
     user = request.user
-    staff = None
+
+    # =========================================================
+    # DEV ORIGINAL - visibilidad según tipo usuario
+    # =========================================================
     if user.type == 'Producer':
-        staff = Staff.objects.filter(producer=user)
-        crops = Crop.objects.filter(producer=user)
+        country_sides = Countryside.objects.filter(producer=user)
+        crops_base = Crop.objects.filter(producer=user)
+
     elif user.type == 'Staff':
-        crops = Crop.objects.filter(responsible__user=user)
-    elif user.type == 'Administration':
-        crops = Crop.objects.all()
-    else:
-        crops = Crop.objects.none()
+        country_sides = Countryside.objects.filter(producer=user.producer)
+        crops_base = Crop.objects.filter(producer=user.producer)
 
-    # Cultivo seleccionado o principal
-    crop_selected = None
+    elif user.type == 'Administration':
+        country_sides = Countryside.objects.all()
+        crops_base = Crop.objects.all()
+
+    else:
+        country_sides = Countryside.objects.none()
+        crops_base = Crop.objects.none()
+
+    campaings = Campaing.objects.all()
+    campaign_active = campaings.filter(active=True).first()
+
+    # =========================================================
+    # CLARA - campaña seleccionada / activa
+    # =========================================================
+    if campaing_id:
+        selected_campaing = campaings.filter(id=campaing_id).first()
+    else:
+        selected_campaing = campaign_active or campaings.first()
+
+    if not crops_base.exists():
+        crops_base = Crop.objects.all()
+
+    if not country_sides.exists():
+        country_sides = Countryside.objects.all()
+
+    lots = Lot.objects.filter(countryside__in=country_sides)
+
+    crops = crops_base
+
+    if selected_campaing:
+        crops = crops.filter(campaing_id=selected_campaing.id)
+
+    if selected_campaing and not crops.exists():
+        crops = Crop.objects.filter(campaing_id=selected_campaing.id)
+
+    if countryside_id:
+        crops = crops.filter(countryside_id=countryside_id)
+        lots = lots.filter(countryside_id=countryside_id)
+
+    if lot_id:
+        crops = crops.filter(lot_id=lot_id)
+        lots = lots.filter(id=lot_id)
+
     if crop_id:
-        crop_selected = crops.filter(id=crop_id).first()
+        selected_crop = crops.filter(id=crop_id).first()
     else:
-        crop_selected = crops.filter(is_main=True).first() or crops.first()
+        selected_crop = crops.order_by('-id').first()
 
-    # Filtrar alertas y notificaciones por cultivo
+    if not selected_crop and selected_campaing:
+        selected_crop = Crop.objects.filter(
+            campaing_id=selected_campaing.id
+        ).order_by('-id').first()
+
+    # =========================================================
+    # CLARA - alertas reales
+    # =========================================================
     alerts = Alert.objects.none()
-    notifications = Notification.objects.none()
-    if crop_selected:
-        alerts = Alert.objects.filter(crop=crop_selected).order_by('-date')
-        if user.type == 'Producer':
-            staff_users = staff.values('user') if staff is not None else []
-            notifications = Notification.objects.filter(user__in=staff_users).order_by('-date')
-        elif user.type == 'Staff':
-            notifications = Notification.objects.filter(user=user).order_by('-date')
-        elif user.type == 'Administration':
-            notifications = Notification.objects.all().order_by('-date')
-    elif user.type == 'Administration':
-        alerts = Alert.objects.all().order_by('-date')
-        notifications = Notification.objects.all().order_by('-date')
+
+    if selected_crop:
+        alerts = Alert.objects.filter(
+            crop=selected_crop
+        ).order_by('-date')
+
+    if selected_status == 'active':
+        alerts = alerts.filter(date__gte=date.today())
+
+    elif selected_status == 'history':
+        alerts = alerts.filter(date__lt=date.today())
+
+    if search_query:
+        alerts = alerts.filter(
+            Q(name__icontains=search_query) |
+            Q(detail__icontains=search_query)
+        )
+
+    alerts_count = alerts.count()
+    featured_alert = alerts.first()
 
     data = {
-        'notifications': notifications,
-        'alerts': alerts,
-        'crop_main': crop_selected,
+        'country_sides': country_sides,
+        'lots': lots,
         'crops': crops,
+        'campaings': campaings,
+
+        'selected_crop': selected_crop,
+        'crop_main': selected_crop,
+        'selected_campaing': selected_campaing,
+        'campaign_active': campaign_active,
+
+        'alerts': alerts,
+        'alerts_count': alerts_count,
+        'featured_alert': featured_alert,
+
+        'selected_status': selected_status,
+        'search_query': search_query,
+        'today': date.today(),
     }
 
     return render(request, 'pages/alert.html', data)

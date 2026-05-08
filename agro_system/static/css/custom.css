@@ -1110,11 +1110,6 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   overflow: hidden;
 }
 
-#calendar .fc-toolbar{
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
 #calendar .fc-button{
   border-radius: 999px !important;
   font-weight: 700;
@@ -1131,82 +1126,41 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   }
 
   #calendar .fc-toolbar{
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  #calendar .fc-toolbar .fc-left,
-  #calendar .fc-toolbar .fc-center,
-  #calendar .fc-toolbar .fc-right{
-    display: flex;
-    justify-content: center;
-    width: 100%;
-  }
-
-  #calendar .fc-toolbar h2{
-    font-size: 14px;
-    margin: 0;
-  }
-
-  #calendar .fc-button{
-    padding: 6px 10px;
-    font-size: 11px;
-  }
-
-  #calendar .fc-day-grid-event{
-    font-size: 10px;
-    padding: 2px 4px;
-  }
-
-  .calendar-activity-list-mobile{
-    max-height: 520px;
-    overflow-y: auto;
-    padding-right: 6px;
-  }
-}
-
-@media (max-width: 767px){
-
-  #calendar .fc-toolbar{
-    display: grid;
-    grid-template-columns: 92px 1fr;
+    display: grid !important;
+    grid-template-columns: 46px 1fr 46px;
     grid-template-areas:
-      "nav title"
-      "views views";
+      "prev title next"
+      "views views views";
     align-items: center;
-    gap: 14px 10px;
+    gap: 12px 8px;
     margin-bottom: 18px;
   }
 
   #calendar .fc-left,
   #calendar .fc-center,
   #calendar .fc-right{
-    display: contents;
+    display: contents !important;
   }
 
   #calendar .fc-left .btn-group{
-    grid-area: nav;
-    display: flex;
-    gap: 6px;
+    display: contents !important;
   }
 
-  #calendar .fc-prev-button,
+  #calendar .fc-prev-button{
+    grid-area: prev;
+  }
+
   #calendar .fc-next-button{
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    padding: 0;
-    border-radius: 999px !important;
+    grid-area: next;
   }
 
   #calendar .fc-center h2{
     grid-area: title;
-    text-align: right;
+    margin: 0;
+    text-align: center;
     font-size: 15px;
     font-weight: 600;
     text-transform: capitalize;
-    margin: 0;
     color: #1f2433;
   }
 
@@ -1216,10 +1170,18 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 
   #calendar .fc-right .btn-group{
     grid-area: views;
-    display: grid;
+    display: grid !important;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
     width: 100%;
+  }
+
+  #calendar .fc-prev-button,
+  #calendar .fc-next-button{
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 999px !important;
   }
 
   #calendar .fc-right .btn{
@@ -1236,5 +1198,127 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   #calendar .fc-right .btn.active{
     background: #6b3f6e !important;
     color: #fff !important;
+  }
+
+  #calendar .fc-day-grid-event{
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+
+  .calendar-activity-list-mobile{
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 6px;
+  }
+}
+
+/* ==========================================================
+   18) Alertas y avisos
+   ========================================================== */
+
+.geagro-alert-featured{
+  border: 1px solid rgba(207,78,78,.18);
+  box-shadow: 0 14px 34px rgba(15,23,42,.08);
+}
+
+.geagro-alert-label{
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(207,78,78,.12);
+  color: #cf4e4e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.geagro-alert-featured-icon{
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  background: rgba(207,78,78,.12);
+  color: #cf4e4e;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.geagro-alert-featured-icon i{
+  font-size: 28px;
+}
+
+@media (max-width: 767px){
+  .table-responsive table{
+    font-size: 12px;
+  }
+}
+
+/* Tabla responsive */
+.geagro-responsive-table table tbody tr:nth-child(odd){
+  background: #f1f1f1;
+}
+
+.geagro-responsive-table table tbody tr:nth-child(even){
+  background: #ffffff;
+}
+
+.geagro-responsive-table table th{
+  font-weight: 700;
+  color: #1f2433;
+  white-space: nowrap;
+}
+
+.geagro-responsive-table table td{
+  vertical-align: top;
+  color: #374151;
+}
+
+/* Mobile: cada fila pasa a card */
+@media (max-width: 767px){
+
+  .geagro-responsive-table{
+    overflow-x: visible;
+  }
+
+  .geagro-responsive-table table,
+  .geagro-responsive-table thead,
+  .geagro-responsive-table tbody,
+  .geagro-responsive-table th,
+  .geagro-responsive-table td,
+  .geagro-responsive-table tr{
+    display: block;
+    width: 100%;
+  }
+
+  .geagro-responsive-table thead{
+    display: none;
+  }
+
+  .geagro-responsive-table tbody tr{
+    padding: 16px;
+    margin-bottom: 14px;
+    border-radius: 14px;
+  }
+
+  .geagro-responsive-table tbody tr:nth-child(odd){
+    background: #f1f1f1;
+  }
+
+  .geagro-responsive-table tbody tr:nth-child(even){
+    background: #ffffff;
+    border: 1px solid #eef0f2;
+  }
+
+  .geagro-responsive-table td{
+    border: 0 !important;
+    padding: 8px 0 !important;
+  }
+
+  .geagro-responsive-table td::before{
+    content: attr(data-label);
+    display: block;
+    font-weight: 700;
+    color: #1f2433;
+    margin-bottom: 3px;
   }
 }
