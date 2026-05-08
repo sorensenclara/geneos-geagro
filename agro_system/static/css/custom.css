@@ -938,7 +938,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  font-size: clamp(15px, 2vw, 24px);
+  font-size: clamp(12px, 2vw, 18px);
   line-height: 1.2;
   font-weight: 600;
   color: #1f2433;
@@ -966,7 +966,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   }
 
   .geagro-dashboard-context {
-    font-size: 18px;
+    font-size: 16px;
     gap: 8px;
   }
 }
@@ -1079,5 +1079,162 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
     justify-self: stretch;
     width: 100%;
     text-align: left;
+  }
+}
+
+/* ==========================================================
+   17) Calendario de órdenes
+   ========================================================== */
+
+.calendar-filter-panel .form-label{
+  font-weight: 600;
+  color: #1f2433;
+}
+
+.calendar-activity-list{
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.calendar-activity-list::-webkit-scrollbar{
+  width: 6px;
+}
+
+.calendar-activity-list::-webkit-scrollbar-thumb{
+  background: rgba(107,63,110,.35);
+  border-radius: 999px;
+}
+
+.calendar-main-card{
+  overflow: hidden;
+}
+
+#calendar .fc-toolbar{
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#calendar .fc-button{
+  border-radius: 999px !important;
+  font-weight: 700;
+}
+
+@media (max-width: 767px){
+
+  .calendar-main-card .card-body{
+    padding: 12px;
+  }
+
+  #calendar{
+    font-size: 11px;
+  }
+
+  #calendar .fc-toolbar{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  #calendar .fc-toolbar .fc-left,
+  #calendar .fc-toolbar .fc-center,
+  #calendar .fc-toolbar .fc-right{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  #calendar .fc-toolbar h2{
+    font-size: 14px;
+    margin: 0;
+  }
+
+  #calendar .fc-button{
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  #calendar .fc-day-grid-event{
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+
+  .calendar-activity-list-mobile{
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 6px;
+  }
+}
+
+@media (max-width: 767px){
+
+  #calendar .fc-toolbar{
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    grid-template-areas:
+      "nav title"
+      "views views";
+    align-items: center;
+    gap: 14px 10px;
+    margin-bottom: 18px;
+  }
+
+  #calendar .fc-left,
+  #calendar .fc-center,
+  #calendar .fc-right{
+    display: contents;
+  }
+
+  #calendar .fc-left .btn-group{
+    grid-area: nav;
+    display: flex;
+    gap: 6px;
+  }
+
+  #calendar .fc-prev-button,
+  #calendar .fc-next-button{
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
+    border-radius: 999px !important;
+  }
+
+  #calendar .fc-center h2{
+    grid-area: title;
+    text-align: right;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: capitalize;
+    margin: 0;
+    color: #1f2433;
+  }
+
+  #calendar .fc-today-button{
+    display: none !important;
+  }
+
+  #calendar .fc-right .btn-group{
+    grid-area: views;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  #calendar .fc-right .btn{
+    min-width: 0;
+    padding: 8px 6px;
+    font-size: 11px;
+    border-radius: 999px !important;
+    background: rgba(107,63,110,.12) !important;
+    border-color: transparent !important;
+    color: #6b3f6e !important;
+    font-weight: 700;
+  }
+
+  #calendar .fc-right .btn.active{
+    background: #6b3f6e !important;
+    color: #fff !important;
   }
 }
