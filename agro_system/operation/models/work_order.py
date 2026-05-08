@@ -13,9 +13,9 @@ from producer.models.staff import Staff
 class WorkOrder(models.Model):
 
     types = [
-        ('TPW', 'Third-Party Work'),
-        ('OW', 'Own Work'),
-        ('PW', 'Partner Work')
+        ('TPW', _('Third-Party Work')),
+        ('OW', _('Own Work')),
+        ('PW', _('Partner Work'))
     ]
 
     code = models.CharField(max_length=100, verbose_name= _('code'))

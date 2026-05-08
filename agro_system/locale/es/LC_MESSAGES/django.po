@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-07 17:27+0000\n"
+"POT-Creation-Date: 2026-05-08 11:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -177,19 +177,25 @@ msgstr "Compra"
 msgid ""
 "Automatic Reorder: A new pending order has been created for %s based on "
 "history."
-msgstr "Reorden automático: Se ha creado una nueva orden pendiente para %s basada en el historial."
+msgstr ""
+"Reorden automático: Se ha creado una nueva orden pendiente para %s basada en "
+"el historial."
 
 #: input/admin/input.py:87
 #, python-format
 msgid ""
 "Automatic Reorder: A new pending order has been created for %s using "
 "defaults."
-msgstr "Reorden automático: Se ha creado una nueva orden pendiente para %s usando valores predeterminados."
+msgstr ""
+"Reorden automático: Se ha creado una nueva orden pendiente para %s usando "
+"valores predeterminados."
 
 #: input/admin/input.py:89
 #, python-format
 msgid "Automatic Reorder Failed for %s: No default provider or store found."
-msgstr "Reorden automático fallido para %s: No se encontró proveedor predeterminado o almacén."
+msgstr ""
+"Reorden automático fallido para %s: No se encontró proveedor predeterminado "
+"o almacén."
 
 #: input/admin/purchase_order.py:13
 msgid "Process Purchase Order"
@@ -210,7 +216,8 @@ msgstr "Procesar orden de compra"
 #, python-format
 msgid ""
 "Order %s cannot be cancelled because it already has associated receptions."
-msgstr "La orden %s no puede ser cancelada porque ya tiene recepciones asociadas."
+msgstr ""
+"La orden %s no puede ser cancelada porque ya tiene recepciones asociadas."
 
 #: input/admin/purchase_order.py:48
 #, python-format
@@ -475,7 +482,8 @@ msgstr "Procesar plan en cultivo "
 #, python-format
 msgid ""
 "The crop '%s' cannot be processed because it does not have an start date."
-msgstr "El cultivo '%s' no puede ser procesado porque no tiene una fecha de inicio."
+msgstr ""
+"El cultivo '%s' no puede ser procesado porque no tiene una fecha de inicio."
 
 #: operation/admin/crop.py:48
 #, python-format
@@ -791,6 +799,18 @@ msgstr "Insumo del plan tecnico"
 #: operation/models/technical_plan_input.py:27
 msgid "technical plan inputs"
 msgstr "Insumos del plan tecnico"
+
+#: operation/models/work_order.py:16
+msgid "Third-Party Work"
+msgstr "Ordenes de terceros"
+
+#: operation/models/work_order.py:17
+msgid "Own Work"
+msgstr "Ordenes propias"
+
+#: operation/models/work_order.py:18
+msgid "Partner Work"
+msgstr "Ordenes de socios"
 
 #: operation/models/work_order.py:22
 msgid "date emission"
@@ -1313,7 +1333,9 @@ msgstr "Cntidad"
 msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
-msgstr "Te has autenticado como %(username)s, pero no tienes autorización para acceder a esta página. ¿Deseas iniciar sesión con una cuenta diferente?"
+msgstr ""
+"Te has autenticado como %(username)s, pero no tienes autorización para "
+"acceder a esta página. ¿Deseas iniciar sesión con una cuenta diferente?"
 
 #: templates/admin/login.html:75
 msgid "Forgotten your password or username?"
