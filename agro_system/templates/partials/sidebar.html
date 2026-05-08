@@ -10,45 +10,45 @@
         <div id="sidebar-menu">
             <!-- Left Menu Start -->
             <ul class="metismenu list-unstyled" id="side-menu">
-                <li class="menu-title">Viñedo actual - Curtel Norte</li>
+                <li class="menu-title">VIÑEDO ACTUAL</li>
 
-                <li>
-                    <a href="{% url 'dashboard' %}" class="waves-effect">
+                <li class="{% if request.resolver_match.url_name == 'dashboard' %}mm-active{% endif %}">
+                    <a href="{% url 'dashboard' %}" class="waves-effect {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                         <img src="{% static 'images/icon/dashboard.svg' %}" class="menu-icon-img" />
                         <span>Dashboard</span>
                     </a>
                 </li>
 
-                <li>
-                    <a href="{% url 'technical-plan' %}?campaing={{ selected_campaing.id }}&crop={{ selected_crop.id }}" class=" waves-effect">
+                <li class="{% if request.resolver_match.url_name == 'technical-plan' %}mm-active{% endif %}">
+                    <a href="{% url 'technical-plan' %}?campaing={{ selected_campaing.id }}&crop={{ selected_crop.id }}" class="waves-effect {% if request.resolver_match.url_name == 'technical-plan' %}active{% endif %}">
                         <img src="{% static 'images/icon/technical_plan.svg' %}" class="menu-icon-img" />
                         <span class="badge rounded-pill bg-success float-end">New</span>
                         <span>Plan Técnico</span>
                     </a>
                 </li>
 
-                <li>
-                    <a href="{% url 'calendarboard' %}" class=" waves-effect">
+                <li class="{% if request.resolver_match.url_name == 'calendarboard' %}mm-active{% endif %}">
+                    <a href="{% url 'calendarboard' %}" class="waves-effect {% if request.resolver_match.url_name == 'calendarboard' %}active{% endif %}">
                         <img src="{% static 'images/icon/calendar.svg' %}" class="menu-icon-img" />
                         <span>Calendario</span>
                     </a>
                 </li>
 
-                <li>
-                    <a href="alert" class=" waves-effect">
+                <li class="{% if request.resolver_match.url_name == 'alert' %}mm-active{% endif %}">
+                    <a href="{% url 'alert' %}" class="waves-effect {% if request.resolver_match.url_name == 'alert' %}active{% endif %}">
                         <img src="{% static 'images/icon/alert.svg' %}" class="menu-icon-img" />
                         <span class="badge rounded-pill bg-danger float-end">Atención</span>
                         <span>Alerta y Avisos</span>
                     </a>
                 </li>
 
-                                
-                <li>
-                    <a href="weather" class=" waves-effect">
+                <li class="{% if request.resolver_match.url_name == 'weather' %}mm-active{% endif %}">
+                    <a href="{% url 'weather' %}" class="waves-effect {% if request.resolver_match.url_name == 'weather' %}active{% endif %}">
                         <img src="{% static 'images/icon/weather.svg' %}" class="menu-icon-img" />
                         <span>Clima</span>
                     </a>
                 </li>
+
                 <li>
                     <a href="wines" class=" waves-effect">
                         <img src="{% static 'images/icon/vinedos.svg' %}" class="menu-icon-img" />

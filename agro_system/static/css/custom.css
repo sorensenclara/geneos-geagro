@@ -93,6 +93,50 @@ body[data-sidebar="dark"]{
   --bs-sidebar-dark-menu-item-active-bg: #2c1830;
 }
 
+
+/* ==========================================================
+   Sidebar hover / active GEAGRO
+   ========================================================== */
+
+.vertical-menu #sidebar-menu ul li a{
+  transition:
+    background-color .18s ease,
+    color .18s ease,
+    transform .18s ease;
+}
+
+/* HOVER */
+.vertical-menu #sidebar-menu ul li a:hover{
+  background: rgba(255,255,255,.08);
+  color: #ffffff !important;
+}
+
+/* ACTIVE */
+.vertical-menu #sidebar-menu ul li a.active,
+.vertical-menu #sidebar-menu ul li.mm-active > a{
+  background: #2c1830;
+  color: #ffffff !important;
+}
+
+/* TEXTOS */
+.vertical-menu #sidebar-menu ul li a:hover span,
+.vertical-menu #sidebar-menu ul li a.active span,
+.vertical-menu #sidebar-menu ul li.mm-active > a span{
+  color: #ffffff !important;
+}
+
+/* ICONOS */
+.vertical-menu #sidebar-menu ul li a:hover .menu-icon-img,
+.vertical-menu #sidebar-menu ul li a.active .menu-icon-img,
+.vertical-menu #sidebar-menu ul li.mm-active > a .menu-icon-img{
+  opacity: 1;
+}
+
+/* MICRO INTERACCIÓN */
+.vertical-menu #sidebar-menu ul li a:hover{
+  transform: translateX(2px);
+}
+
 /* ==========================================================
    3) Iconos
    ========================================================== */
@@ -945,4 +989,95 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   font-weight: 700;
   font-size: 0.95rem;
   line-height: 1;
+}
+
+/* Plan técnico - resumen compacto */
+.geagro-plan-summary{
+  min-height: 76px;
+  padding: 16px 22px;
+  display: grid;
+  grid-template-columns: 1.4fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+}
+
+.geagro-plan-summary-info{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.geagro-plan-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: #1f2433;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.geagro-plan-pill span{
+  color: #4b5563;
+  font-weight: 600;
+}
+
+.geagro-plan-responsible{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.geagro-plan-responsible-name{
+  font-weight: 700;
+  color: #1f2433;
+  line-height: 1.1;
+}
+
+.geagro-plan-muted{
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+.geagro-plan-progress{
+  justify-self: end;
+  width: 230px;
+  text-align: right;
+}
+
+.geagro-plan-progress-title{
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #6b7280;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.geagro-plan-progress .progress{
+  height: 7px;
+  border-radius: 999px;
+  background: #eef0f2;
+}
+
+.geagro-plan-progress .progress-bar{
+  border-radius: 999px;
+}
+
+@media (max-width: 992px){
+  .geagro-plan-summary{
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .geagro-plan-progress{
+    justify-self: stretch;
+    width: 100%;
+    text-align: left;
+  }
 }
