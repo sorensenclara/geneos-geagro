@@ -1322,3 +1322,61 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
     margin-bottom: 3px;
   }
 }
+
+/* ==========================================================
+   19) Weather
+   ========================================================== */
+
+.geagro-weather-main-icon{
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    background: rgba(122,74,129,.10);
+    color: #7A4A81;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.geagro-weather-main-icon i{
+    font-size: 42px;
+}
+
+.geagro-weather-stat{
+    background:#f8f9fb;
+    border-radius:16px;
+    padding:18px;
+    height:100%;
+}
+
+.geagro-weather-stat-icon{
+    color:#7A4A81;
+    font-size:24px;
+    margin-bottom:10px;
+}
+
+.geagro-weather-stat-value{
+    font-size:26px;
+    font-weight:700;
+    color:#1f2433;
+    line-height:1;
+}
+
+.geagro-weather-stat-label{
+    margin-top:8px;
+    color:#6b7280;
+    font-size:13px;
+}
+
+.geagro-weather-mini-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 0;
+    border-bottom:1px solid #eef0f2;
+}
+
+.geagro-weather-mini-row:last-child{
+    border-bottom:0;
+}

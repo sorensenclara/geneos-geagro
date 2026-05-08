@@ -43,7 +43,7 @@
                 </li>
 
                 <li class="{% if request.resolver_match.url_name == 'weather' %}mm-active{% endif %}">
-                    <a href="{% url 'weather' %}" class="waves-effect {% if request.resolver_match.url_name == 'weather' %}active{% endif %}">
+                    <a href="{% url 'weather' %}?campaing={{ selected_campaing.id }}&crop={{ selected_crop.id }}" class="waves-effect">
                         <img src="{% static 'images/icon/weather.svg' %}" class="menu-icon-img" />
                         <span>Clima</span>
                     </a>
