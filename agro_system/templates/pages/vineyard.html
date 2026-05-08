@@ -1,57 +1,248 @@
 {% extends 'partials/base.html' %}
 {% load static %}
-{% block title %} Calendar {% endblock title %}
+{% block title %} Mis Viñedos {% endblock title %}
 
-{% block extra_css %}
+{% block content %}
 
-    <link href="{% static 'libs/@fullcalendar/core/main.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'libs/@fullcalendar/daygrid/main.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'libs/@fullcalendar/bootstrap/main.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'libs/@fullcalendar/timegrid/main.min.css' %}" rel="stylesheet" type="text/css" />
+<div class="geagro-dashboard-title mb-4">
+  <h1>Mis Viñedos</h1>
 
-{% endblock extra_css %}
+  <div class="geagro-dashboard-context">
+    <span>Resumen productivo y operativo</span>
+    {% if selected_campaing %}
+      <i class="mdi mdi-chevron-right"></i>
+      <span>CAMPAÑA: {{ selected_campaing.name }}</span>
+    {% endif %}
+  </div>
+</div>
 
+<div class="row mb-4">
 
-<!-- MIS VIÑEDOS -->
-{% block content %} 
+  <div class="col-xl-3 col-md-6 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="geagro-card-header">
+          <h5 class="card-title">Campos</h5>
+          <i class="mdi mdi-map-marker-radius geagro-card-icon"></i>
+        </div>
+        <div class="geagro-kpi-value">{{ country_sides.count }}</div>
+        <p class="geagro-kpi-meta mb-0">Establecimientos cargados</p>
+      </div>
+    </div>
+  </div>
 
-    {% block pagetitle %}
-    {% include "partials/page-title.html" with pagetitle="GEAGRO" subtitle="Producción" title="Clima" %}
-    {% endblock pagetitle %}
+  <div class="col-xl-3 col-md-6 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="geagro-card-header">
+          <h5 class="card-title">Lotes</h5>
+          <i class="mdi mdi-select-group geagro-card-icon"></i>
+        </div>
+        <div class="geagro-kpi-value">{{ lots.count }}</div>
+        <p class="geagro-kpi-meta mb-0">Unidades productivas</p>
+      </div>
+    </div>
+  </div>
 
-                            <div class="container-fluid">
+  <div class="col-xl-3 col-md-6 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="geagro-card-header">
+          <h5 class="card-title">Hectáreas productivas</h5>
+          <i class="mdi mdi-chart-areaspline geagro-card-icon"></i>
+        </div>
+        <div class="geagro-kpi-value">{{ total_productive_hectares|default:"0" }} ha</div>
+        <p class="geagro-kpi-meta mb-0">Superficie disponible</p>
+      </div>
+    </div>
+  </div>
 
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h4 class="mb-3">Clima</h4>
-                                    </div>
-                                </div>
+  <div class="col-xl-3 col-md-6 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="geagro-card-header">
+          <h5 class="card-title">Cultivos activos</h5>
+          <i class="mdi mdi-sprout geagro-card-icon"></i>
+        </div>
+        <div class="geagro-kpi-value">{{ crops.count }}</div>
+        <p class="geagro-kpi-meta mb-0">Cultivos de campaña</p>
+      </div>
+    </div>
+  </div>
 
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                Contenido de clima
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+</div>
 
-                            </div>
+{% if main_crop %}
+<div class="card mb-4 geagro-vineyard-hero">
+  <div class="card-body">
+
+    <div class="row align-items-center">
+
+      <div class="col-xl-8">
+
+        <div class="geagro-alert-label mb-3">
+          Viñedo actual
+        </div>
+
+        <h3 class="mb-2">
+          {{ main_crop.countryside }}
+        </h3>
+
+        <p class="text-muted mb-3">
+          {{ main_crop.lot }} · {{ main_crop.activity }} · {{ main_crop.campaing }}
+        </p>
+
+        <div class="d-flex flex-wrap gap-2 mb-3">
+
+          <span class="geagro-plan-pill">
+            <i class="mdi mdi-map-marker-outline"></i>
+            Zona: {{ main_crop.area }}
+          </span>
+
+          <span class="geagro-plan-pill">
+            <i class="mdi mdi-account-outline"></i>
+            {{ main_crop.responsible }}
+          </span>
+
+          <span class="geagro-plan-pill">
+            <i class="mdi mdi-leaf"></i>
+            Estado: {{ main_crop.state }}
+          </span>
+
+          {% if main_crop.lot.station %}
+          <span class="geagro-plan-pill">
+            <i class="mdi mdi-weather-partly-cloudy"></i>
+            {{ main_crop.lot.station }}
+          </span>
+          {% endif %}
+
+        </div>
+
+        <div class="row mt-4">
+
+          <div class="col-md-3 col-6 mb-3">
+            <div class="geagro-vineyard-mini">
+              <span>Productivas</span>
+              <strong>{{ main_crop.hectares_productive }} ha</strong>
+            </div>
+          </div>
+
+          <div class="col-md-3 col-6 mb-3">
+            <div class="geagro-vineyard-mini">
+              <span>Plantadas</span>
+              <strong>{{ main_crop.hectares_planted }} ha</strong>
+            </div>
+          </div>
+
+          <div class="col-md-3 col-6 mb-3">
+            <div class="geagro-vineyard-mini">
+              <span>Sin plantar</span>
+              <strong>{{ main_crop.hectares_unplanted }} ha</strong>
+            </div>
+          </div>
+
+          <div class="col-md-3 col-6 mb-3">
+            <div class="geagro-vineyard-mini">
+              <span>Cosechadas</span>
+              <strong>{{ main_crop.hectares_harvested }} ha</strong>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="col-xl-4 mt-4 mt-xl-0">
+        <div class="geagro-vineyard-actions">
+          <a href="{% url 'technical-plan' %}?campaing={{ main_crop.campaing.id }}&crop={{ main_crop.id }}" class="btn btn-primary w-100 mb-2">
+            Ver plan técnico
+          </a>
+
+          <a href="{% url 'weather' %}?campaing={{ main_crop.campaing.id }}&crop={{ main_crop.id }}" class="btn btn-outline-primary w-100 mb-2">
+            Ver clima
+          </a>
+
+          <a href="{% url 'calendarboard' %}?campaing={{ main_crop.campaing.id }}&crop={{ main_crop.id }}" class="btn btn-outline-primary w-100">
+            Ver calendario
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endif %}
+
+<div class="row">
+
+  {% for lot in lots %}
+  <div class="col-xl-4 col-md-6 mb-4">
+    <div class="card h-100 geagro-vineyard-lot-card">
+      <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+          <div>
+            <h5 class="mb-1">{{ lot.name }}</h5>
+            <div class="text-muted">{{ lot.countryside }}</div>
+          </div>
+
+          <span class="badge rounded-pill bg-light text-dark border">
+            {{ lot.hectares_productive }} ha
+          </span>
+        </div>
+
+        <div class="geagro-weather-mini-row">
+          <span>Zona</span>
+          <strong>{{ lot.area }}</strong>
+        </div>
+
+        <div class="geagro-weather-mini-row">
+          <span>Responsable</span>
+          <strong>{{ lot.responsible }}</strong>
+        </div>
+
+        <div class="geagro-weather-mini-row">
+          <span>Centro de costo</span>
+          <strong>{{ lot.cost_center }}</strong>
+        </div>
+
+        <div class="geagro-weather-mini-row">
+          <span>Estación</span>
+          <strong>
+            {% if lot.station %}
+              {{ lot.station }}
+            {% else %}
+              Sin estación
+            {% endif %}
+          </strong>
+        </div>
+
+        <div class="mt-3">
+          {% for crop in crops %}
+            {% if crop.lot.id == lot.id %}
+              <span class="geagro-plan-pill mb-2">
+                <i class="mdi mdi-sprout"></i>
+                {{ crop.name }}
+              </span>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <h4>No hay lotes cargados</h4>
+        <p class="text-muted mb-0">Todavía no existen lotes asociados al productor.</p>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
+
 {% endblock content %}
-
-{% block extra_javascript %}
-
-    <!-- plugin js -->
-    <script src="{% static 'libs/moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'libs/jquery-ui-dist/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'libs/@fullcalendar/core/main.min.js' %}"></script>
-    <script src="{% static 'libs/@fullcalendar/bootstrap/main.min.js' %}"></script>
-    <script src="{% static 'libs/@fullcalendar/daygrid/main.min.js' %}"></script>
-    <script src="{% static 'libs/@fullcalendar/timegrid/main.min.js' %}"></script>
-    <script src="{% static 'libs/@fullcalendar/interaction/main.min.js' %}"></script>
-
-    <!-- Calendar init -->
-    <script src="{% static 'js/pages/calendar.init.js' %}"></script>
-      
-{% endblock extra_javascript %}

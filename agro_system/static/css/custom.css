@@ -1380,3 +1380,66 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 .geagro-weather-mini-row:last-child{
     border-bottom:0;
 }
+
+/* ==========================================================
+   20) Mis Viñedos
+   ========================================================== */
+
+.geagro-vineyard-hero{
+  border: 1px solid rgba(107,63,110,.14);
+  box-shadow: 0 16px 40px rgba(15,23,42,.08);
+}
+
+.geagro-vineyard-mini{
+  background: #f8f9fb;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.geagro-vineyard-mini span{
+  display: block;
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.geagro-vineyard-mini strong{
+  color: #1f2433;
+  font-size: 18px;
+}
+
+.geagro-vineyard-actions{
+  background: #f8f9fb;
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.geagro-vineyard-lot-card{
+  border: 1px solid #eef0f2;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.geagro-vineyard-lot-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(15,23,42,.10);
+}
+
+@media (max-width: 767px){
+  .geagro-vineyard-mini strong{
+    font-size: 16px;
+  }
+}
+
+.geagro-vineyard-actions .btn-outline-primary{
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-weight: 700;
+  color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.geagro-vineyard-actions .btn-outline-primary:hover{
+  background: rgba(107,63,110,.08);
+  color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
