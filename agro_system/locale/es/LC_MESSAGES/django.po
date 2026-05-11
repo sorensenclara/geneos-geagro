@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-08 11:15+0000\n"
+"POT-Creation-Date: 2026-05-11 15:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgstr "Gráficos de Stock"
 msgid "alerts"
 msgstr "Alertas"
 
-#: alert/models/alert.py:10 alert/models/indicator.py:10
+#: alert/models/alert.py:10 alert/models/indicator.py:16
 #: alert/models/variable_register.py:10 input/models/category_input.py:9
 #: input/models/input.py:12 input/models/type_input.py:10
 #: input/models/type_provider.py:10 operation/models/activity.py:11
@@ -54,7 +54,7 @@ msgstr "Alertas"
 msgid "name"
 msgstr "Nombre"
 
-#: alert/models/alert.py:11 alert/models/indicator.py:27
+#: alert/models/alert.py:11 alert/models/indicator.py:34
 msgid "indicator"
 msgstr "Indicador"
 
@@ -86,50 +86,66 @@ msgid "alert"
 msgstr "Alerta"
 
 #: alert/models/indicator.py:11
+msgid "Low"
+msgstr "Bajo"
+
+#: alert/models/indicator.py:12
+msgid "Medium"
+msgstr "Medio"
+
+#: alert/models/indicator.py:13
+msgid "High"
+msgstr "Alto"
+
+#: alert/models/indicator.py:17
 msgid "variable one"
 msgstr "Primera variable"
 
-#: alert/models/indicator.py:12
+#: alert/models/indicator.py:18
 msgid "min variable one"
 msgstr "Minimo de la primera variable"
 
-#: alert/models/indicator.py:13
+#: alert/models/indicator.py:19
 msgid "max variable one"
 msgstr "Maximo de la primera variable"
 
-#: alert/models/indicator.py:14
+#: alert/models/indicator.py:20
 msgid "variable two"
 msgstr "Segunda variable"
 
-#: alert/models/indicator.py:15
+#: alert/models/indicator.py:21
 msgid "min variable two"
 msgstr "Minimo de la segunda variable"
 
-#: alert/models/indicator.py:16
+#: alert/models/indicator.py:22
 msgid "max variable two"
 msgstr "Maximo de la segunda variable"
 
-#: alert/models/indicator.py:17
+#: alert/models/indicator.py:23
 msgid "variable three"
 msgstr "Tercera variable"
 
-#: alert/models/indicator.py:18
+#: alert/models/indicator.py:24
 msgid "min variable three"
 msgstr "Minimo de tercera variable"
 
-#: alert/models/indicator.py:19
+#: alert/models/indicator.py:25
 msgid "max variable three"
 msgstr "Maximo de tercera variable"
 
-#: alert/models/indicator.py:20
+#: alert/models/indicator.py:26
 msgid "user alert"
 msgstr "Usuarios a reportar"
 
-#: alert/models/indicator.py:21
+#: alert/models/indicator.py:27
 msgid "report mails"
 msgstr "Emails a notificar"
 
-#: alert/models/indicator.py:28 operation/models/crop.py:38
+#: alert/models/indicator.py:28
+msgid "criticality level"
+msgstr "Nivel de criticidad"
+
+#: alert/models/indicator.py:35 operation/models/crop.py:38
 msgid "indicators"
 msgstr "Indicadores"
 

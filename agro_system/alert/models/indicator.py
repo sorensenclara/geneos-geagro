@@ -6,7 +6,13 @@ from user.models.user_extend import UserExtend
 class Indicator(models.Model):
 
     """ Modelo para representar el indicador que se va a evaluar para generar una alerta"""
-
+    
+    levels = [
+        ('low', _('Low')),
+        ('medium', _('Medium')),
+        ('high', _('High')),
+    ]
+    
     name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
     variable_one = models.ForeignKey(VarCropTechnique, on_delete=models.CASCADE, verbose_name = _('variable one'), related_name='variable_one')
     min_var_one = models.FloatField(verbose_name = _('min variable one'))
@@ -19,6 +25,7 @@ class Indicator(models.Model):
     max_var_three = models.FloatField(verbose_name = _('max variable three'), null=True, blank=True,)
     report_user = models.ManyToManyField(UserExtend, verbose_name = _('user alert'), blank=True)
     report_mails = models.TextField(verbose_name = _('report mails'), blank=True, null=True)
+    criticality_level = models.CharField(max_length=6, verbose_name=_('criticality level'), choices=levels, default='low')
     
     def __str__(self):
         return f"{self.name}"
