@@ -208,8 +208,22 @@ body.login-page .login-box a.btn-primary:active {
     border-color: var(--geagro-green-600);
 }
 
-.btn-success, .btn-info, .btn-danger, .btn-secondary{
+.btn-outline-secondary {
+    border-color: var(--geagro-green-500);
     border-radius: var(--geagro-radius-pill);
+    color:var(--geagro-green-500);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.btn-outline-secondary:active {
+    background-color: var(--geagro-green-500);
+    border-color: var(--geagro-green-500);
+    color:white;
+}
+
+.btn-success, .btn-info, .btn-danger, .btn-secondary .btn-outline-secondary{
+    border-radius: var(--geagro-radius-pill)!important;
 }
 
 /* Acciones secundarias: guardar y añadir / continuar */
@@ -447,4 +461,793 @@ button:active {
 .main-content,
 .card-body {
     overflow: visible;
+}
+/* ==========================================================
+   10. ADMIN DASHBOARD AGRONÓMICO
+========================================================== */
+
+.geagro-admin-dashboard{
+  padding:8px 0 36px;
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.geagro-admin-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  margin-bottom:24px;
+}
+
+.geagro-admin-header h1{
+  margin:0;
+  font-size:38px;
+  line-height:1.05;
+  font-weight:800;
+  color:#1e293b;
+}
+
+.geagro-muted{
+  color:#64748b;
+}
+
+.geagro-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.geagro-actions .btn,
+.geagro-card-actions .btn{
+  border-radius:999px;
+  font-weight:700;
+}
+
+/* ==========================================================
+   FILTROS
+========================================================== */
+
+.geagro-filterbar{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:12px;
+
+  margin:20px 0 24px;
+
+  padding:16px;
+
+  border-radius:18px;
+
+  background:#fff;
+
+  box-shadow:0 10px 24px rgba(15,23,42,.06);
+}
+
+.geagro-filterbar-title{
+  display:none;
+
+  width:100%;
+
+  font-size:13px;
+  font-weight:800;
+
+  color:#64748b;
+
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+
+.geagro-filterbar select{
+  min-width:220px;
+
+  border:1px solid #d7dce3;
+
+  border-radius:12px;
+
+  padding:10px 14px;
+}
+
+/* ==========================================================
+   GRID
+========================================================== */
+
+.geagro-grid-operacion,
+.geagro-grid-estado{
+  display:grid;
+
+  grid-template-columns:repeat(3,1fr);
+
+  gap:20px;
+
+  margin-bottom:24px;
+
+  align-items:stretch;
+}
+
+.geagro-grid-insumos{
+  display:grid;
+
+  grid-template-columns:1.75fr .85fr;
+
+  gap:20px;
+
+  margin-bottom:24px;
+
+  align-items:stretch;
+}
+
+/* ==========================================================
+   CARDS
+========================================================== */
+
+.geagro-card{
+  background:#fff;
+
+  border-radius:20px;
+
+  padding:24px;
+
+  border:1px solid #edf0f3;
+
+  box-shadow:0 10px 24px rgba(15,23,42,.06);
+
+  min-width:0;
+}
+
+.geagro-card-featured{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(30,125,59,.05),
+      #fff 70%
+    );
+
+  border:1px solid rgba(30,125,59,.18);
+
+  box-shadow:
+    0 16px 36px rgba(30,125,59,.08);
+}
+
+.geagro-card-title{
+  font-size:13px;
+
+  font-weight:800;
+
+  color:#64748b;
+
+  margin-bottom:12px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.04em;
+}
+
+.geagro-labor-title{
+  font-size:24px;
+
+  line-height:1.15;
+
+  font-weight:800;
+
+  color:#1f2433;
+
+  margin-bottom:8px;
+}
+
+.geagro-main-number{
+  font-size:38px;
+
+  font-weight:800;
+
+  line-height:1;
+
+  color:#1f2433;
+
+  margin:8px 0 12px;
+}
+
+/* ==========================================================
+   KPI
+========================================================== */
+
+.geagro-kpi-row{
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:12px;
+
+  padding:10px 0;
+
+  border-bottom:1px solid #eef1f4;
+}
+
+.geagro-kpi-row:first-of-type{
+  border-top:1px solid #eef1f4;
+}
+
+.geagro-kpi-row:last-child{
+  border-bottom:0;
+}
+
+.geagro-progress{
+  width:100%;
+
+  height:10px;
+
+  border-radius:999px;
+
+  overflow:hidden;
+
+  background:#edf0f3;
+
+  margin:14px 0 12px;
+}
+
+.geagro-progress span{
+  display:block;
+
+  height:100%;
+
+  background:#22b24c;
+}
+
+/* ==========================================================
+   TABLAS
+========================================================== */
+
+.geagro-table{
+  width:100%;
+
+  border-collapse:collapse;
+}
+
+.geagro-table th,
+.geagro-table td{
+  padding:12px;
+
+  border-bottom:1px solid #edf0f3;
+
+  vertical-align:top;
+}
+
+.geagro-table th{
+  color:#64748b;
+
+  font-size:12px;
+
+  text-transform:uppercase;
+
+  font-weight:800;
+}
+
+.geagro-table a{
+  color:#16a34a;
+
+  font-weight:700;
+}
+
+/* ==========================================================
+   BADGES
+========================================================== */
+
+.geagro-badge{
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:6px;
+
+  border-radius:999px;
+
+  padding:6px 12px;
+
+  font-size:12px;
+
+  font-weight:800;
+}
+
+.geagro-badge-danger{
+  background:#fee2e2;
+  color:#b91c1c;
+}
+
+.geagro-badge-warning{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.geagro-badge-success{
+  background:#dcfce7;
+  color:#166534;
+}
+
+/* ==========================================================
+   CLIMA
+========================================================== */
+
+.geagro-weather-grid{
+  display:grid;
+
+  grid-template-columns:repeat(3,1fr);
+
+  gap:8px;
+
+  margin-top:8px;
+}
+
+.geagro-weather-grid div{
+  background:#f8fafc;
+
+  border-radius:12px;
+
+  padding:10px;
+}
+
+.geagro-weather-grid span{
+  display:block;
+
+  font-size:12px;
+
+  color:#64748b;
+}
+
+.geagro-weather-grid strong{
+  display:block;
+
+  color:#1f2433;
+
+  margin-top:4px;
+}
+
+/* ==========================================================
+   ALERTAS
+========================================================== */
+
+.geagro-card-alert-clean{
+  display:flex;
+
+  flex-direction:column;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fff7ed 0%,
+      #ffffff 72%
+    );
+
+  border:1px solid rgba(245,158,11,.35);
+
+  box-shadow:
+    0 16px 36px rgba(245,158,11,.12);
+}
+
+.geagro-card-alert-clean .geagro-card-title{
+  color:#92400e;
+}
+
+.geagro-card-alert-clean .geagro-main-number{
+  color:#b45309;
+}
+
+.geagro-alert-clean-content h3{
+  font-size:24px;
+
+  line-height:1.1;
+
+  font-weight:800;
+
+  color:#1f2433;
+
+  margin:0 0 8px;
+}
+
+.geagro-alert-date{
+  display:block;
+
+  color:#64748b;
+
+  font-size:13px;
+
+  margin-bottom:10px;
+}
+
+.geagro-alert-clean-content p{
+  color:#475569;
+
+  font-size:14px;
+
+  line-height:1.5;
+
+  margin-bottom:0;
+
+  max-width:95%;
+}
+
+.geagro-card-alert-clean .geagro-card-actions{
+  margin-top:auto;
+}
+
+/* ==========================================================
+   PROXIMAS LABORES
+========================================================== */
+
+.geagro-next-work-table tbody tr:nth-child(n+5){
+  display:none;
+}
+
+.geagro-next-work-table td,
+.geagro-next-work-table th{
+  padding:10px 12px;
+}
+
+/* ==========================================================
+   INSUMOS
+========================================================== */
+
+.geagro-insumos-header{
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:16px;
+
+  margin-bottom:24px;
+}
+
+.geagro-inline-actions{
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+}
+
+/* ==========================================================
+   ACCIONES INSUMOS
+========================================================== */
+
+.geagro-action-btn{
+  width:36px;
+  height:36px;
+
+  border-radius:10px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:#fff;
+
+  border:1px solid #e5e7eb;
+
+  text-decoration:none;
+
+  transition:.2s ease;
+
+  color:#475569;
+}
+
+.geagro-action-btn svg{
+  width:18px;
+  height:18px;
+  stroke-width:2;
+}
+
+.geagro-action-btn:hover{
+  transform:translateY(-1px);
+
+  background:#f8fafc;
+
+  border-color:#cbd5e1;
+}
+
+.geagro-action-buy{
+  background:#f0fdf4;
+
+  color:#15803d;
+
+  border-color:#bbf7d0;
+}
+
+/* ==========================================================
+   SPONSOR
+========================================================== */
+
+.geagro-card-sponsor{
+  background:
+    linear-gradient(
+      135deg,
+      rgba(107,63,110,.08),
+      rgba(30,125,59,.08)
+    );
+
+  border:1px solid rgba(107,63,110,.16);
+
+  display:flex;
+
+  flex-direction:column;
+
+  justify-content:space-between;
+}
+
+.geagro-sponsor-label{
+  display:inline-flex;
+
+  width:max-content;
+
+  padding:5px 10px;
+
+  border-radius:999px;
+
+  background:rgba(107,63,110,.12);
+
+  color:#6b3f6e;
+
+  font-size:12px;
+
+  font-weight:800;
+
+  text-transform:uppercase;
+
+  letter-spacing:.04em;
+
+  margin-bottom:14px;
+}
+
+.geagro-sponsor-title{
+  font-size:24px;
+
+  line-height:1.15;
+
+  font-weight:800;
+
+  color:#1f2433;
+
+  margin:0 0 10px;
+}
+
+.geagro-sponsor-text{
+  color:#475569;
+
+  font-size:15px;
+
+  line-height:1.45;
+
+  margin-bottom:18px;
+}
+
+.geagro-sponsor-product{
+  background:#fff;
+
+  border-radius:16px;
+
+  padding:14px;
+
+  margin-bottom:18px;
+
+  border:1px solid rgba(15,23,42,.08);
+}
+
+.geagro-sponsor-product strong{
+  display:block;
+
+  color:#1f2433;
+
+  font-size:16px;
+}
+
+.geagro-sponsor-product span{
+  display:block;
+
+  color:#64748b;
+
+  font-size:13px;
+
+  margin-top:4px;
+}
+
+/* ==========================================================
+   MOBILE HELPERS
+========================================================== */
+
+.geagro-mobile-only{
+  display:none;
+}
+
+/* ==========================================================
+   RESPONSIVE TABLET
+========================================================== */
+
+@media (max-width:1200px){
+
+  .geagro-grid-operacion,
+  .geagro-grid-estado,
+  .geagro-grid-insumos{
+    grid-template-columns:1fr 1fr;
+  }
+
+}
+
+/* ==========================================================
+   RESPONSIVE MOBILE
+========================================================== */
+
+@media (max-width:768px){
+
+  .geagro-admin-header{
+    flex-direction:column;
+  }
+
+  .geagro-admin-header h1{
+    font-size:30px;
+  }
+
+  .geagro-actions{
+    width:100%;
+  }
+
+  .geagro-actions .btn{
+    flex:1;
+  }
+
+  /* filtros */
+
+  .geagro-filterbar{
+    flex-direction:column;
+
+    align-items:stretch;
+
+    padding:18px;
+  }
+
+  .geagro-filterbar-title{
+    display:block;
+  }
+
+  .geagro-filterbar select,
+  .geagro-filterbar .btn{
+    width:100%;
+
+    min-width:0;
+  }
+
+  /* grids */
+
+  .geagro-grid-operacion,
+  .geagro-grid-estado,
+  .geagro-grid-insumos{
+    grid-template-columns:1fr;
+  }
+
+  /* ocultar secundarios */
+
+  .geagro-mobile-hide{
+    display:none !important;
+  }
+
+  /* cards */
+
+  .geagro-card{
+    padding:20px;
+  }
+
+  .geagro-main-number{
+    font-size:34px;
+  }
+
+  /* clima */
+
+  .geagro-weather-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .geagro-weather-grid div{
+    padding:10px 8px;
+  }
+
+  .geagro-weather-grid span{
+    font-size:11px;
+  }
+
+  .geagro-weather-grid strong{
+    font-size:13px;
+  }
+
+  .geagro-card-weather-mobile p.geagro-muted{
+    font-size:14px;
+    line-height:1.35;
+  }
+
+  /* insumos */
+
+  .geagro-desktop-only{
+    display:none !important;
+  }
+
+  .geagro-mobile-only{
+    display:block;
+  }
+
+  .geagro-insumos-header{
+    flex-direction:column;
+
+    align-items:flex-start;
+  }
+
+  .geagro-insumos-header .geagro-card-actions,
+  .geagro-insumos-header .btn{
+    width:100%;
+  }
+
+  .geagro-mobile-inputs-list{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+  }
+
+  .geagro-mobile-input-item{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    background:#f8fafc;
+
+    border-radius:16px;
+
+    padding:14px;
+  }
+
+  .geagro-mobile-input-main{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+  }
+
+  .geagro-mobile-input-main strong{
+    font-size:14px;
+
+    line-height:1.3;
+
+    color:#1f2433;
+  }
+
+  .geagro-mobile-input-actions{
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    flex-shrink:0;
+  }
+
+  .geagro-mobile-more{
+    margin-top:14px;
+  }
+
+  .geagro-mobile-more .btn{
+    width:100%;
+  }
+
 }

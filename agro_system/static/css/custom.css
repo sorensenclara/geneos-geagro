@@ -1443,3 +1443,15 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   color: var(--bs-primary);
   border-color: var(--bs-primary);
 }
+
+.geagro-card-actions .btn-outline-secondary{
+  background:#f4edf5;
+  border-color:#d8c3dc;
+  color:#6b3f6e;
+}
+
+.geagro-card-actions .btn-outline-secondary:hover{
+  background:#6b3f6e;
+  border-color:#6b3f6e;
+  color:#fff;
+}
