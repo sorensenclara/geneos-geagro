@@ -23,23 +23,14 @@ from alert.models.alert import Alert
 @staff_member_required
 def custom_admin_dashboard(request):
 
-    # =========================================================
-    # CLARA - filtros del dashboard agronómico
-    # =========================================================
     campaing_id = request.GET.get('campaing')
     crop_id = request.GET.get('crop')
 
     user = request.user
     today = timezone.now().date()
 
-    # =========================================================
-    # DEV ORIGINAL - contexto del admin
-    # =========================================================
     context = adminSite.each_context(request)
 
-    # =========================================================
-    # CLARA - visibilidad según usuario
-    # =========================================================
     if user.is_superuser or getattr(user, 'type', None) == 'Administration':
         crops_base = Crop.objects.all()
         country_sides = Countryside.objects.all()
@@ -62,9 +53,7 @@ def custom_admin_dashboard(request):
         crops_base = Crop.objects.none()
         country_sides = Countryside.objects.none()
 
-    # =========================================================
-    # CLARA - campaña activa / seleccionada
-    # =========================================================
+
     campaings = Campaing.objects.all().order_by('-date_init')
     campaign_active = campaings.filter(active=True).first() or campaings.first()
 
@@ -87,9 +76,7 @@ def custom_admin_dashboard(request):
 
     lots = Lot.objects.filter(countryside__in=country_sides)
 
-    # =========================================================
-    # CLARA - órdenes base
-    # =========================================================
+
     base_qs = WorkOrder.objects.none()
 
     if selected_crop:
@@ -104,9 +91,6 @@ def custom_admin_dashboard(request):
         if lots.exists():
             base_qs = base_qs.filter(crop__lot__in=lots)
 
-    # =========================================================
-    # CLARA - estados de finalización
-    # =========================================================
     finished_filter = (
         Q(stateOT__name__icontains='COMPLET') |
         Q(stateOT__name__icontains='FINALIZ') |
@@ -116,9 +100,7 @@ def custom_admin_dashboard(request):
     in_progress_filter = Q(stateOT__name__icontains='CURSO')
     pending_filter = Q(stateOT__name__icontains='PEND')
 
-    # =========================================================
-    # CLARA - labor en curso / próxima labor
-    # =========================================================
+
     current_or_next_order = base_qs.filter(
         in_progress_filter
     ).order_by('date_init').first()
@@ -135,9 +117,6 @@ def custom_admin_dashboard(request):
             finished_filter
         ).order_by('date_init').first()
 
-    # =========================================================
-    # CLARA - órdenes sin iniciar
-    # =========================================================
     orders_not_started_count = base_qs.filter(
         pending_filter
     ).count()
@@ -160,9 +139,7 @@ def custom_admin_dashboard(request):
         finished_filter
     ).count()
 
-    # =========================================================
-    # CLARA - ejecución campaña
-    # =========================================================
+
     work_orders_total = base_qs.count()
 
     work_orders_completed = base_qs.filter(
@@ -178,16 +155,11 @@ def custom_admin_dashboard(request):
             (work_orders_completed / work_orders_total) * 100
         )
 
-    # =========================================================
-    # CLARA - próximas labores
-    # =========================================================
+
     next_work_orders = base_qs.exclude(
         finished_filter
     ).order_by('date_init')[:6]
 
-    # =========================================================
-    # CLARA - alertas
-    # =========================================================
     alerts = Alert.objects.none()
 
     if selected_crop:
@@ -203,9 +175,7 @@ def custom_admin_dashboard(request):
     alerts_count = alerts.count()
     recent_alerts = alerts[:5]
 
-    # =========================================================
-    # CLARA - clima operativo
-    # =========================================================
+
     weather_data = None
     station = None
 
@@ -244,9 +214,7 @@ def custom_admin_dashboard(request):
             weather_operational_detail = "Ventana favorable para labores."
             weather_operational_badge = "geagro-badge-success"
 
-    # =========================================================
-    # CLARA - insumos faltantes / requeridos
-    # =========================================================
+
     required_inputs = InputWorkOrder.objects.filter(
         work_order__in=next_work_orders
     ).select_related(
@@ -266,17 +234,12 @@ def custom_admin_dashboard(request):
 
     missing_inputs_count = len(missing_inputs)
 
-    # =========================================================
-    # DEV ORIGINAL - precios BCR
-    # =========================================================
+
     try:
         precios = get_quotes_bcr()
     except Exception:
         precios = []
 
-    # =========================================================
-    # CLARA - contexto final
-    # =========================================================
     context.update({
         'precios': precios,
 
