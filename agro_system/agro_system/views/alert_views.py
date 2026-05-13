@@ -8,7 +8,7 @@ from operation.models.crop import Crop
 from producer.models.country_side import Countryside
 from producer.models.lot import Lot
 from parameter.models.campaign import Campaing
-
+from producer.models.staff import Staff
 
 @login_required
 def AlertView(request):
@@ -33,8 +33,9 @@ def AlertView(request):
         crops_base = Crop.objects.filter(producer=user)
 
     elif user.type == 'Staff':
-        country_sides = Countryside.objects.filter(producer=user.producer)
-        crops_base = Crop.objects.filter(producer=user.producer)
+        staff = Staff.objects.filter(user=user).first()
+        country_sides = Countryside.objects.filter(producer=staff.producer)
+        crops_base = Crop.objects.filter(producer=staff.producer)
 
     elif user.type == 'Administration':
         country_sides = Countryside.objects.all()
@@ -47,9 +48,6 @@ def AlertView(request):
     campaings = Campaing.objects.all()
     campaign_active = campaings.filter(active=True).first()
 
-    # =========================================================
-    # CLARA - campaña seleccionada / activa
-    # =========================================================
     if campaing_id:
         selected_campaing = campaings.filter(id=campaing_id).first()
     else:
@@ -82,16 +80,13 @@ def AlertView(request):
     if crop_id:
         selected_crop = crops.filter(id=crop_id).first()
     else:
-        selected_crop = crops.order_by('-id').first()
+        selected_crop = crops.filter(is_main=True).first() or crops.order_by('-id').first()
 
     if not selected_crop and selected_campaing:
         selected_crop = Crop.objects.filter(
             campaing_id=selected_campaing.id
         ).order_by('-id').first()
 
-    # =========================================================
-    # CLARA - alertas reales
-    # =========================================================
     alerts = Alert.objects.none()
 
     if selected_crop:
@@ -103,13 +98,13 @@ def AlertView(request):
         alerts = alerts.filter(date__gte=date.today())
 
     elif selected_status == 'history':
-        alerts = alerts.filter(date__lt=date.today())
+        alerts = alerts.filter(date__lt=date.today()).order_by('-date')
 
     if search_query:
         alerts = alerts.filter(
             Q(name__icontains=search_query) |
             Q(detail__icontains=search_query)
-        )
+        ).order_by('-date')
 
     alerts_count = alerts.count()
     featured_alert = alerts.first()

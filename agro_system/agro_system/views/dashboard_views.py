@@ -32,7 +32,7 @@ def DashboardView(request):
 
     if user.type == 'Staff':
         staff = Staff.objects.filter(user=user).first()
-        country_sides = Countryside.objects.filter(producer=user.producer)
+        country_sides = Countryside.objects.filter(producer=staff.producer)
         crops = Crop.objects.filter(responsible=staff)
 
     elif user.type == 'Producer':
@@ -114,14 +114,14 @@ def DashboardView(request):
             base_qs = base_qs.filter(crop__lot__in=lots)
 
     # =========================
-    # CLARA - Timeline próximas actividades
+    # ine próximas actividades
     # Solo muestra 3 órdenes en la card central
     # =========================
     work_orders = base_qs.order_by('date_init')[:3]
 
 
     # =========================
-    # CLARA - Métricas reales de ejecución
+    #  Métricas reales de ejecución
     # Se calculan sobre TODAS las órdenes del cultivo/campaña,
     # no solo sobre las 3 que se muestran en la timeline.
     # =========================
@@ -144,7 +144,7 @@ def DashboardView(request):
 
 
     # =========================
-    # CLARA - Días restantes de campaña
+    #  Días restantes de campaña
     # =========================
     campaign_days_remaining = 0
     campaign_reference = selected_campaing or campaign_active
@@ -203,7 +203,7 @@ def DashboardView(request):
 
 
     # =========================
-    # CLARA - Si hay órdenes, usar el cultivo real de la primera orden
+    # Si hay órdenes, usar el cultivo real de la primera orden
     # Esto corrige cuando selected_crop queda vacío pero work_orders sí trae datos.
     # =========================
     if not selected_crop and work_orders:

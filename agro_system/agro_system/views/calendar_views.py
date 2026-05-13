@@ -12,7 +12,7 @@ from producer.models.country_side import Countryside
 from producer.models.lot import Lot
 
 from parameter.models.campaign import Campaing
-
+from producer.models.staff import Staff
 
 @login_required
 def CalendarView(request):
@@ -27,20 +27,14 @@ def CalendarView(request):
 
     user = request.user
 
-    # =========================================================
-    # DEV ORIGINAL - visibilidad según tipo usuario
-    # =========================================================
     if user.type == 'Producer':
         country_sides = Countryside.objects.filter(producer=user)
         crops_base = Crop.objects.filter(producer=user)
 
     elif user.type == 'Staff':
-
-        # =========================================================
-        # CLARA - mismo criterio que dashboard/plan técnico
-        # =========================================================
-        country_sides = Countryside.objects.filter(producer=user.producer)
-        crops_base = Crop.objects.filter(producer=user.producer)
+        staff = Staff.objects.filter(user=user).first()
+        country_sides = Countryside.objects.filter(producer=staff.producer)
+        crops_base = Crop.objects.filter(producer=staff.producer)
 
     elif user.type == 'Administration':
         country_sides = Countryside.objects.all()
@@ -50,23 +44,16 @@ def CalendarView(request):
         country_sides = Countryside.objects.none()
         crops_base = Crop.objects.none()
 
-    # =========================================================
-    # DEV ORIGINAL - campañas/lotes
-    # =========================================================
+  
     campaings = Campaing.objects.all()
     campaign_active = campaings.filter(active=True).first()
 
-    # =========================================================
-    # CLARA - campaña seleccionada / activa
-    # =========================================================
+
     if campaing_id:
         selected_campaing = campaings.filter(id=campaing_id).first()
     else:
         selected_campaing = campaign_active or campaings.first()
 
-    # =========================================================
-    # CLARA - fallback local/dev
-    # =========================================================
     if not crops_base.exists():
         crops_base = Crop.objects.all()
 
@@ -75,9 +62,6 @@ def CalendarView(request):
 
     lots = Lot.objects.filter(countryside__in=country_sides)
 
-    # =========================================================
-    # CLARA - cultivos disponibles según filtros
-    # =========================================================
     crops = crops_base
 
     if selected_campaing:
@@ -96,18 +80,11 @@ def CalendarView(request):
         crops = crops.filter(lot_id=lot_id)
         lots = lots.filter(id=lot_id)
 
-    # =========================================================
-    # CLARA - cultivo seleccionado
-    # =========================================================
     if crop_id:
         selected_crop = crops.filter(id=crop_id).first()
-
     else:
-        selected_crop = crops.order_by('-id').first()
+        selected_crop = crops.filter(is_main=True).first() or crops.order_by('-id').first()
 
-    # =========================================================
-    # CLARA - fallback por campaña
-    # =========================================================
     if not selected_crop and selected_campaing:
 
         selected_crop = Crop.objects.filter(
@@ -115,7 +92,7 @@ def CalendarView(request):
         ).order_by('-id').first()
 
     # =========================================================
-    # CLARA - órdenes reales del cultivo seleccionado
+    # órdenes reales del cultivo seleccionado
     # =========================================================
     work_orders = WorkOrder.objects.none()
 
@@ -131,7 +108,7 @@ def CalendarView(request):
             )
 
     # =========================================================
-    # CLARA - filtros calendario
+    # filtros calendario
     # =========================================================
     state_filter = request.GET.get('state')
     service_filter = request.GET.get('service')
@@ -163,7 +140,7 @@ def CalendarView(request):
         })
 
     # =========================================================
-    # CLARA - eventos reales FullCalendar
+    #  eventos reales FullCalendar
     # =========================================================
     calendar_events = []
 
@@ -210,7 +187,7 @@ def CalendarView(request):
         })
 
     # =========================================================
-    # CLARA - próximas actividades sidebar
+    # próximas actividades sidebar
     # Mostrar primero EN CURSO / fecha actual, luego próximas pendientes
     # =========================================================
     today = date.today()
@@ -241,8 +218,10 @@ def CalendarView(request):
 
         if len(recent_activities) >= 5:
             break
+    
+    services = set(order.service for order in work_orders if order.service)
     # =========================================================
-    # CLARA - data template
+    # data template
     # =========================================================
     data = {
 
@@ -268,7 +247,7 @@ def CalendarView(request):
 
         'selected_state': state_filter,
         'selected_service': service_filter,
-        'services': [order.service for order in work_orders if order.service],
+        'services': list(services),
     }
 
     return render(

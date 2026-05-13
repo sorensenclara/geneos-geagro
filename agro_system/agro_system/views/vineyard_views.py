@@ -15,7 +15,7 @@ from operation.models.crop import Crop
 def VineyardView(request):
 
     # =========================================================
-    # CLARA - filtros desde topbar/dashboard
+    # filtros desde topbar/dashboard
     # =========================================================
     campaing_id = request.GET.get('campaing')
     crop_id = request.GET.get('crop')
@@ -59,7 +59,7 @@ def VineyardView(request):
         crops_base = Crop.objects.none()
 
     # =========================================================
-    # CLARA - campaña seleccionada / activa
+    # campaña seleccionada / activa
     # =========================================================
     campaings = Campaing.objects.all()
     campaign_active = campaings.filter(active=True).first()
@@ -86,7 +86,7 @@ def VineyardView(request):
         crops = Crop.objects.filter(campaing_id=selected_campaing.id)
 
     # =========================================================
-    # CLARA - cultivo principal / seleccionado
+    #  cultivo principal / seleccionado
     # =========================================================
     if crop_id:
         main_crop = crops.filter(id=crop_id).first()
@@ -99,7 +99,7 @@ def VineyardView(request):
         ).order_by('-id').first()
 
     # =========================================================
-    # CLARA - métricas reales
+    # métricas reales
     # =========================================================
     total_productive_hectares = lots.aggregate(
         total=Sum('hectares_productive')

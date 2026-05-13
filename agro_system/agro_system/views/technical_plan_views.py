@@ -13,6 +13,7 @@ from producer.models.country_side import Countryside
 from producer.models.lot import Lot
 
 from parameter.models.campaign import Campaing
+from producer.models.staff import Staff
 
 from alert.models.alert import Alert
 
@@ -32,8 +33,9 @@ def TechnicalPlanView(request):
         crops_base = Crop.objects.filter(producer=user)
 
     elif user.type == 'Staff':
-        country_sides = Countryside.objects.filter(producer=user.producer)
-        crops_base = Crop.objects.filter(producer=user.producer)
+        staff = Staff.objects.filter(user=user).first()
+        country_sides = Countryside.objects.filter(producer=staff.producer)
+        crops_base = Crop.objects.filter(producer=staff.producer)
 
     elif user.type == 'Administration':
         country_sides = Countryside.objects.all()
@@ -82,7 +84,7 @@ def TechnicalPlanView(request):
     if crop_id:
         selected_crop = crops.filter(id=crop_id).first()
     else:
-        selected_crop = crops.order_by('-id').first()
+        selected_crop = crops.filter(is_main=True).first() or crops.order_by('-id').first()
 
     if not selected_crop and selected_campaing:
         selected_crop = Crop.objects.filter(

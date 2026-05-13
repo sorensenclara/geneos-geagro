@@ -223,10 +223,8 @@ msgid "The order %s is already confirmed."
 msgstr "La orden %s ya está confirmada."
 
 #: input/admin/purchase_order.py:30
-#, fuzzy
-#| msgid "Process Purchase Order"
 msgid "Cancel Purchase Order"
-msgstr "Procesar orden de compra"
+msgstr "Cancelar orden de compra"
 
 #: input/admin/purchase_order.py:35
 #, python-format
@@ -357,8 +355,6 @@ msgid "email"
 msgstr "email"
 
 #: input/models/provider.py:19 producer/models/store.py:13
-#, fuzzy
-#| msgid "is default"
 msgid "default"
 msgstr "Predeterminado"
 
@@ -473,10 +469,8 @@ msgid "types of provider"
 msgstr "Tipos de proveedores"
 
 #: input/views.py:51
-#, fuzzy
-#| msgid "technical plan input"
 msgid "Select an input"
-msgstr "Insumo del plan tecnico"
+msgstr "Selecciona un insumo"
 
 #: operation/admin/crop.py:22
 msgid "technical details"
@@ -620,16 +614,10 @@ msgid "estimate secada"
 msgstr "Estimación de secada"
 
 #: operation/models/crop.py:39
-#, fuzzy
-#| msgid "is main lot"
 msgid "is main crop"
 msgstr "Lote principal"
 
 #: operation/models/crop.py:39
-#, fuzzy
-#| msgid ""
-#| "Indicates if this lot is the main lot of the staff. Only one lot can be "
-#| "the main lot for a staff."
 msgid ""
 "Indicates if this crop is the main crop of the staff. Only one crop can be "
 "the main crop for a staff."
@@ -1070,16 +1058,12 @@ msgid "Last operation"
 msgstr "Ultima operación"
 
 #: producer/models/lot.py:29
-#, fuzzy
-#| msgid "notification"
 msgid "ubication"
-msgstr "Notificación"
+msgstr "Ubicacion"
 
 #: producer/models/lot.py:30
-#, fuzzy
-#| msgid "description"
 msgid "delimitation"
-msgstr "Descripción"
+msgstr "Delimitación"
 
 #: producer/models/lot.py:41
 msgid "lots"
