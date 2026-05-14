@@ -46,7 +46,8 @@ def weather_ingest(request):
     data = request.POST.dict()
     temp_f = to_float(data.get("tempf") if data.get("tempf") else data.get("tempinf"))
     widn_dir_deg = to_float(data.get("winddir"))
-    data["winddir"] = deg_to_cardinal(widn_dir_deg)
+    # data["winddir"] = deg_to_cardinal(widn_dir_deg)
+    winddir = deg_to_cardinal(widn_dir_deg)
     date_str = data.get("dateutc")
 
     if date_str:
@@ -71,7 +72,7 @@ def weather_ingest(request):
         wind_speed=to_float(data.get("windspeedmph")),
         wind_gust=to_float(data.get("windgustmph")),
         wind_gust_max=to_float(data.get("maxdailygust")),
-        wind_dir=data.get("winddir"),
+        wind_dir=winddir,
         rain_rate=rain_rate,
         rain_total= rain_total,
         #uv=to_float(data.get("uv")),

@@ -1464,11 +1464,11 @@ msgstr "Dirección del viento"
 
 #: weather/models/weather_data.py:29
 msgid "rain rate"
-msgstr "Intendidad de lluvia"
+msgstr "Intencidad de lluvia"
 
 #: weather/models/weather_data.py:30
 msgid "rain total"
-msgstr "LLuvia total"
+msgstr "Lluvia total"
 
 #: weather/models/weather_data.py:31
 msgid "rain week"
