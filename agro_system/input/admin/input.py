@@ -43,12 +43,6 @@ class InputResource(resources.ModelResource):
         widget=ForeignKeyWidget(TypeInput, 'name')
     )
 
-    producer = fields.Field(
-        column_name='producer',
-        attribute='producer',
-        widget=ForeignKeyWidget('user.UserProducer', 'cuit')
-    )
-
     unit_measure = fields.Field(
         column_name='unit_measure',
         attribute='unit_measure',
@@ -63,7 +57,7 @@ class InputResource(resources.ModelResource):
 
     class Meta:
         model = Input
-        fields = ('id','name','type','unit_measure','presentation','cost','currency','control_stock','stock','min_stock','pending','control_lot','produce')
+        fields = ('id','name','type','unit_measure','presentation','cost','currency','control_stock','stock','min_stock','pending','control_lot')
         skip_unchanged = True
         report_skipped = True
     
