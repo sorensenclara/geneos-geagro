@@ -23,8 +23,11 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
    2. VARIABLES VISUALES GEAGRO VID
 ========================================================= */
 :root {
-    --geagro-purple-900: #3F2642;
-    --geagro-purple-700: #6b3f6e;
+    /* --geagro-purple-900: #3F2642;
+    --geagro-purple-700: #6b3f6e; */
+    --geagro-purple-900:#080707;
+    --geagro-purple-700:#0e0c0e;
+
 
     --geagro-green-900: #0b3422;
     --geagro-green-800: #0f3725;
@@ -75,7 +78,7 @@ body.jazzmin-login-page {
 .login-box input:focus,
 .login-box .form-control:focus {
     border-color: var(--geagro-purple-700);
-    box-shadow: 0 0 0 2px rgba(107, 63, 110, 0.15);
+    box-shadow: 0 0 0 2px rgba(11, 11, 11, 0.15);
     outline: none;
 }
 
@@ -99,7 +102,7 @@ body.login-page .login-box a.btn-primary,
 .login-box button[type="submit"],
 .login-box .btn,
 .login-box a.btn {
-    background-color: var(--geagro-purple-700);
+    background-color: #19863d; /*var(--geagro-purple-700);*/
     border-color: var(--geagro-purple-700);
     color: #fff;
     border-radius: var(--geagro-radius-pill);
@@ -130,7 +133,7 @@ body.login-page .login-box a.btn-primary:active {
     background-color: var(--geagro-purple-700);
     border-color: var(--geagro-purple-700);
     color: #fff;
-    box-shadow: 0 0 0 2px rgba(107, 63, 110, 0.25);
+    box-shadow: 0 0 0 2px rgba(45, 45, 45, 0.25);
 }
 
 
@@ -235,8 +238,8 @@ body.login-page .login-box a.btn-primary:active {
 
 /* Eliminar / acción destructiva */
 .btn-danger {
-    background-color: #D97706 !important;
-    border-color: #D97706 !important;
+    background-color: #d8b622 !important;
+    border-color: #d8b622 !important;
     color: #fff !important;
 }
 
@@ -253,7 +256,7 @@ body.login-page .login-box a.btn-primary:active {
 button:focus,
 button:active {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(107, 63, 110, 0.25);
+    box-shadow: 0 0 0 2px rgba(45, 45, 45, 0.25);
 }
 
 .btn:hover {
@@ -261,6 +264,11 @@ button:active {
     box-shadow: var(--geagro-shadow-md);
 }
 
+/* Separación entre botones */
+.btn-group {
+    display: flex;
+    gap: 4px;
+}
 
 /* =========================================================
    6. LINKS / ACCENTS ADMIN
@@ -970,11 +978,11 @@ button:active {
   background:
     linear-gradient(
       135deg,
-      rgba(107,63,110,.08),
+      rgba(45,45,45,.08),
       rgba(30,125,59,.08)
     );
 
-  border:1px solid rgba(107,63,110,.16);
+  border:1px solid rgba(45,45,45,.16);
 
   display:flex;
 
@@ -992,9 +1000,9 @@ button:active {
 
   border-radius:999px;
 
-  background:rgba(107,63,110,.12);
+  background:rgba(45,45,45,.12);
 
-  color:#6b3f6e;
+  color:#19863d;
 
   font-size:12px;
 
@@ -1250,4 +1258,47 @@ button:active {
     width:100%;
   }
 
+}
+
+/* IMPORT / EXPORT */
+/* =========================================================
+   IMPORT / EXPORT - Override con mayor especificidad
+   El archivo original usa !important, así que necesitamos
+   mayor especificidad para ganar.
+========================================================= */
+
+/* Fila "Nuevo" (new) - fondo verde suave */
+html body table.import-preview tr.new,
+html body table.import-preview tr.new td {
+  background-color: #d4edda !important;
+}
+
+/* Fila "Actualizar" (update) - fondo amarillo suave */
+html body table.import-preview tr.update,
+html body table.import-preview tr.update td {
+  background-color: #fff3cd !important;
+}
+
+/* Fila "Eliminar" (delete) - fondo rojo suave */
+html body table.import-preview tr.delete,
+html body table.import-preview tr.delete td {
+  background-color: #f8d7da !important;
+}
+
+/* Fila "Omitir" (skip) - fondo gris */
+html body table.import-preview tr.skip,
+html body table.import-preview tr.skip td {
+  background-color: #e9ecef !important;
+}
+
+/* <ins> - texto insertado (verde) */
+html body table.import-preview td ins {
+  background-color: #a8d5b5 !important;
+  color: #155724 !important;
+}
+
+/* <del> - texto eliminado (rojo) */
+html body table.import-preview td del {
+  background-color: #f5c2c7 !important;
+  color: #842029 !important;
 }

@@ -68,6 +68,8 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+
+    'import_export',
 ]
 
 LOCAL_APPS = [
@@ -223,9 +225,9 @@ JAZZMIN_SETTINGS = {
     "site_brand": "GEAGRO",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "img/logo-sm-GEAGRO-vid.svg",
+    "site_logo": "img/Isologo-geagro.svg",
 
-    "login_logo": "img/logo-GEAGRO-vid.svg",
+    "login_logo": "img/logo-geagro-cereal.svg",
 
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
@@ -237,7 +239,7 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
 
     # Welcome text on the login screen
-    "welcome_sign": "Bienvenidos a la gestión técnica GEAGRO VID",
+    "welcome_sign": "Bienvenidos a la gestión técnica GEAGRO CEREALES",
 
     # Copyright on the footer
     "copyright": "Cooperativa Geneos",

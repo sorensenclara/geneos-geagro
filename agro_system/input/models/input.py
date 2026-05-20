@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .type_input import TypeInput
 from parameter.models.measure_unit import  MaensureUnit
-from .category_input import CategoryInput
 from parameter.models.currency import Currency
 
 class Input(models.Model):

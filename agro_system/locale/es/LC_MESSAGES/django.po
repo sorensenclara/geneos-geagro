@@ -574,11 +574,11 @@ msgstr "Hectareas productivas"
 
 #: operation/models/crop.py:27
 msgid "hectares planted"
-msgstr "Hectareas plantadas"
+msgstr "Hectareas sembradas"
 
 #: operation/models/crop.py:28
 msgid "hectares unplanted"
-msgstr "Hectareas sin plantar"
+msgstr "Hectareas sin sembrar"
 
 #: operation/models/crop.py:29
 msgid "hectares harvested"
