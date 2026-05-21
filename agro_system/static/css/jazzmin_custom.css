@@ -1251,3 +1251,52 @@ button:active {
   }
 
 }
+
+/* Separación entre botones */
+.btn-group {
+    display: flex;
+    gap: 4px;
+}
+
+/* IMPORT / EXPORT */
+/* =========================================================
+   IMPORT / EXPORT - Override con mayor especificidad
+   El archivo original usa !important, así que necesitamos
+   mayor especificidad para ganar.
+========================================================= */
+
+/* Fila "Nuevo" (new) - fondo verde suave */
+html body table.import-preview tr.new,
+html body table.import-preview tr.new td {
+  background-color: #d4edda !important;
+}
+
+/* Fila "Actualizar" (update) - fondo amarillo suave */
+html body table.import-preview tr.update,
+html body table.import-preview tr.update td {
+  background-color: #fff3cd !important;
+}
+
+/* Fila "Eliminar" (delete) - fondo rojo suave */
+html body table.import-preview tr.delete,
+html body table.import-preview tr.delete td {
+  background-color: #f8d7da !important;
+}
+
+/* Fila "Omitir" (skip) - fondo gris */
+html body table.import-preview tr.skip,
+html body table.import-preview tr.skip td {
+  background-color: #e9ecef !important;
+}
+
+/* <ins> - texto insertado (verde) */
+html body table.import-preview td ins {
+  background-color: #a8d5b5 !important;
+  color: #155724 !important;
+}
+
+/* <del> - texto eliminado (rojo) */
+html body table.import-preview td del {
+  background-color: #f5c2c7 !important;
+  color: #842029 !important;
+}

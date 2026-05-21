@@ -7,6 +7,13 @@ from input.models.purchase_order import PurchaseOrder
 from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.input import Input
 from django.utils.translation import gettext_lazy as _, gettext
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
+from import_export.widgets import ForeignKeyWidget
+from import_export import fields
+from input.models.type_input import TypeInput
+from parameter.models.measure_unit import  MaensureUnit
+from parameter.models.currency import Currency
 
 
 class PurchaseInline(admin.StackedInline):
@@ -28,13 +35,66 @@ class PurchaseInline(admin.StackedInline):
         return False
 
 
-class InputAdmin(admin.ModelAdmin):
+class InputResource(resources.ModelResource):
+
+    type = fields.Field(
+        column_name='type',
+        attribute='type',
+        widget=ForeignKeyWidget(TypeInput, 'name')
+    )
+
+    producer = fields.Field(
+        column_name='producer',
+        attribute='producer',
+        widget=ForeignKeyWidget('user.UserProducer', 'cuit')
+    )
+
+    unit_measure = fields.Field(
+        column_name='unit_measure',
+        attribute='unit_measure',
+        widget=ForeignKeyWidget(MaensureUnit, 'name')
+    )
+
+    currency = fields.Field(
+        column_name='currency',
+        attribute='currency',
+        widget=ForeignKeyWidget(Currency, 'name')
+    )
+
+    class Meta:
+        model = Input
+        fields = ('id','name','type','unit_measure','presentation','cost','currency','control_stock','stock','min_stock','pending','control_lot')
+        skip_unchanged = True
+        report_skipped = True
+    
+    def __init__(self, user=None):
+        super().__init__()
+        self.user = user
+
+    
+    def before_save_instance(self, instance, row, **kwargs):
+        userProducer = UserProducer.objects.filter(email=self.user.email).first()
+        if userProducer:
+            instance.producer = userProducer
+        elif self.user.is_superuser:
+            instance.producer = None
+        else:
+            raise ValueError("No se pudo asignar el productor al insumo. Usuario no tiene un productor asociado.")
+
+class InputAdmin(ImportExportModelAdmin):
     search_fields = ['name'] 
     inlines = [PurchaseInline]
     list_display = ['name', 'type', 'cost', 'stock', 'min_stock', 'pending', 'producer']
     list_filter = ['type', 'unit_measure', 'currency']
     readonly_fields = ['pending']
     
+    resource_class = InputResource
+
+    
+    def get_import_resource_kwargs(self, request, *args, **kwargs):
+        return {"user": request.user}
+
+
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado
         userProducer = UserProducer.objects.filter(email=request.user.email).first()

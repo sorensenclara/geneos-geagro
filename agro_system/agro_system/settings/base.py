@@ -68,6 +68,8 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+
+    'import_export',
 ]
 
 LOCAL_APPS = [
