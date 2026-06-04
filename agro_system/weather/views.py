@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import WeatherData
-from datetime import datetime, timezone as dt_timezone
+from datetime import datetime, timezone as dt_timezone, timedelta
 from .models.station_weather import WeatherStation
 
 
@@ -61,8 +61,17 @@ def weather_ingest(request):
     station = WeatherStation.objects.get(passkey=passkey)
     rain_total = in_to_mm(to_float(data.get("dailyrainin")))
     rain_rate = in_to_mm(to_float(data.get("rainratein"))) 
+    rain_week = in_to_mm(to_float(data.get("weeklyrainin"))) 
+    rain_month = in_to_mm(to_float(data.get("monthlyrainin")))
+    rain_year = in_to_mm(to_float(data.get("yearlyrainin")))
+
     if not station:
         return JsonResponse({"error": "Estación no encontrada"}, status=404)
+
+    last = WeatherData.objects.filter(station=station).order_by('-timestamp').first()
+    if last and (timestamp - last.timestamp) < timedelta(minutes=station.save_interval):
+        return JsonResponse({"status": "skipped"})
+
     WeatherData.objects.create(
         station=station,
         timestamp=timestamp,
@@ -75,6 +84,9 @@ def weather_ingest(request):
         wind_dir=winddir,
         rain_rate=rain_rate,
         rain_total= rain_total,
+        rain_week=rain_week,
+        rain_month=rain_month,
+        rain_year=rain_year,
         #uv=to_float(data.get("uv")),
         solar_radiation=to_float(data.get("solarradiation")),
         raw_data=data

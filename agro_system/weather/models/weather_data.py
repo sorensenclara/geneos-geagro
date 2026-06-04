@@ -27,8 +27,10 @@ class WeatherData(models.Model):
 
     # lluvia
     rain_rate = models.FloatField(null=True, blank=True, verbose_name= _('rain rate')) # Intensidad de lluvia (mm/h)
-    rain_total = models.FloatField(null=True, blank=True, verbose_name= _('rain total'))
+    rain_total = models.FloatField(null=True, blank=True, verbose_name= _('rain total')) # TOTAL diaria
     rain_week = models.FloatField(null=True, blank=True, verbose_name= _('rain week')) # Lluvia acumulada semanal (mm)
+    rain_month = models.FloatField(null=True, blank=True, verbose_name= _('rain month')) # Lluvia acumulada mensual (mm)
+    rain_year = models.FloatField(null=True, blank=True, verbose_name= _('rain year')) # Lluvia acumulada anual (mm)
 
     # radiación
     #uv = models.FloatField(null=True, blank=True, verbose_name= _('uv'))
