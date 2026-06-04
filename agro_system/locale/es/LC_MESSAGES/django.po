@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-11 15:03+0000\n"
+"POT-Creation-Date: 2026-06-04 11:10-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
 
-#: agro_system/settings/base.py:177
+#: agro_system/settings/base.py:185
 msgid "Español"
 msgstr "Español"
 
-#: agro_system/settings/base.py:309
+#: agro_system/settings/base.py:317
 msgid "Stock Charts"
 msgstr "Gráficos de Stock"
 
@@ -50,7 +50,7 @@ msgstr "Alertas"
 #: producer/models/staff.py:20 producer/models/store.py:10
 #: producer/models/typeStaff.py:10 sale/models/driver.py:11
 #: sale/models/type_sales_receipt.py:8 user/models/notification.py:10
-#: weather/models/station_weather.py:7
+#: weather/models/station_weather.py:18
 msgid "name"
 msgstr "Nombre"
 
@@ -164,7 +164,7 @@ msgid "value"
 msgstr "Valor"
 
 #: alert/models/variable_register.py:16 producer/models/lot.py:33
-#: weather/models/station_weather.py:16 weather/models/weather_data.py:10
+#: weather/models/station_weather.py:32 weather/models/weather_data.py:10
 msgid "weather station"
 msgstr "Estación meteorologica"
 
@@ -176,19 +176,19 @@ msgstr "Registro de variables"
 msgid "variable registers"
 msgstr "Registros de variables"
 
-#: input/admin/input.py:22
+#: input/admin/input.py:29
 msgid "Order Date"
 msgstr "Fecha de orden"
 
-#: input/admin/input.py:24
+#: input/admin/input.py:31
 msgid "Purchases"
 msgstr "Compras"
 
-#: input/admin/input.py:25
+#: input/admin/input.py:32
 msgid "Purchase"
 msgstr "Compra"
 
-#: input/admin/input.py:70
+#: input/admin/input.py:130
 #, python-format
 msgid ""
 "Automatic Reorder: A new pending order has been created for %s based on "
@@ -197,7 +197,7 @@ msgstr ""
 "Reorden automático: Se ha creado una nueva orden pendiente para %s basada en "
 "el historial."
 
-#: input/admin/input.py:87
+#: input/admin/input.py:147
 #, python-format
 msgid ""
 "Automatic Reorder: A new pending order has been created for %s using "
@@ -206,7 +206,7 @@ msgstr ""
 "Reorden automático: Se ha creado una nueva orden pendiente para %s usando "
 "valores predeterminados."
 
-#: input/admin/input.py:89
+#: input/admin/input.py:149
 #, python-format
 msgid "Automatic Reorder Failed for %s: No default provider or store found."
 msgstr ""
@@ -1413,24 +1413,52 @@ msgstr "Productor"
 msgid "usersProducers"
 msgstr "Productores"
 
-#: weather/apps.py:7 weather/models/weather_data.py:44
-#: weather/models/weather_data.py:45
+#: weather/apps.py:7 weather/models/weather_data.py:46
+#: weather/models/weather_data.py:47
 msgid "weather data"
 msgstr "Datos climatológicos"
 
-#: weather/models/station_weather.py:8
+#: weather/models/station_weather.py:10
+msgid "1 minute"
+msgstr "1 minuto"
+
+#: weather/models/station_weather.py:11
+msgid "5 minutes"
+msgstr "5 minutos"
+
+#: weather/models/station_weather.py:12
+msgid "15 minutes"
+msgstr "15 minutos"
+
+#: weather/models/station_weather.py:13
+msgid "30 minutes"
+msgstr "30 minutos"
+
+#: weather/models/station_weather.py:14
+msgid "1 hour"
+msgstr "1 hora"
+
+#: weather/models/station_weather.py:15
+msgid "2 hours"
+msgstr "2 horas"
+
+#: weather/models/station_weather.py:19
 msgid "passkey"
 msgstr "Passkey"
 
-#: weather/models/station_weather.py:9
+#: weather/models/station_weather.py:20
 msgid "latitude"
 msgstr "Latitud"
 
-#: weather/models/station_weather.py:10
+#: weather/models/station_weather.py:21
 msgid "longitude"
 msgstr "Longitud"
 
-#: weather/models/station_weather.py:17
+#: weather/models/station_weather.py:25
+msgid "save interval (minutes)"
+msgstr "Intervalo de registro de datos"
+
+#: weather/models/station_weather.py:33
 msgid "weather stations"
 msgstr "Estaciones meteorologicas"
 
@@ -1468,17 +1496,25 @@ msgstr "Intencidad de lluvia"
 
 #: weather/models/weather_data.py:30
 msgid "rain total"
-msgstr "Lluvia total"
+msgstr "Lluvia diaria"
 
 #: weather/models/weather_data.py:31
 msgid "rain week"
 msgstr "Lluvia semanal"
 
-#: weather/models/weather_data.py:35
+#: weather/models/weather_data.py:32
+msgid "rain month"
+msgstr "Lluvia mensual"
+
+#: weather/models/weather_data.py:33
+msgid "rain year"
+msgstr "Lluvia anual"
+
+#: weather/models/weather_data.py:37
 msgid "solar radiation"
 msgstr "Radiación solar"
 
-#: weather/models/weather_data.py:38
+#: weather/models/weather_data.py:40
 msgid "raw data"
 msgstr "Datos"
 
