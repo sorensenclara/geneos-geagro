@@ -1,6 +1,8 @@
 from django.db import models
 from .station_weather import WeatherStation
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+
 
 class WeatherData(models.Model):
 
@@ -40,7 +42,8 @@ class WeatherData(models.Model):
     raw_data = models.JSONField(null=True, blank=True, verbose_name= _('raw data'))
 
     def __str__(self):
-        return f"{self.timestamp} - {self.temp}°C"
+        local_time = timezone.localtime(self.timestamp)
+        return f"{local_time} - {self.temp}°C"
     
     class Meta:
         verbose_name = _('weather data')
