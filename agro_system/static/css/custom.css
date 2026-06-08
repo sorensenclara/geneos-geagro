@@ -6,20 +6,23 @@
    1) Tokens (paleta + radios + sombras)
    ========================================================== */
 :root{
-  /*--geagro-purple-900:#3F2642;
-  --geagro-purple-700:#6b3f6e;
-  --geagro-purple-500:#906693;*/
-  --geagro-purple-900:#1a1a1a;
-  --geagro-purple-700:#2d2d2d;
-  --geagro-purple-500:#274330;
- 
+  --geagro-yellow-900:#816d09;
+  --geagro-yellow-700:#c6a400;
+  --geagro-yellow-500: #f3c600;
+
+  --geagro-green-900: #0b3422;
+  --geagro-green-800: #0f3725;
+  --geagro-green-700: #113f2a;
+  --geagro-green-600: #118237;
+  --geagro-green-500: #1E7D3B;
+  --geagro-green-400: #22b24c;
 
   --geagro-text:#0f172a;
   --geagro-muted:#64748b;
 
   --geagro-danger:#cf4e4e;
   --geagro-success:#5a994c;
-  --geagro-warning:#f0b429;
+  --geagro-warning:#f3c600;
 
   --geagro-radius-lg:18px;
   --geagro-radius-xl:22px;
@@ -44,22 +47,35 @@
   --risk-high:#e02424;
 }
 
+:root,
+[data-bs-theme="light"],
+[data-bs-theme="dark"]{
+  --bs-primary: var(--geagro-yellow-700);
+  --bs-primary-rgb: 243, 198, 0;
+
+  --bs-link-color-rgb: 243, 198, 0;
+  --bs-link-hover-color-rgb: 217, 178, 0;
+
+  --bs-info: #138037;
+  --bs-info-rgb: 19, 128, 55;
+
+  --bs-light: #E0E0E0;
+  --bs-light-rgb: 224, 224, 224;
+}
+
 /* ==========================================================
    2) Bootstrap / Theme vars (Primary + Sidebar dark)
    ========================================================== */
 :root,
-/* [data-bs-theme="light"]{
-  --bs-primary-rgb: 107, 63, 110;
-} */
- [data-bs-theme="light"]{
-  --bs-primary-rgb: 45, 45, 45;
+[data-bs-theme="light"]{
+  --bs-primary-rgb: 243, 198, 0;
 }
 
 :root,
 [data-bs-theme="light"],
 [data-bs-theme="dark"]{
-  --bs-primary: var(--geagro-purple-700);
-  --bs-primary-rgb: 45, 45, 45;
+  --bs-primary: var(--geagro-yellow-700);
+  --bs-primary-rgb: 243, 198, 0;
 
   --bs-info: #138037;
   --bs-info-rgb: 19, 128, 55;
@@ -71,7 +87,7 @@
 /* Igualamos especificidad del tema (sin !important) */
 :root [data-sidebar="dark"],
 [data-bs-theme="light"] [data-sidebar="dark"]{
-  --bs-sidebar-dark-bg: var(--geagro-purple-900);
+  --bs-sidebar-dark-bg: var(--geagro-green-900);
 
   --bs-sidebar-dark-menu-item-color: #d6c9d9;
   --bs-sidebar-dark-menu-sub-item-color: #d6c9d9;
@@ -81,7 +97,7 @@
 
   /* hover/active suaves (del CSS nuevo) */
   --bs-sidebar-dark-menu-item-hover-bg: rgba(255,255,255,.08);
-  --bs-sidebar-dark-menu-item-active-bg: #2c181a1a1a30;
+  --bs-sidebar-dark-menu-item-active-bg: #6c5b06;
 
   --bs-sidebar-dark-menu-sub-item-hover-color: #ffffff;
   --bs-sidebar-dark-menu-sub-item-active-color: #ffffff;
@@ -91,13 +107,13 @@
 
 /* por si el atributo está en body */
 body[data-sidebar="dark"]{
-  --bs-sidebar-dark-bg: var(--geagro-purple-900);
+  --bs-sidebar-dark-bg: var(--geagro-yellow-900);
   --bs-sidebar-dark-menu-item-color: #d6c9d9;
   --bs-sidebar-dark-menu-sub-item-color: #d6c9d9;
   --bs-sidebar-dark-menu-item-icon-color: #d6c9d9;
   --bs-sidebar-dark-menu-item-hover-color: #ffffff;
   --bs-sidebar-dark-menu-item-active-color: #ffffff;
-  --bs-sidebar-dark-menu-item-active-bg: #1a1a1a;
+  --bs-sidebar-dark-menu-item-active-bg: #6c5b06;
 }
 
 
@@ -121,7 +137,7 @@ body[data-sidebar="dark"]{
 /* ACTIVE */
 .vertical-menu #sidebar-menu ul li a.active,
 .vertical-menu #sidebar-menu ul li.mm-active > a{
-  background: #1a1a1a;
+  background: #066c1a;
   color: #ffffff !important;
 }
 
@@ -184,7 +200,7 @@ body[data-sidebar="dark"]{
 
 .geagro-filterbar-btn:hover{
   transform: translateY(-1px);
-  border-color: rgba(45,45,45,.20);
+  border-color: rgba(107,63,110,.20);
   box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
 }
 
@@ -214,7 +230,7 @@ body[data-sidebar="dark"]{
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  background: rgba(45,45,45,.12);
+  background: rgba(107,63,110,.12);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -344,7 +360,7 @@ body[data-sidebar="dark"]{
 /* Card 1 destaque suave */
 .geagro-card-primary{
   box-shadow: 0 16px 40px rgba(15,23,42,.10);
-  border: 1px solid rgba(45,45,45,.18);
+  border: 1px solid rgba(107,63,110,.18);
 }
 
 /* ==========================================================
@@ -456,7 +472,7 @@ body[data-sidebar="dark"]{
 }
 .geagro-weather-metrics i{
   font-size: 18px;
-  color:#19863d;
+  color:#c6a400;
 }
 
 /* chips chicos (como en antiguo) */
@@ -479,7 +495,7 @@ body[data-sidebar="dark"]{
    8) Alert bar (violeta compacta + responsive)
    ========================================================== */
 .geagro-alertbar{
-  background: var(--geagro-purple-500);
+  background: var(--geagro-yellow-700);
   border: 1px solid rgba(255,255,255,.14);
   border-radius: 18px;
   box-shadow: 0 12px 28px rgba(15,23,42,.08);
@@ -590,29 +606,29 @@ body[data-sidebar="dark"]{
 }
 
 .btn-primary:hover{
-  background-color: #19863d;
-  border-color: #19863d;
+  background-color: var(--geagro-yellow-500);
+  border-color: var(--geagro-yellow-500);
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(45,45,45,.25);
+  box-shadow: 0 8px 18px rgba(107,63,110,.25);
 }
 
 .btn-primary:active{
   transform: translateY(0px);
-  box-shadow: 0 4px 10px rgba(45,45,45,.25);
+  box-shadow: 0 4px 10px rgba(107,63,110,.25);
 }
 
 .btn-primary:focus,
 .btn-primary:focus-visible{
   outline: none;
   box-shadow:
-    0 0 0 3px rgba(45,45,45,.25),
-    0 6px 14px rgba(45,45,45,.20);
+    0 0 0 3px rgba(107,63,110,.25),
+    0 6px 14px rgba(107,63,110,.20);
 }
 
 .btn-primary:disabled,
 .btn-primary.disabled{
-  background-color: rgba(45,45,45,.4);
-  border-color: rgba(45,45,45,.4);
+  background-color: rgba(107,63,110,.4);
+  border-color: rgba(107,63,110,.4);
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
@@ -631,7 +647,7 @@ body[data-sidebar="dark"]{
 
   padding: 8px 12px;
   border-radius: 32px;
-  border: 1px solid rgba(45,45,45,.28);
+  border: 1px solid rgba(107,63,110,.28);
 
   transition: 
     background-color .2s ease,
@@ -640,15 +656,15 @@ body[data-sidebar="dark"]{
 }
 
 .geagro-kpi .geagro-card-footer a:hover{
-  background: rgba(45,45,45,.08);
-  border-color: rgba(45,45,45,.40);
+  background: rgba(107,63,110,.08);
+  border-color: rgba(107,63,110,.40);
   transform: translateY(-1px);
 }
 
 .geagro-kpi .geagro-card-footer a:focus,
 .geagro-kpi .geagro-card-footer a:focus-visible{
   outline: none;
-  box-shadow: 0 0 0 3px rgba(45,45,45,.18);
+  box-shadow: 0 0 0 3px rgba(107,63,110,.18);
 }
 
 /* ==========================================================
@@ -692,7 +708,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   padding: 6px 8px 6px 22px;
   gap: 18px;
   border-radius: 999px;
-  border: 1px solid rgba(45,45,45,.20);
+  border: 1px solid rgba(107,63,110,.20);
   background: #fff;
   box-shadow: 0 10px 24px rgba(15,23,42,.08);
   overflow: visible;
@@ -803,14 +819,14 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   width: 42px;
   height: 42px;
   border-radius: 999px;
-  background: #f1e8f2;
+  background: #f2f1e8;
   color: var(--bs-primary);
-  border: 1px solid rgba(45,45,45,.18);
+  border: 1px solid rgba(107,63,110,.18);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
-  box-shadow: 0 8px 22px rgba(45,45,45,.12);
+  box-shadow: 0 8px 22px rgba(107,63,110,.12);
 }
 
 .geagro-user-avatar i {
@@ -841,7 +857,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 }
 
 .geagro-progress-summary .progress-row strong {
-  color: #19863d;
+  color: #c6a400;
   font-size: 14px;
 }
 
@@ -857,7 +873,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: #19863d;
+  background: #c6a400;
 }
 
 /* ==========================================================
@@ -887,7 +903,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 
 .activity-feed .date.is-today::before {
   content: "● ";
-  color: #19863d;
+  color: #c6a400;
 }
 
 /* Segunda fila: cards iguales y CTA siempre abajo */
@@ -907,8 +923,8 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 }
 
 .activity-feed .feed-item.is-current .feed-item-list {
-  background: rgba(107, 63, 110, .08);
-  border: 1px solid rgba(107, 63, 110, .22);
+  background: rgba(110, 106, 63, 0.08);
+  border: 1px solid rgba(110, 108, 63, 0.22);
   border-radius: 14px;
   padding: 14px 16px;
 }
@@ -988,7 +1004,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   height: 38px;
   min-width: 38px;
   border-radius: 50%;
-  background: #d4b324;
+  background: #6c5b06;
   color: #fff;
   display: inline-flex;
   align-items: center;
@@ -1109,7 +1125,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 }
 
 .calendar-activity-list::-webkit-scrollbar-thumb{
-  background: rgba(45,45,45,.35);
+  background: rgba(107,63,110,.35);
   border-radius: 999px;
 }
 
@@ -1196,14 +1212,14 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
     padding: 8px 6px;
     font-size: 11px;
     border-radius: 999px !important;
-    background: rgba(45,45,45,.12) !important;
+    background: rgba(107,63,110,.12) !important;
     border-color: transparent !important;
-    color: #19863d !important;
+    color: #c6a400 !important;
     font-weight: 700;
   }
 
   #calendar .fc-right .btn.active{
-    background: #19863d !important;
+    background: #c6a400 !important;
     color: #fff !important;
   }
 
@@ -1338,8 +1354,8 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
     width: 72px;
     height: 72px;
     border-radius: 20px;
-    background: rgba(63, 63, 63, 0.1);
-    color: #3f3f3f;
+    background: rgba(122,74,129,.10);
+    color: #c6a400;
 
     display:flex;
     align-items:center;
@@ -1358,7 +1374,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 }
 
 .geagro-weather-stat-icon{
-    color:#3f3f3f;
+    color:#c6a400;
     font-size:24px;
     margin-bottom:10px;
 }
@@ -1393,7 +1409,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
    ========================================================== */
 
 .geagro-vineyard-hero{
-  border: 1px solid rgba(45,45,45,.14);
+  border: 1px solid rgba(107,63,110,.14);
   box-shadow: 0 16px 40px rgba(15,23,42,.08);
 }
 
@@ -1446,7 +1462,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 }
 
 .geagro-vineyard-actions .btn-outline-primary:hover{
-  background: rgba(45,45,45,.08);
+  background: rgba(107,63,110,.08);
   color: var(--bs-primary);
   border-color: var(--bs-primary);
 }
@@ -1454,11 +1470,11 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 .geagro-card-actions .btn-outline-secondary{
   background:#f4edf5;
   border-color:#d8c3dc;
-  color:#19863d;
+  color:#c6a400;
 }
 
 .geagro-card-actions .btn-outline-secondary:hover{
-  background:#19863d;
-  border-color:#19863d;
+  background:#c6a400;
+  border-color:#c6a400;
   color:#fff;
 }

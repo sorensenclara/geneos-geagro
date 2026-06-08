@@ -23,11 +23,9 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
    2. VARIABLES VISUALES GEAGRO VID
 ========================================================= */
 :root {
-    /* --geagro-purple-900: #3F2642;
-    --geagro-purple-700: #6b3f6e; */
-    --geagro-purple-900:#080707;
-    --geagro-purple-700:#0e0c0e;
-
+  --geagro-yellow-900:#2b2f24;
+  --geagro-yellow-700:#c6a400;
+  --geagro-yellow-500: #f3c600;
 
     --geagro-green-900: #0b3422;
     --geagro-green-800: #0f3725;
@@ -40,8 +38,8 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 
     --geagro-radius-pill: 32px;
 
-    --geagro-shadow-sm: 0 10px 24px rgba(15,23,42,.06);
-    --geagro-shadow-md: 0 18px 50px rgba(15,23,42,.16);
+    --geagro-shadow-sm: 0 10px 24px rgba(42, 36, 15, 0.06);
+    --geagro-shadow-md: 0 18px 50px rgba(42, 36, 15, 0.06);
 }
 
 
@@ -52,7 +50,7 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
 ========================================================= */
 body.login-page,
 body.jazzmin-login-page {
-    background: linear-gradient(135deg, var(--geagro-purple-900), var(--geagro-green-500));
+    background: linear-gradient(135deg, var(--geagro-yellow-900), var(--geagro-green-500));
 }
 
 /* Oculto el logo default de Jazzmin para evitar duplicado */
@@ -77,8 +75,8 @@ body.jazzmin-login-page {
 
 .login-box input:focus,
 .login-box .form-control:focus {
-    border-color: var(--geagro-purple-700);
-    box-shadow: 0 0 0 2px rgba(11, 11, 11, 0.15);
+    border-color: var(--geagro-yellow-700);
+    box-shadow: 0 0 0 2px rgba(107, 63, 110, 0.15);
     outline: none;
 }
 
@@ -102,8 +100,8 @@ body.login-page .login-box a.btn-primary,
 .login-box button[type="submit"],
 .login-box .btn,
 .login-box a.btn {
-    background-color: #19863d; /*var(--geagro-purple-700);*/
-    border-color: var(--geagro-purple-700);
+    background-color: var(--geagro-yellow-700);
+    border-color: var(--geagro-yellow-700);
     color: #fff;
     border-radius: var(--geagro-radius-pill);
     font-weight: 700;
@@ -119,8 +117,8 @@ body.login-page .login-box a.btn-primary:hover,
 .login-box a.btn:hover,
 .login-box input[type="submit"]:hover,
 .login-box button[type="submit"]:hover {
-    background-color: var(--geagro-purple-900);
-    border-color: var(--geagro-purple-900);
+    background-color: var(--geagro-yellow-900);
+    border-color: var(--geagro-yellow-900);
     transform: translateY(-1px);
     box-shadow: var(--geagro-shadow-md);
 }
@@ -130,10 +128,10 @@ body.login-page .login-box .btn-primary:active,
 body.login-page .login-box .btn-primary:not(:disabled):not(.disabled):active,
 body.login-page .login-box a.btn-primary:focus,
 body.login-page .login-box a.btn-primary:active {
-    background-color: var(--geagro-purple-700);
-    border-color: var(--geagro-purple-700);
+    background-color: var(--geagro-yellow-700);
+    border-color: var(--geagro-yellow-700);
     color: #fff;
-    box-shadow: 0 0 0 2px rgba(45, 45, 45, 0.25);
+    box-shadow: 0 0 0 2px rgba(110, 106, 63, 0.25);
 }
 
 
@@ -149,22 +147,22 @@ body.login-page .login-box a.btn-primary:active {
 }
 
 .brand-link {
-    background-color: var(--geagro-green-700);
+    background-color: var(--geagro-yellow-900);
 }
 
 /* Topbar violeta */
 .main-header {
-    background-color: var(--geagro-purple-700);
+    background-color: var(--geagro-yellow-700);
     color: #fff;
 }
 
 .brand-link {
-        background-color: var(--geagro-purple-900)!important;
+        background-color: var(--geagro-yellow-900)!important;
 }
 
 /* Logo / brand */
 .brand-link {
-    background-color: var(--geagro-purple-900);
+    background-color: var(--geagro-yellow-900);
     color: #fff;
     border-bottom: 1px solid rgba(255,255,255,.08);
 }
@@ -190,7 +188,7 @@ body.login-page .login-box a.btn-primary:active {
 /* Estado activo / abierto */
 .sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active,
 .nav-sidebar > .nav-item.menu-open > .nav-link {
-    background-color: var(--geagro-purple-700);
+    background-color: var(--geagro-yellow-700);
     color: #fff;
 }
 
@@ -231,15 +229,15 @@ body.login-page .login-box a.btn-primary:active {
 
 /* Acciones secundarias: guardar y añadir / continuar */
 .btn-info {
-    background-color: var(--geagro-purple-700) !important;
-    border-color: var(--geagro-purple-700) !important;
+    background-color: var(--geagro-yellow-700) !important;
+    border-color: var(--geagro-yellow-700) !important;
     color: #fff !important;
 }
 
 /* Eliminar / acción destructiva */
 .btn-danger {
-    background-color: #d8b622 !important;
-    border-color: #d8b622 !important;
+    background-color: #D97706 !important;
+    border-color: #D97706 !important;
     color: #fff !important;
 }
 
@@ -256,7 +254,7 @@ body.login-page .login-box a.btn-primary:active {
 button:focus,
 button:active {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(45, 45, 45, 0.25);
+    box-shadow: 0 0 0 2px rgba(110, 106, 63, 0.25);
 }
 
 .btn:hover {
@@ -264,11 +262,6 @@ button:active {
     box-shadow: var(--geagro-shadow-md);
 }
 
-/* Separación entre botones */
-.btn-group {
-    display: flex;
-    gap: 4px;
-}
 
 /* =========================================================
    6. LINKS / ACCENTS ADMIN
@@ -532,7 +525,7 @@ button:active {
 
   background:#fff;
 
-  box-shadow:0 10px 24px rgba(15,23,42,.06);
+  box-shadow: 0 0 0 2px rgba(110, 106, 63, 0.25);
 }
 
 .geagro-filterbar-title{
@@ -978,11 +971,11 @@ button:active {
   background:
     linear-gradient(
       135deg,
-      rgba(45,45,45,.08),
+      rgba(107,63,110,.08),
       rgba(30,125,59,.08)
     );
 
-  border:1px solid rgba(45,45,45,.16);
+  border:1px solid rgba(107,63,110,.16);
 
   display:flex;
 
@@ -1000,9 +993,9 @@ button:active {
 
   border-radius:999px;
 
-  background:rgba(45,45,45,.12);
+  background:rgba(107,63,110,.12);
 
-  color:#19863d;
+  color:#6b3f6e;
 
   font-size:12px;
 
@@ -1258,47 +1251,4 @@ button:active {
     width:100%;
   }
 
-}
-
-/* IMPORT / EXPORT */
-/* =========================================================
-   IMPORT / EXPORT - Override con mayor especificidad
-   El archivo original usa !important, así que necesitamos
-   mayor especificidad para ganar.
-========================================================= */
-
-/* Fila "Nuevo" (new) - fondo verde suave */
-html body table.import-preview tr.new,
-html body table.import-preview tr.new td {
-  background-color: #d4edda !important;
-}
-
-/* Fila "Actualizar" (update) - fondo amarillo suave */
-html body table.import-preview tr.update,
-html body table.import-preview tr.update td {
-  background-color: #fff3cd !important;
-}
-
-/* Fila "Eliminar" (delete) - fondo rojo suave */
-html body table.import-preview tr.delete,
-html body table.import-preview tr.delete td {
-  background-color: #f8d7da !important;
-}
-
-/* Fila "Omitir" (skip) - fondo gris */
-html body table.import-preview tr.skip,
-html body table.import-preview tr.skip td {
-  background-color: #e9ecef !important;
-}
-
-/* <ins> - texto insertado (verde) */
-html body table.import-preview td ins {
-  background-color: #a8d5b5 !important;
-  color: #155724 !important;
-}
-
-/* <del> - texto eliminado (rojo) */
-html body table.import-preview td del {
-  background-color: #f5c2c7 !important;
-  color: #842029 !important;
 }

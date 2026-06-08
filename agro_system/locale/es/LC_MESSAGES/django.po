@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-04 11:10-0300\n"
+"POT-Creation-Date: 2026-06-08 11:40-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,6 +23,10 @@ msgstr ""
 msgid "Español"
 msgstr "Español"
 
+#: agro_system/settings/base.py:309
+msgid "Calendar work orders"
+msgstr "Calendario de OP"
+
 #: agro_system/settings/base.py:317
 msgid "Stock Charts"
 msgstr "Gráficos de Stock"
@@ -33,7 +37,7 @@ msgstr "Alertas"
 
 #: alert/models/alert.py:10 alert/models/indicator.py:16
 #: alert/models/variable_register.py:10 input/models/category_input.py:9
-#: input/models/input.py:12 input/models/type_input.py:10
+#: input/models/input.py:11 input/models/type_input.py:10
 #: input/models/type_provider.py:10 operation/models/activity.py:11
 #: operation/models/crop.py:18 operation/models/service.py:10
 #: operation/models/service_type.py:8 operation/models/stage.py:9
@@ -164,7 +168,7 @@ msgid "value"
 msgstr "Valor"
 
 #: alert/models/variable_register.py:16 producer/models/lot.py:33
-#: weather/models/station_weather.py:32 weather/models/weather_data.py:10
+#: weather/models/station_weather.py:32 weather/models/weather_data.py:12
 msgid "weather station"
 msgstr "Estación meteorologica"
 
@@ -176,19 +180,19 @@ msgstr "Registro de variables"
 msgid "variable registers"
 msgstr "Registros de variables"
 
-#: input/admin/input.py:29
+#: input/admin/input.py:28
 msgid "Order Date"
 msgstr "Fecha de orden"
 
-#: input/admin/input.py:31
+#: input/admin/input.py:30
 msgid "Purchases"
 msgstr "Compras"
 
-#: input/admin/input.py:32
+#: input/admin/input.py:31
 msgid "Purchase"
 msgstr "Compra"
 
-#: input/admin/input.py:130
+#: input/admin/input.py:121
 #, python-format
 msgid ""
 "Automatic Reorder: A new pending order has been created for %s based on "
@@ -197,7 +201,7 @@ msgstr ""
 "Reorden automático: Se ha creado una nueva orden pendiente para %s basada en "
 "el historial."
 
-#: input/admin/input.py:147
+#: input/admin/input.py:138
 #, python-format
 msgid ""
 "Automatic Reorder: A new pending order has been created for %s using "
@@ -206,7 +210,7 @@ msgstr ""
 "Reorden automático: Se ha creado una nueva orden pendiente para %s usando "
 "valores predeterminados."
 
-#: input/admin/input.py:149
+#: input/admin/input.py:140
 #, python-format
 msgid "Automatic Reorder Failed for %s: No default provider or store found."
 msgstr ""
@@ -250,7 +254,7 @@ msgstr "Procesar recepción de compras"
 msgid "Only receptions that are not already confirmed can be processed."
 msgstr "Solo se pueden procesar las recepciones que aún no están confirmadas."
 
-#: input/apps.py:7 input/models/input.py:30
+#: input/apps.py:7 input/models/input.py:29
 msgid "inputs"
 msgstr "Insumos"
 
@@ -262,49 +266,49 @@ msgstr "Categoria de insumos"
 msgid "Categories of inputs"
 msgstr "Categorias de insumos"
 
-#: input/models/input.py:13
+#: input/models/input.py:12
 msgid "type of input"
 msgstr "Tipo de insumo"
 
-#: input/models/input.py:14 parameter/models/measure_unit.py:18
+#: input/models/input.py:13 parameter/models/measure_unit.py:18
 msgid "unit of measure"
 msgstr "Unidad de medida"
 
-#: input/models/input.py:15
+#: input/models/input.py:14
 msgid "presentation"
 msgstr "Presentación"
 
-#: input/models/input.py:16
+#: input/models/input.py:15
 msgid "cost"
 msgstr "Precio"
 
-#: input/models/input.py:17 parameter/models/currency.py:14
+#: input/models/input.py:16 parameter/models/currency.py:14
 #: sale/models/sales_receipt.py:20
 msgid "currency"
 msgstr "Moneda"
 
-#: input/models/input.py:18
+#: input/models/input.py:17
 msgid "control of stock"
 msgstr "Control de stock"
 
-#: input/models/input.py:19
+#: input/models/input.py:18
 msgid "stock"
 msgstr "Stock"
 
-#: input/models/input.py:20
+#: input/models/input.py:19
 msgid "reorder point"
 msgstr "Punto de reorden"
 
-#: input/models/input.py:21 input/models/purchase_order.py:14
+#: input/models/input.py:20 input/models/purchase_order.py:14
 #: input/models/purchase_reception.py:11
 msgid "pending"
 msgstr "Pendiente"
 
-#: input/models/input.py:22
+#: input/models/input.py:21
 msgid "control of lot"
 msgstr "Control de lote"
 
-#: input/models/input.py:23 input/models/provider.py:20
+#: input/models/input.py:22 input/models/provider.py:20
 #: input/models/purchase_order.py:26 input/models/purchase_reception.py:21
 #: operation/models/crop.py:37 operation/models/technical_plan.py:22
 #: operation/models/work_order.py:40 producer/models/country_side.py:24
@@ -313,7 +317,7 @@ msgstr "Control de lote"
 msgid "producer"
 msgstr "Productor"
 
-#: input/models/input.py:29 input/models/purchase_order_detail.py:15
+#: input/models/input.py:28 input/models/purchase_order_detail.py:15
 #: input/models/purchase_reception_detail.py:15
 #: operation/models/input_work_order.py:10
 #: operation/models/technical_plan_input.py:17
@@ -1413,8 +1417,8 @@ msgstr "Productor"
 msgid "usersProducers"
 msgstr "Productores"
 
-#: weather/apps.py:7 weather/models/weather_data.py:46
-#: weather/models/weather_data.py:47
+#: weather/apps.py:7 weather/models/weather_data.py:49
+#: weather/models/weather_data.py:50
 msgid "weather data"
 msgstr "Datos climatológicos"
 
@@ -1462,97 +1466,58 @@ msgstr "Intervalo de registro de datos"
 msgid "weather stations"
 msgstr "Estaciones meteorologicas"
 
-#: weather/models/weather_data.py:9
+#: weather/models/weather_data.py:11
 msgid "timestamp"
 msgstr "Fecha y hora"
 
-#: weather/models/weather_data.py:13
+#: weather/models/weather_data.py:15
 msgid "temperature"
 msgstr "Temperatura"
 
-#: weather/models/weather_data.py:17
+#: weather/models/weather_data.py:19
 msgid "humidity"
 msgstr "Humedad"
 
-#: weather/models/weather_data.py:23
+#: weather/models/weather_data.py:25
 msgid "wind speed"
 msgstr "Velocidad del viento"
 
-#: weather/models/weather_data.py:24
+#: weather/models/weather_data.py:26
 msgid "wind gust"
 msgstr "Rafaga actual"
 
-#: weather/models/weather_data.py:25
+#: weather/models/weather_data.py:27
 msgid "wind gust max"
 msgstr "Ráfaga maxima"
 
-#: weather/models/weather_data.py:26
+#: weather/models/weather_data.py:28
 msgid "wind direction"
 msgstr "Dirección del viento"
 
-#: weather/models/weather_data.py:29
+#: weather/models/weather_data.py:31
 msgid "rain rate"
 msgstr "Intencidad de lluvia"
 
-#: weather/models/weather_data.py:30
+#: weather/models/weather_data.py:32
 msgid "rain total"
 msgstr "Lluvia diaria"
 
-#: weather/models/weather_data.py:31
+#: weather/models/weather_data.py:33
 msgid "rain week"
 msgstr "Lluvia semanal"
 
-#: weather/models/weather_data.py:32
+#: weather/models/weather_data.py:34
 msgid "rain month"
 msgstr "Lluvia mensual"
 
-#: weather/models/weather_data.py:33
+#: weather/models/weather_data.py:35
 msgid "rain year"
 msgstr "Lluvia anual"
 
-#: weather/models/weather_data.py:37
+#: weather/models/weather_data.py:39
 msgid "solar radiation"
 msgstr "Radiación solar"
 
-#: weather/models/weather_data.py:40
+#: weather/models/weather_data.py:42
 msgid "raw data"
 msgstr "Datos"
-
-#~ msgid "feels like"
-#~ msgstr "Sensaciín térmica"
-
-#~ msgid "uv"
-#~ msgstr "UV"
-
-#~ msgid "category"
-#~ msgstr "Categoria"
-
-#~ msgid "Pending work orders"
-#~ msgstr "Imprimir ordenes pendientes"
-
-#~ msgid "state of OT"
-#~ msgstr "Estado de una orden de trabajo"
-
-#~ msgid "states"
-#~ msgstr "Estados de las ordenes de trabajo"
-
-#~ msgid "operation"
-#~ msgstr "Operaciones"
-
-#~ msgid "key"
-#~ msgstr "Clave"
-
-#~ msgid "Data of waybill"
-#~ msgstr "Detalle de una carta de porte"
-
-#~ msgid "technical plan details"
-#~ msgstr "Detalles del plan tecnico"
-
-#~ msgid "crop estimate"
-#~ msgstr "Rinde estimado"
-
-#~ msgid "crop real"
-#~ msgstr "Rinde real"
-
-#~ msgid "technical plans detail"
-#~ msgstr "Detalles del plan tecnico"

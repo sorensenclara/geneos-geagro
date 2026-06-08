@@ -225,7 +225,7 @@ JAZZMIN_SETTINGS = {
     "site_brand": "GEAGRO",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "img/Isologo-geagro.svg",
+    "site_logo": "img/logo-sm-GEAGRO-cereal.svg",
 
     "login_logo": "img/logo-geagro-cereal.svg",
 
@@ -306,7 +306,7 @@ JAZZMIN_SETTINGS = {
     "custom_links": {
         "operation": [
         {
-            "name": "Calendar work orders", 
+            "name": _("Calendar work orders"), 
             "url": "/calendar/", 
             "icon": "fas fa-calendar-alt",
             "order": 2
