@@ -590,8 +590,8 @@ body[data-sidebar="dark"]{
 }
 
 .btn-primary:hover{
-  background-color: #5a345d;
-  border-color: #5a345d;
+  background-color: #19863d;
+  border-color: #19863d;
   transform: translateY(-2px);
   box-shadow: 0 8px 18px rgba(45,45,45,.25);
 }

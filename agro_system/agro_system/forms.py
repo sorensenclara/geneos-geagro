@@ -20,7 +20,6 @@ class UserRegistrationForm(SignupForm):
         self.helper = FormHelper(self)
         self.fields['email'].widget = forms.EmailInput(attrs={'class': 'form-control mb-2','placeholder':'Enter Email','id':'email'})
         self.fields['email'].label="Email"
-        self.fields['username'].widget = forms.TextInput(attrs={'class': 'form-control mb-2','placeholder':'Enter Username','id':'username1'})
         self.fields['password1'].widget = forms.PasswordInput(attrs={'class': 'form-control mb-2','placeholder':'Enter Password','id':'password1'})
         self.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'form-control mb-2','placeholder':'Enter Confirm Password','id':'password2'})
         self.fields['password2'].label="Confirm Password"

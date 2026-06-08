@@ -472,12 +472,7 @@ CORS_ALLOW_CREDENTIALS = True
 #CORS_ALLOW_ALL_ORIGINS = True  # Permite todas las solicitudes CORS 
 
 
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'   # Login
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_EMAIL_REQUIRED = True   # Login
-ACCOUNT_SIGNUP_FIELDS = ['email', 'username', 'password1', 'password2']
-# ACCOUNT_USERNAME_REQUIRED = False   # Login
-ACCOUNT_SIGNUP_FIELDS = False
+
 
 # envio de mail
 EMAIL_BACKEND = env('EMAIL_BACKEND')
@@ -509,6 +504,10 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@localhost")
 # Si algún paquete usa SERVER_EMAIL:
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'   # Login
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_EMAIL_REQUIRED = True   # Login
+
 # =========================
 # DJANGO-ALLAUTH
 # =========================
@@ -519,7 +518,9 @@ ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
 
 # Reemplazo deprecado: ACCOUNT_EMAIL_REQUIRED -> ACCOUNT_SIGNUP_FIELDS
 # El * indica requerido
-ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
 
 ACCOUNT_UNIQUE_EMAIL = True
 SOCIALACCOUNT_QUERY_EMAIL = True

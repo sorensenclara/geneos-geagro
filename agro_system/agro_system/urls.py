@@ -22,6 +22,7 @@ from agro_system import views
 from user.admin.adminSite import adminSite
 from agro_system.admin_dashboard import custom_admin_dashboard
 from django.views.generic import RedirectView
+from django.http import Http404
 from operation.views import calendar_json, calendar_view
 from django.contrib.auth.decorators import login_required
 from .views.user_views import MyPasswordChangeView, MyPasswordSetView
@@ -58,6 +59,8 @@ urlpatterns = [
         login_required(MyPasswordSetView.as_view()),
         name="account_set_password",
     ),
+    # NO PERMITE EL REGISTRO
+    path("account/signup/", lambda request: (_ for _ in ()).throw(Http404())),
     path("account/", include("allauth.urls")),
 
 
