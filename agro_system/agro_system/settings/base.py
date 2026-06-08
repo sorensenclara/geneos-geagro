@@ -306,7 +306,7 @@ JAZZMIN_SETTINGS = {
     "custom_links": {
         "operation": [
         {
-            "name": _("Calendar work orders"), 
+            "name": "Calendario de OP", 
             "url": "/calendar/", 
             "icon": "fas fa-calendar-alt",
             "order": 2
