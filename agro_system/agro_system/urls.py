@@ -58,6 +58,8 @@ urlpatterns = [
         login_required(MyPasswordSetView.as_view()),
         name="account_set_password",
     ),
+    # Ocultar registro
+    path("account/signup/", RedirectView.as_view(url="/account/login/", permanent=True)),
     path("account/", include("allauth.urls")),
 
 
