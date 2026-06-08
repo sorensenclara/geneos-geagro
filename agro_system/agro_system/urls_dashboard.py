@@ -15,7 +15,7 @@ urlpatterns = [
     path('calendarboard',view=CalendarView, name="calendarboard"),
     path('weather',view=WeatherView, name="weather"),
     path('alert',view=AlertView, name="alert"),
-    path('wines',view=VineyardView, name="vineyard"), # antes era wines 
+    path('fields',view=VineyardView, name="vineyard"), # antes era wines 
     path('technical-plan', view=TechnicalPlanView, name="technical-plan"), # antes era kanbanboard
     path('profile/', view=ProducerProfileView.as_view(), name='producer_profile'),
 ]
