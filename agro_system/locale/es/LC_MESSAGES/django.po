@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-04 11:10-0300\n"
+"POT-Creation-Date: 2026-06-18 09:08-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -164,7 +164,7 @@ msgid "value"
 msgstr "Valor"
 
 #: alert/models/variable_register.py:16 producer/models/lot.py:33
-#: weather/models/station_weather.py:32 weather/models/weather_data.py:10
+#: weather/models/station_weather.py:32 weather/models/weather_data.py:12
 msgid "weather station"
 msgstr "Estación meteorologica"
 
@@ -307,7 +307,7 @@ msgstr "Control de lote"
 #: input/models/input.py:23 input/models/provider.py:20
 #: input/models/purchase_order.py:26 input/models/purchase_reception.py:21
 #: operation/models/crop.py:37 operation/models/technical_plan.py:22
-#: operation/models/work_order.py:40 producer/models/country_side.py:24
+#: operation/models/work_order.py:40 producer/models/country_side.py:25
 #: producer/models/staff.py:33 producer/models/store.py:14
 #: sale/models/sales_receipt.py:31
 msgid "producer"
@@ -328,7 +328,7 @@ msgstr "Razon social"
 msgid "type of provider"
 msgstr "Tipo de proveedores"
 
-#: input/models/provider.py:15 producer/models/country_side.py:17
+#: input/models/provider.py:15 producer/models/country_side.py:18
 #: producer/models/staff.py:23 producer/models/store.py:11
 #: sale/models/driver.py:13 user/models/user_organization.py:15
 #: user/models/user_producer.py:16
@@ -336,19 +336,19 @@ msgid "address"
 msgstr "Dirección"
 
 #: input/models/provider.py:16 parameter/models/city.py:17
-#: parameter/models/port.py:11 producer/models/country_side.py:18
+#: parameter/models/port.py:11 producer/models/country_side.py:19
 #: producer/models/staff.py:24 producer/models/store.py:12
 #: sale/models/driver.py:14 user/models/user_producer.py:17
 msgid "city"
 msgstr "Ciudad"
 
-#: input/models/provider.py:17 producer/models/country_side.py:19
+#: input/models/provider.py:17 producer/models/country_side.py:20
 #: producer/models/staff.py:25 sale/models/driver.py:15
 #: user/models/user_producer.py:18
 msgid "phone"
 msgstr "Telefono"
 
-#: input/models/provider.py:18 producer/models/country_side.py:20
+#: input/models/provider.py:18 producer/models/country_side.py:21
 #: producer/models/staff.py:26 sale/models/driver.py:16
 #: user/models/user_extend.py:78
 msgid "email"
@@ -392,7 +392,7 @@ msgid "applicant"
 msgstr "Solicitante"
 
 #: input/models/purchase_order.py:25 input/models/purchase_reception.py:20
-#: producer/models/country_side.py:22
+#: producer/models/country_side.py:23
 msgid "store"
 msgstr "Almacen"
 
@@ -427,7 +427,7 @@ msgstr "Impuestos"
 msgid "price total"
 msgstr "Precio total"
 
-#: input/models/purchase_order_detail.py:21 producer/models/country_side.py:21
+#: input/models/purchase_order_detail.py:21 producer/models/country_side.py:22
 #: producer/models/lot.py:22 sale/models/sales_receipt.py:24
 msgid "cost center"
 msgstr "Centro de costo"
@@ -545,7 +545,7 @@ msgstr "Actividad"
 msgid "campaing"
 msgstr "Campaña"
 
-#: operation/models/crop.py:20 producer/models/country_side.py:30
+#: operation/models/crop.py:20 producer/models/country_side.py:31
 #: producer/models/lot.py:17
 msgid "countryside"
 msgstr "Campos"
@@ -559,7 +559,7 @@ msgstr "Zona"
 msgid "lot"
 msgstr "Lote"
 
-#: operation/models/crop.py:24 producer/models/country_side.py:16
+#: operation/models/crop.py:24 producer/models/country_side.py:17
 #: producer/models/lot.py:19
 msgid "responsible"
 msgstr "Responsable"
@@ -900,7 +900,7 @@ msgid "countries"
 msgstr "Paises"
 
 #: parameter/models/countryside_condition.py:14
-#: producer/models/country_side.py:14
+#: producer/models/country_side.py:15
 msgid "countryside condition"
 msgstr "Condición del campo"
 
@@ -1033,15 +1033,19 @@ msgstr "Centro de costo"
 msgid "centes of cost"
 msgstr "Centros de costo"
 
-#: producer/models/country_side.py:15 producer/models/lot.py:20
+#: producer/models/country_side.py:14
+msgid "number id"
+msgstr "Numero (ID)"
+
+#: producer/models/country_side.py:16 producer/models/lot.py:20
 msgid "hectares"
 msgstr "Hectareas"
 
-#: producer/models/country_side.py:23
+#: producer/models/country_side.py:24
 msgid "observation"
 msgstr "Observación"
 
-#: producer/models/country_side.py:31
+#: producer/models/country_side.py:32
 msgid "countrysides"
 msgstr "Campos"
 
@@ -1413,8 +1417,8 @@ msgstr "Productor"
 msgid "usersProducers"
 msgstr "Productores"
 
-#: weather/apps.py:7 weather/models/weather_data.py:46
-#: weather/models/weather_data.py:47
+#: weather/apps.py:7 weather/models/weather_data.py:49
+#: weather/models/weather_data.py:50
 msgid "weather data"
 msgstr "Datos climatológicos"
 
@@ -1462,97 +1466,60 @@ msgstr "Intervalo de registro de datos"
 msgid "weather stations"
 msgstr "Estaciones meteorologicas"
 
-#: weather/models/weather_data.py:9
+#: weather/models/weather_data.py:11
 msgid "timestamp"
 msgstr "Fecha y hora"
 
-#: weather/models/weather_data.py:13
+#: weather/models/weather_data.py:15
 msgid "temperature"
 msgstr "Temperatura"
 
-#: weather/models/weather_data.py:17
+#: weather/models/weather_data.py:19
 msgid "humidity"
 msgstr "Humedad"
 
-#: weather/models/weather_data.py:23
+#: weather/models/weather_data.py:25
 msgid "wind speed"
 msgstr "Velocidad del viento"
 
-#: weather/models/weather_data.py:24
+#: weather/models/weather_data.py:26
 msgid "wind gust"
 msgstr "Rafaga actual"
 
-#: weather/models/weather_data.py:25
+#: weather/models/weather_data.py:27
 msgid "wind gust max"
 msgstr "Ráfaga maxima"
 
-#: weather/models/weather_data.py:26
+#: weather/models/weather_data.py:28
 msgid "wind direction"
 msgstr "Dirección del viento"
 
-#: weather/models/weather_data.py:29
+#: weather/models/weather_data.py:31
 msgid "rain rate"
 msgstr "Intencidad de lluvia"
 
-#: weather/models/weather_data.py:30
+#: weather/models/weather_data.py:32
 msgid "rain total"
 msgstr "Lluvia diaria"
 
-#: weather/models/weather_data.py:31
+#: weather/models/weather_data.py:33
 msgid "rain week"
 msgstr "Lluvia semanal"
 
-#: weather/models/weather_data.py:32
+#: weather/models/weather_data.py:34
 msgid "rain month"
 msgstr "Lluvia mensual"
 
-#: weather/models/weather_data.py:33
+#: weather/models/weather_data.py:35
 msgid "rain year"
 msgstr "Lluvia anual"
 
-#: weather/models/weather_data.py:37
+#: weather/models/weather_data.py:39
 msgid "solar radiation"
 msgstr "Radiación solar"
 
-#: weather/models/weather_data.py:40
+#: weather/models/weather_data.py:42
 msgid "raw data"
 msgstr "Datos"
 
-#~ msgid "feels like"
-#~ msgstr "Sensaciín térmica"
 
-#~ msgid "uv"
-#~ msgstr "UV"
-
-#~ msgid "category"
-#~ msgstr "Categoria"
-
-#~ msgid "Pending work orders"
-#~ msgstr "Imprimir ordenes pendientes"
-
-#~ msgid "state of OT"
-#~ msgstr "Estado de una orden de trabajo"
-
-#~ msgid "states"
-#~ msgstr "Estados de las ordenes de trabajo"
-
-#~ msgid "operation"
-#~ msgstr "Operaciones"
-
-#~ msgid "key"
-#~ msgstr "Clave"
-
-#~ msgid "Data of waybill"
-#~ msgstr "Detalle de una carta de porte"
-
-#~ msgid "technical plan details"
-#~ msgstr "Detalles del plan tecnico"
-
-#~ msgid "crop estimate"
-#~ msgstr "Rinde estimado"
-
-#~ msgid "crop real"
-#~ msgstr "Rinde real"
-
-#~ msgid "technical plans detail"
-#~ msgstr "Detalles del plan tecnico"
