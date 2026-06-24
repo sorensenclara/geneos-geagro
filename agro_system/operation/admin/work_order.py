@@ -17,7 +17,7 @@ class InputWorkOrderInline(admin.StackedInline):
 @admin.action(description="Finalizar orden")
 def finish_order(modeladmin, request, queryset):
     for obj in queryset:
-        obj.state = OTState.objects.filter(nombre="Finalizada")[0]
+        obj.state = OTState.objects.filter(name="Finalizada")[0]
         obj.save()
         inputs = InputWorkOrder.objects.filter(work_order=obj)
         if inputs:
@@ -39,10 +39,9 @@ def download_pdf(modeladmin, request, queryset):
 
 class WorkOrderAdmin(admin.ModelAdmin):
     list_display = ['code', 'crop', 'stage', 'date_init', 'stateOT', 'type']
-    list_filter = ['campaing','stage','stateOT']
-    search_fields = ['code']
+    list_filter = ['campaing','stage','stateOT', 'crop']
+    search_fields = ['code', 'crop__name']
     ordering = ['code']
-    search_fields = ['name']
     inlines = [InputWorkOrderInline]
     actions = [finish_order, download_pdf]
 

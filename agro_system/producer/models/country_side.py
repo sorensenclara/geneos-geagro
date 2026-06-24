@@ -11,6 +11,7 @@ class Countryside(models.Model):
     """ Modelo para representar el campo """
 
     name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
+    number_id = models.CharField(max_length=20, blank=True, null=True, verbose_name = _('number id'))
     condition = models.ForeignKey(CountrysideCondition, models.CASCADE, verbose_name = _('countryside condition'))
     hectares = models.FloatField(default=0, verbose_name = _('hectares'))
     responsible = models.ForeignKey(Staff, models.CASCADE,verbose_name = _('responsible'))
