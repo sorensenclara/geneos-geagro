@@ -17,7 +17,7 @@ class InputWorkOrderInline(admin.StackedInline):
 @admin.action(description="Finalizar orden")
 def finish_order(modeladmin, request, queryset):
     for obj in queryset:
-        obj.state = OTState.objects.filter(name="Finalizada")[0]
+        obj.stateOT = OTState.objects.filter(name="Finalizada")[0]
         obj.save()
         inputs = InputWorkOrder.objects.filter(work_order=obj)
         if inputs:
