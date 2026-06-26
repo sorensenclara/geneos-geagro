@@ -26,10 +26,14 @@ class PurchaseOrder(models.Model):
     producer = models.ForeignKey('user.UserProducer', on_delete=models.RESTRICT, verbose_name= _('producer'))
 
 
+    @property
+    def code(self):
+        return f"OC{self.number:04d}"
+
     def __str__(self):
-        return f"{self.number}"
+        return self.code
 
     class Meta:
         verbose_name = _('purchase order')
         verbose_name_plural = _('purchase orders')
-        ordering = ["date"]
+        ordering = ["-number"]

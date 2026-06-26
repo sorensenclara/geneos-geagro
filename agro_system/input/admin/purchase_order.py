@@ -3,6 +3,7 @@ from user.admin.adminSite import adminSite
 from input.models.purchase_order import PurchaseOrder
 from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.purchase_reception import PurchaseReception
+from input.models.purchase_reception_detail import PurchaseReceptionDetail
 from user.models.user_producer import UserProducer
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
@@ -26,6 +27,27 @@ def procesar_purchase_order(modeladmin, request, queryset):
             item.input.pending += item.amount
             item.input.save()
             item.save()
+
+        # Crear recepción pendiente automáticamente si todavía no existe una
+        if not PurchaseReception.objects.filter(purchase_order=obj).exists():
+            reception = PurchaseReception.objects.create(
+                purchase_order=obj,
+                store=obj.store,
+                producer=obj.producer,
+                state='pending',
+            )
+            for item in details:
+                PurchaseReceptionDetail.objects.create(
+                    purchase_reception=reception,
+                    input=item.input,
+                    amount=item.amount,
+                )
+            messages.success(
+                request,
+                _("Order %(number)s confirmed. A pending reception was created automatically — "
+                  "adjust quantities if needed and then confirm it.")
+                % {'number': obj.number}
+            )
 
 @admin.action(description=_("Cancel Purchase Order"))
 def cancelar_purchase_order(modeladmin, request, queryset):
@@ -86,9 +108,10 @@ class PurchaseOrderDetailInline(admin.StackedInline):
         return super().get_readonly_fields(request, obj)
     
 class PurchaseOrderAdmin(admin.ModelAdmin):
-    list_display = ['number','date', 'provider', 'state']
+    list_display = ['code', 'date', 'provider', 'store', 'state']
     list_filter = ['state', 'provider']
-    search_fields = ['number',]
+    search_fields = ['number']
+    ordering = ['-number']
     inlines = [PurchaseOrderDetailInline]
     actions = [procesar_purchase_order, cancelar_purchase_order, input_pending_pdf]
 

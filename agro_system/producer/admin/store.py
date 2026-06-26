@@ -3,11 +3,25 @@ from producer.models.store import Store
 from user.models.user_producer import UserProducer
 from user.admin.adminSite import adminSite
 from django.utils.translation import gettext_lazy as _
+from input.models.input_stock import InputStock
+
+
+
+class StoreInputStockInline(admin.TabularInline):
+    model = InputStock
+    extra = 0
+    fields = ['input', 'quantity']
+    verbose_name = _('Input stock')
+    verbose_name_plural = _('Input stock')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class StoreAdmin(admin.ModelAdmin):
-    exclude=['producer']
-    list_display =  ['name', 'address', 'city', 'default']
+    exclude = ['producer']
+    list_display = ['name', 'address', 'city', 'default']
+    inlines = [StoreInputStockInline,]
     
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado

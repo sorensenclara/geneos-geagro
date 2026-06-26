@@ -103,14 +103,15 @@ def process_plan(modeladmin, request, queryset):
                 input = item_input.input
                 dose_reference = item_input.dose
                 details = item_input.detail
-                dose_total = dose_reference*obj.hectares_productive/ plan.first().hectares
+                dose_total = dose_reference * obj.hectares_productive / plan.first().hectares
 
-                input_order = InputWorkOrder.objects.create(work_order=order,
-                                                input=input,
-                                                dose=dose_total,
-                                                details=details
-                                                )
-                input_order.save()
+                InputWorkOrder.objects.create(
+                    work_order=order,
+                    input=input,
+                    dose=dose_total,
+                    store=item_input.store,
+                    details=details,
+                )
 
 
 

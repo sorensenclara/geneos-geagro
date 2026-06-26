@@ -6,6 +6,7 @@ from user.admin.adminSite import adminSite
 from input.models.purchase_order import PurchaseOrder
 from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.input import Input
+from input.models.input_stock import InputStock
 from django.utils.translation import gettext_lazy as _, gettext
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
@@ -14,6 +15,18 @@ from import_export import fields
 from input.models.type_input import TypeInput
 from parameter.models.measure_unit import  MaensureUnit
 from parameter.models.currency import Currency
+
+
+class InputStockInline(admin.TabularInline):
+    model = InputStock
+    extra = 0
+    fields = ['store', 'quantity']
+    verbose_name = _('Stock per store')
+    verbose_name_plural = _('Stock per store')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class PurchaseInline(admin.StackedInline):
     model = PurchaseOrderDetail
@@ -26,7 +39,7 @@ class PurchaseInline(admin.StackedInline):
         return obj.purchase_order.date if obj.purchase_order else None
 
     date_order.short_description = _('Order Date')
-    
+
     verbose_name_plural = _("Purchases")
     verbose_name = _("Purchase")
 
@@ -75,8 +88,8 @@ class InputResource(resources.ModelResource):
             raise ValueError("No se pudo asignar el productor al insumo. Usuario no tiene un productor asociado.")
 
 class InputAdmin(ImportExportModelAdmin):
-    search_fields = ['name'] 
-    inlines = [PurchaseInline]
+    search_fields = ['name']
+    inlines = [InputStockInline, PurchaseInline]
     list_display = ['name', 'type', 'cost', 'stock', 'min_stock', 'pending', 'producer']
     list_filter = ['type', 'unit_measure', 'currency']
     readonly_fields = ['pending']

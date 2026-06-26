@@ -4,30 +4,61 @@ from input.models.purchase_reception import PurchaseReception
 from input.models.purchase_reception_detail import PurchaseReceptionDetail
 from user.models.user_producer import UserProducer
 from django.utils.translation import gettext_lazy as _
+from django.utils.timezone import localdate
 from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.input import Input
+from input.models.input_stock import InputStock
+from input.models.stock_movement import StockMovement
+
+
+def _add_to_store_stock(input_obj, store, amount):
+    stock_record, _ = InputStock.objects.get_or_create(
+        input=input_obj,
+        store=store,
+        defaults={'quantity': 0},
+    )
+    stock_before = stock_record.quantity
+    stock_record.quantity += amount
+    stock_record.save()
+    return stock_before, stock_record.quantity
+
 
 @admin.action(description=_("Process Reception"))
 def process_reception(modeladmin, request, queryset):
-    if not queryset.filter(state="confirm").exists():
-        queryset.update(state="confirm")
-        for obj in queryset:
-            details = PurchaseReceptionDetail.objects.filter(purchase_reception=obj)
-            for item in details:
-                input_obj = item.input
-                if obj.purchase_order:
-                    detail_po = PurchaseOrderDetail.objects.filter(purchase_order=obj.purchase_order, input=input_obj).first()
-                    if detail_po:
-                        detail_po.pending_amount -= item.amount
-                        detail_po.save()
-                        input_obj.stock += item.amount
-                        input_obj.pending -= item.amount
-                        input_obj.save()
-                else:
-                    input_obj.stock += item.amount
-                    input_obj.save()
-    else:
+    if queryset.filter(state="confirm").exists():
         messages.error(request, _("Only receptions that are not already confirmed can be processed."))
+        return
+
+    queryset.update(state="confirm")
+    for obj in queryset:
+        if not obj.delivery_date:
+            obj.delivery_date = localdate()
+            obj.save(update_fields=['delivery_date'])
+        details = PurchaseReceptionDetail.objects.filter(purchase_reception=obj)
+        for item in details:
+            input_obj = item.input
+            if obj.purchase_order:
+                detail_po = PurchaseOrderDetail.objects.filter(
+                    purchase_order=obj.purchase_order, input=input_obj
+                ).first()
+                if detail_po:
+                    detail_po.pending_amount -= item.amount
+                    detail_po.save()
+                    input_obj.pending -= item.amount
+            input_obj.stock += item.amount
+            input_obj.save()
+            stock_before, stock_after = _add_to_store_stock(input_obj, obj.store, item.amount)
+            StockMovement.objects.create(
+                date=obj.delivery_date or localdate(),
+                producer=obj.producer,
+                input=input_obj,
+                store=obj.store,
+                quantity=item.amount,
+                stock_before=stock_before,
+                stock_after=stock_after,
+                operation='purchase',
+                purchase_reception=obj,
+            )
 
 
 class DetalleRecepcionInline(admin.StackedInline):
@@ -57,8 +88,10 @@ class DetalleRecepcionInline(admin.StackedInline):
         return super().get_readonly_fields(request, obj)
 
 class PurchaseReceptionAdmin(admin.ModelAdmin):
-    list_display = ['purchase_order', 'delivery_date', 'state', 'store']
-    list_filter = ['state', 'purchase_order', 'store']
+    list_display = ['code', 'purchase_order', 'delivery_date', 'state', 'store']
+    list_filter = ['state', 'store']
+    search_fields = ['code', 'purchase_order__number']
+    ordering = ['-code']
     actions = [process_reception]
     inlines = [DetalleRecepcionInline]
 

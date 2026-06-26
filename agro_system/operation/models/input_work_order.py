@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .work_order import WorkOrder
 from input.models.input import Input
+from producer.models.store import Store
 
 class InputWorkOrder(models.Model):
     """ Modelo que representa los insumos de la orden de trabajo"""
@@ -10,6 +11,7 @@ class InputWorkOrder(models.Model):
     input = models.ForeignKey(Input, models.CASCADE, verbose_name= _('input'))
     dose = models.FloatField(verbose_name= _('planned dose'))
     dose_applied = models.FloatField(null=True, blank=True, verbose_name= _('dose applied'))
+    store = models.ForeignKey(Store, models.SET_NULL, null=True, blank=True, verbose_name=_('store'))
     details = models.TextField(null=True, blank=True, verbose_name= _('details'))
 
     def __str__(self):

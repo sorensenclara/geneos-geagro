@@ -16,7 +16,7 @@ class Input(models.Model):
     currency = models.ForeignKey(Currency, models.CASCADE, verbose_name=_('currency'))
     control_stock = models.BooleanField(default=True, verbose_name = _('control of stock'))
     stock = models.FloatField(default=0, verbose_name = _('stock'))
-    min_stock = models.FloatField(default=0, verbose_name = _('reorder point')) # Punto de pedido
+    min_stock = models.FloatField(default=0, verbose_name = _('reorder point'), help_text=_('Minimum stock level to trigger a reorder')) # Punto de pedido
     pending = models.FloatField(default=0, verbose_name = _('pending'))
     control_lot = models.BooleanField(default=False, verbose_name = _('control of lot'))
     producer = models.ForeignKey('user.UserProducer', on_delete=models.RESTRICT, verbose_name= _('producer'), null=True, blank=True)
