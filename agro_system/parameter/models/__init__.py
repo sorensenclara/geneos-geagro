@@ -16,3 +16,5 @@ from .measure_unit import MaensureUnit
 from .currency import Currency
 from .exchange_rate import exchangeRate
 from .type_var_crop_technique import TypeVarCropTechnique
+from .silo_type import SiloType
+from .storage_service_type import StorageServiceType

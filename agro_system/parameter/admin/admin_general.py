@@ -18,6 +18,8 @@ from parameter.models.measure_unit import MaensureUnit
 from parameter.models.currency import Currency
 from parameter.models.exchange_rate import exchangeRate
 from parameter.models.type_var_crop_technique  import TypeVarCropTechnique
+from parameter.models.silo_type import SiloType
+from parameter.models.storage_service_type import StorageServiceType
 
 
 adminSite.register(Country)
@@ -38,3 +40,5 @@ adminSite.register(MaensureUnit)
 adminSite.register(Currency)
 adminSite.register(exchangeRate)
 adminSite.register(TypeVarCropTechnique)
+adminSite.register(SiloType)
+adminSite.register(StorageServiceType)

@@ -1,0 +1,62 @@
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+from datetime import date
+from parameter.models.specie import Specie
+from parameter.models.campaign import Campaing
+from input.models.provider import Provider
+
+
+class StorageCertificate(models.Model):
+
+    """ Modelo para representar un certificado de depósito emitido por un acopiador. Representa el contrato de almacenamiento de granos en instalaciones de un tercero. Puede convertirse en warrant. """
+
+    ACTIVE = 'active'
+    PARTIAL = 'partial'
+    CANCELLED = 'cancelled'
+    WARRANT = 'warrant'
+    STATE_CHOICES = [
+        (ACTIVE, _('Active')),
+        (PARTIAL, _('Partially withdrawn')),
+        (CANCELLED, _('Cancelled')),
+        (WARRANT, _('Warrant')),
+    ]
+
+    number = models.CharField(max_length=50, unique=True, verbose_name=_('certificate number'))
+    date_issue = models.DateField(default=date.today, verbose_name=_('issue date'))
+    date_expiry = models.DateField(null=True, blank=True, verbose_name=_('expiry date'))
+    storage_provider = models.ForeignKey(
+        Provider, on_delete=models.PROTECT,
+        limit_choices_to={'type__name': 'Acopiador'},
+        verbose_name=_('storage provider'),
+    )
+    campaing = models.ForeignKey(Campaing, on_delete=models.PROTECT, verbose_name=_('campaing'))
+    specie = models.ForeignKey(Specie, on_delete=models.PROTECT, verbose_name=_('specie'))
+    crop = models.ForeignKey('operation.Crop', on_delete=models.SET_NULL, null=True, blank=True,
+                             verbose_name=_('crop'))
+    quantity_entry = models.FloatField(verbose_name=_('quantity at entry (tons)'))
+    humidity_entry = models.FloatField(null=True, blank=True, verbose_name=_('humidity at entry (%)'))
+    impurities_entry = models.FloatField(null=True, blank=True, verbose_name=_('impurities at entry (%)'))
+    protein_entry = models.FloatField(null=True, blank=True, verbose_name=_('protein at entry (%)'))
+    test_weight_entry = models.FloatField(null=True, blank=True, verbose_name=_('test weight at entry (kg/hl)'))
+    state = models.CharField(max_length=20, choices=STATE_CHOICES, default=ACTIVE, verbose_name=_('state'))
+    is_warrant = models.BooleanField(default=False, verbose_name=_('is warrant'))
+    warrant_entity = models.CharField(max_length=200, null=True, blank=True, verbose_name=_('warrant entity'))
+    warrant_expiry = models.DateField(null=True, blank=True, verbose_name=_('warrant expiry date'))
+    producer = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, verbose_name=_('producer'))
+    notes = models.TextField(blank=True, verbose_name=_('notes'))
+
+    @property
+    def quantity_available(self):
+        """ Cantidad disponible = entrada - total de salidas registradas en movimientos """
+        exits = self.movements.filter(type__in=['sale_exit', 'withdrawal', 'transfer']).aggregate(
+            total=models.Sum('quantity_tons')
+        )['total'] or 0
+        return self.quantity_entry - exits
+
+    def __str__(self):
+        return f"{self.number} - {self.storage_provider} ({self.specie})"
+
+    class Meta:
+        verbose_name = _('storage certificate')
+        verbose_name_plural = _('storage certificates')
+        ordering = ['-date_issue']
