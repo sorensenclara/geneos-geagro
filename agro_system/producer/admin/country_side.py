@@ -1,5 +1,5 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from producer.models.country_side import Countryside
 from user.models.user_producer import UserProducer
 from producer.models.staff import Staff
@@ -10,7 +10,7 @@ from django.core.serializers import serialize
 from producer.models.lot import Lot
 
 # Register your models here.
-class CountrysideAdmin(admin.ModelAdmin):
+class CountrysideAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['name', 'condition', 'hectares', 'responsible', 'city', 'cost_center']
     list_filter = ['condition','responsible','city']
     search_fields = ['name']
@@ -40,16 +40,11 @@ class CountrysideAdmin(admin.ModelAdmin):
                     staff_qs = Staff.objects.filter(producer=user_producer)
             kwargs["queryset"] = staff_qs
             
-        if db_field.name == "producer":
-            if request.user.type == "Organization":
-                kwargs["queryset"] = UserProducer.objects.filter(association=request.user)
-            elif request.user.type == "Producer":
-                kwargs["queryset"] = UserProducer.objects.filter(email=request.user.email)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        
+
         if request.user.is_superuser:
             return queryset
         if request.user.type == 'Administration':
@@ -63,12 +58,6 @@ class CountrysideAdmin(admin.ModelAdmin):
             if userProducer:
                 return queryset.filter(producer=userProducer)
         return queryset.none()
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
-        if request.user.type == 'Producer':
-            return ['producer']
-        return readonly_fields
 
     def get_urls(self):
         urls = super().get_urls()

@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from operation.models.crop import Crop
 from django.utils.translation import gettext_lazy as _
 from operation.models.partner_crop import PartnerCrop
@@ -115,7 +115,7 @@ def process_plan(modeladmin, request, queryset):
 
 
 
-class CropAdmin(admin.ModelAdmin):
+class CropAdmin(ProducerAwareMixin, admin.ModelAdmin):
     
     list_display = ['name','campaing', 'countryside', 'lot', 'activity']
     list_filter = ['campaing', 'activity', 'countryside']
@@ -148,21 +148,6 @@ class CropAdmin(admin.ModelAdmin):
             if userProducer:
                 return queryset.filter(producer=userProducer)
         return queryset.none()
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
-        if request.user.type == 'Producer':
-            return ['producer']
-        return readonly_fields
-
-    #  Limitar choices del campo en el formulario
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "producer":
-            if request.user.type == "Organization":
-                kwargs["queryset"] = UserProducer.objects.filter(association=request.user)
-            elif request.user.type == "Producer":
-                kwargs["queryset"] = UserProducer.objects.filter(email=request.user.email)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 adminSite.register(Crop, CropAdmin)

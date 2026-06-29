@@ -1,7 +1,7 @@
 from django.contrib import admin
 from producer.models.store import Store
 from user.models.user_producer import UserProducer
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from django.utils.translation import gettext_lazy as _
 from input.models.input_stock import InputStock
 
@@ -11,15 +11,21 @@ class StoreInputStockInline(admin.TabularInline):
     model = InputStock
     extra = 0
     fields = ['input', 'quantity']
+    readonly_fields = ['input', 'quantity']
     verbose_name = _('Input stock')
     verbose_name_plural = _('Input stock')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
     def has_delete_permission(self, request, obj=None):
         return False
 
 
-class StoreAdmin(admin.ModelAdmin):
-    exclude = ['producer']
+class StoreAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['name', 'address', 'city', 'default']
     inlines = [StoreInputStockInline,]
     

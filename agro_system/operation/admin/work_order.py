@@ -1,5 +1,5 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from operation.models.work_order import WorkOrder
 from operation.models.input_work_order import InputWorkOrder
 from django.utils.translation import gettext_lazy as _
@@ -77,7 +77,7 @@ def download_pdf(modeladmin, request, queryset):
     # Redirige a la vista personalizada
     return HttpResponseRedirect(url)
 
-class WorkOrderAdmin(admin.ModelAdmin):
+class WorkOrderAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['code', 'crop', 'stage', 'date_init', 'stateOT', 'type']
     list_filter = ['campaing','stage','stateOT', 'crop']
     search_fields = ['code', 'crop__name']
@@ -108,21 +108,6 @@ class WorkOrderAdmin(admin.ModelAdmin):
             if userProducer:
                 return queryset.filter(producer=userProducer)
         return queryset.none()
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
-        if request.user.type == 'Producer':
-            return ['producer']
-        return readonly_fields
-
-    #  Limitar choices del campo en el formulario
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "producer":
-            if request.user.type == "Organization":
-                kwargs["queryset"] = UserProducer.objects.filter(association=request.user)
-            elif request.user.type == "Producer":
-                kwargs["queryset"] = UserProducer.objects.filter(email=request.user.email)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 adminSite.register(WorkOrder, WorkOrderAdmin)

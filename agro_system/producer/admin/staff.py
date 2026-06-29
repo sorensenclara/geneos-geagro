@@ -1,31 +1,15 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from user.models.user_producer import UserProducer
 from producer.models.staff import Staff
 
 
-class StaffAdmin(admin.ModelAdmin):
+class StaffAdmin(ProducerAwareMixin, admin.ModelAdmin):
 
 
     list_display = ['name','surname','cuit','city','type','gender','user']
     list_filter = ['city','type','gender']
     search_fields = ['name', 'surname','cuit','city','type','gender']
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
-        if request.user.type == 'Producer':
-            return ['producer']
-        return readonly_fields
-
-    #  Limitar choices del campo en el formulario
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "producer":
-            if request.user.type == "Organization":
-                kwargs["queryset"] = UserProducer.objects.filter(association=request.user)
-            elif request.user.type == "Producer":
-                kwargs["queryset"] = UserProducer.objects.filter(email=request.user.email)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
 
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado

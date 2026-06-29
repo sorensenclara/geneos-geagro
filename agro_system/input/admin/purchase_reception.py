@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from input.models.purchase_reception import PurchaseReception
 from input.models.purchase_reception_detail import PurchaseReceptionDetail
 from user.models.user_producer import UserProducer
@@ -87,7 +87,7 @@ class DetalleRecepcionInline(admin.StackedInline):
             return [field.name for field in self.model._meta.fields]
         return super().get_readonly_fields(request, obj)
 
-class PurchaseReceptionAdmin(admin.ModelAdmin):
+class PurchaseReceptionAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['code', 'purchase_order', 'delivery_date', 'state', 'store']
     list_filter = ['state', 'store']
     search_fields = ['code', 'purchase_order__number']
@@ -121,20 +121,8 @@ class PurchaseReceptionAdmin(admin.ModelAdmin):
     
     
     def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
         if obj and obj.state == 'confirm':
             return [field.name for field in obj._meta.fields]
-
-        if request.user.type == 'Producer':
-            return ['producer']
-        return readonly_fields
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "producer":
-            if request.user.type == "Organization":
-                kwargs["queryset"] = UserProducer.objects.filter(association=request.user)
-            elif request.user.type == "Producer":
-                kwargs["queryset"] = UserProducer.objects.filter(email=request.user.email)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+        return super().get_readonly_fields(request, obj)
 
 adminSite.register(PurchaseReception, PurchaseReceptionAdmin)

@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from input.models.purchase_order import PurchaseOrder
 from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.purchase_reception import PurchaseReception
@@ -107,7 +107,7 @@ class PurchaseOrderDetailInline(admin.StackedInline):
             return [field.name for field in self.model._meta.fields]
         return super().get_readonly_fields(request, obj)
     
-class PurchaseOrderAdmin(admin.ModelAdmin):
+class PurchaseOrderAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['code', 'date', 'provider', 'store', 'state']
     list_filter = ['state', 'provider']
     search_fields = ['number']
@@ -148,22 +148,9 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
         return queryset.none()
         
     def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
         if obj and obj.state == 'confirm':
             return [field.name for field in obj._meta.fields]
-
-        if request.user.type == 'Producer':
-            return ['producer']
-        return readonly_fields
-
-    #  Limitar choices del campo en el formulario
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "producer":
-            if request.user.type == "Organization":
-                kwargs["queryset"] = UserProducer.objects.filter(association=request.user)
-            elif request.user.type == "Producer":
-                kwargs["queryset"] = UserProducer.objects.filter(email=request.user.email)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+        return super().get_readonly_fields(request, obj)
 
 
 adminSite.register(PurchaseOrder, PurchaseOrderAdmin)

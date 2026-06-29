@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from user.models.user_producer import UserProducer
 from input.models.stock_movement import StockMovement
 from input.models.input_stock import InputStock
@@ -8,7 +8,7 @@ from input.models.input_stock import InputStock
 AUTO_OPERATIONS = ('purchase', 'output', 'sale')
 
 
-class StockMovementAdmin(admin.ModelAdmin):
+class StockMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['date', 'operation', 'input', 'store', 'quantity', 'stock_before', 'stock_after', 'producer']
     list_filter = ['operation', 'store', 'date']
     search_fields = ['input__name', 'notes']
@@ -72,14 +72,6 @@ class StockMovementAdmin(admin.ModelAdmin):
             if producer:
                 return qs.filter(producer=producer)
         return qs.none()
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'producer':
-            if request.user.type == 'Organization':
-                kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
-            elif request.user.type == 'Producer':
-                kwargs['queryset'] = UserProducer.objects.filter(email=request.user.email)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 adminSite.register(StockMovement, StockMovementAdmin)

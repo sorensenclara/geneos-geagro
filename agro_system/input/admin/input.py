@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from producer.models.store import Store
 from input.models.provider import Provider
 from user.models.user_producer import UserProducer
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from input.models.purchase_order import PurchaseOrder
 from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.input import Input
@@ -21,8 +21,15 @@ class InputStockInline(admin.TabularInline):
     model = InputStock
     extra = 0
     fields = ['store', 'quantity']
+    readonly_fields = ['store', 'quantity']
     verbose_name = _('Stock per store')
     verbose_name_plural = _('Stock per store')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -87,7 +94,7 @@ class InputResource(resources.ModelResource):
         else:
             raise ValueError("No se pudo asignar el productor al insumo. Usuario no tiene un productor asociado.")
 
-class InputAdmin(ImportExportModelAdmin):
+class InputAdmin(ProducerAwareMixin, ImportExportModelAdmin):
     search_fields = ['name']
     inlines = [InputStockInline, PurchaseInline]
     list_display = ['name', 'type', 'cost', 'stock', 'min_stock', 'pending', 'producer']

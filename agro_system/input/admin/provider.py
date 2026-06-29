@@ -1,12 +1,11 @@
 from django.contrib import admin
 from input.models.provider import Provider
 from user.models.user_producer import UserProducer
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from django.utils.translation import gettext_lazy as _
 
 
-class ProviderAdmin(admin.ModelAdmin):
-    exclude=['producer']
+class ProviderAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['name', 'type', 'cuit', 'address', 'city', 'phone', 'email']
     list_filter = ['type', 'city']
     search_fields = ['name', 'cuit']

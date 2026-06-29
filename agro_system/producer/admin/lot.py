@@ -1,5 +1,5 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from producer.models.country_side import Countryside
 from user.models.user_producer import UserProducer
 # from producer.models.staff import Staff
@@ -8,7 +8,7 @@ from leaflet.admin import LeafletGeoAdmin
 
 # Register your models here.
 #class LotAdmin(admin.ModelAdmin):
-class LotAdmin(LeafletGeoAdmin):
+class LotAdmin(ProducerAwareMixin, LeafletGeoAdmin):
     list_display = ['name', 'countryside', 'responsible', 'hectares_productive', 'cost_center']
     list_filter = ['responsible']
     search_fields = ['name']

@@ -53,6 +53,8 @@ class StorageCertificate(models.Model):
         )['total'] or 0
         return self.quantity_entry - exits
 
+    quantity_available.fget.short_description = _('quantity available (tons)')
+
     def __str__(self):
         return f"{self.number} - {self.storage_provider} ({self.specie})"
 

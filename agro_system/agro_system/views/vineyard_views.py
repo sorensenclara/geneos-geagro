@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
@@ -9,6 +10,34 @@ from operation.models.technical_plan import TechnicalPlan
 from operation.models.work_order import WorkOrder
 from producer.models.staff import Staff
 from operation.models.crop import Crop
+from agro_system.views.filter_helpers import read_filter, get_producer_ref
+
+from storage.models.silo import Silo
+from storage.models.silo_movement import SiloMovement
+from storage.models.storage_certificate import StorageCertificate
+from storage.models.storage_movement import StorageMovement
+from operation.models.crop_yields import CropYields
+
+
+def _build_crops_yield_detail(crops_qs):
+    """Devuelve lista de dicts con rinde estimado/real por cultivo para mostrar en detalle."""
+    result = []
+    for crop in crops_qs.select_related('activity', 'lot', 'activity__specie'):
+        cy = CropYields.objects.filter(crop=crop).first()
+        est  = cy.yields_estimate if cy else None
+        real = cy.yields_real if cy else None
+        pct  = round((real / est * 100)) if est and real else None
+        result.append({
+            'crop':     crop,
+            'specie':   crop.activity.specie.name if crop.activity and crop.activity.specie else '—',
+            'activity': str(crop.activity) if crop.activity else '—',
+            'lot':      str(crop.lot) if crop.lot else '—',
+            'ha':       crop.hectares_planted or 0,
+            'est':      est,
+            'real':     real,
+            'pct':      pct,
+        })
+    return result
 
 
 @login_required
@@ -17,8 +46,7 @@ def VineyardView(request):
     # =========================================================
     # filtros desde topbar/dashboard
     # =========================================================
-    campaing_id = request.GET.get('campaing')
-    crop_id = request.GET.get('crop')
+    campaing_id, crop_id = read_filter(request)
 
     user = request.user
 
@@ -26,10 +54,11 @@ def VineyardView(request):
     # DEV ORIGINAL - visibilidad según tipo usuario
     # =========================================================
     if user.type == 'Producer':
-        country_sides = Countryside.objects.filter(producer=user)
-        technical_plans = TechnicalPlan.objects.filter(producer=user)
-        staff = Staff.objects.filter(producer=user)
-        crops_base = Crop.objects.filter(producer=user)
+        _p = get_producer_ref(user)
+        country_sides = Countryside.objects.filter(producer=_p)
+        technical_plans = TechnicalPlan.objects.filter(producer=_p)
+        staff = Staff.objects.filter(producer=_p)
+        crops_base = Crop.objects.filter(producer=_p)
 
     elif user.type == 'Staff':
         staff_instance = Staff.objects.filter(user=user).first()
@@ -105,6 +134,78 @@ def VineyardView(request):
         total=Sum('hectares_productive')
     )['total'] or 0
 
+    # =========================================================
+    # ACOPIO por campo
+    # =========================================================
+    producer_ref = get_producer_ref(user)
+
+    sf = {'producer': producer_ref} if producer_ref else {}
+
+    # Silos con stock calculado
+    silos_qs = Silo.objects.filter(active=True, **sf).select_related('countryside', 'type')
+    silos_con_stock = []
+    for silo in silos_qs:
+        s_in  = SiloMovement.objects.filter(silo=silo, type='entry').aggregate(t=Sum('quantity_tons'))['t'] or 0
+        s_out = SiloMovement.objects.filter(silo=silo, type__in=['exit', 'transfer']).aggregate(t=Sum('quantity_tons'))['t'] or 0
+        silos_con_stock.append({
+            'silo': silo,
+            'stock': round(max(0, s_in - s_out), 2),
+            'capacity': silo.capacity_tons,
+            'pct': min(100, round((max(0, s_in - s_out) / silo.capacity_tons * 100) if silo.capacity_tons else 0)),
+        })
+
+    acopio_silo_total = sum(s['stock'] for s in silos_con_stock)
+
+    # Certificados de acopio externo activos
+    certs_activos = StorageCertificate.objects.filter(
+        state__in=['active', 'partial'], **sf
+    ).select_related('storage_provider', 'specie', 'campaing')
+
+    # Stock disponible por certificado
+    certs_con_stock = []
+    cert_total_entry = 0
+    cert_total_disponible = 0
+    for cert in certs_activos:
+        exits = StorageMovement.objects.filter(
+            certificate=cert,
+            type__in=['sale_exit', 'withdrawal', 'transfer']
+        ).aggregate(t=Sum('quantity_tons'))['t'] or 0
+        disponible = max(0, cert.quantity_entry - exits)
+        cert_total_entry += cert.quantity_entry
+        cert_total_disponible += disponible
+        certs_con_stock.append({
+            'cert': cert,
+            'disponible': round(disponible, 2),
+            'entrada': cert.quantity_entry,
+        })
+
+    # Chart ventas últimas campañas (reutiliza datos del dashboard)
+    recent_campaigns = list(reversed(list(Campaing.objects.order_by('-date_init')[:5])))
+    chart_labels   = [c.name for c in recent_campaigns]
+    chart_acopiado = []
+    chart_vendido  = []
+    for camp in recent_campaigns:
+        date_fin = camp.date_final
+        si_in = SiloMovement.objects.filter(type='entry', date__gte=camp.date_init, **sf)
+        if date_fin:
+            si_in = si_in.filter(date__lte=date_fin)
+        si_in = si_in.aggregate(t=Sum('quantity_tons'))['t'] or 0
+
+        ci_in = StorageCertificate.objects.filter(campaing=camp, **sf).aggregate(t=Sum('quantity_entry'))['t'] or 0
+
+        si_out = SiloMovement.objects.filter(type='exit', date__gte=camp.date_init, **sf)
+        if date_fin:
+            si_out = si_out.filter(date__lte=date_fin)
+        si_out = si_out.aggregate(t=Sum('quantity_tons'))['t'] or 0
+
+        ci_out_f = {'certificate__campaing': camp}
+        if producer_ref:
+            ci_out_f['certificate__producer'] = producer_ref
+        ci_out = StorageMovement.objects.filter(type='sale_exit', **ci_out_f).aggregate(t=Sum('quantity_tons'))['t'] or 0
+
+        chart_acopiado.append(round(si_in + ci_in, 2))
+        chart_vendido.append(round(si_out + ci_out, 2))
+
     data = {
         'technical_plans': technical_plans,
         'staff': staff,
@@ -122,6 +223,21 @@ def VineyardView(request):
         'main_crop': main_crop,
 
         'total_productive_hectares': total_productive_hectares,
+
+        # Acopio
+        'silos_con_stock': silos_con_stock,
+        'acopio_silo_total': round(acopio_silo_total, 2),
+        'certs_con_stock': certs_con_stock,
+        'acopio_externo_total': round(cert_total_disponible, 2),
+        'acopio_total': round(acopio_silo_total + cert_total_disponible, 2),
+
+        # Chart
+        'chart_labels_json': json.dumps(chart_labels),
+        'chart_acopiado_json': json.dumps(chart_acopiado),
+        'chart_vendido_json': json.dumps(chart_vendido),
+
+        # Detalle rendimiento por cultivo de la campaña seleccionada
+        'crops_yield_detail': _build_crops_yield_detail(crops),
     }
 
     return render(request, 'pages/vineyard.html', data)

@@ -35,6 +35,11 @@ class StorageMovement(models.Model):
     notes = models.TextField(blank=True, verbose_name=_('notes'))
     producer = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, verbose_name=_('producer'))
 
+    def save(self, *args, **kwargs):
+        if not self.producer_id:
+            self.producer = self.certificate.producer
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.get_type_display()} - {self.certificate} ({self.date})"
 

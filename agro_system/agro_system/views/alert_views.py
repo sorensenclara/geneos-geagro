@@ -9,6 +9,7 @@ from producer.models.country_side import Countryside
 from producer.models.lot import Lot
 from parameter.models.campaign import Campaing
 from producer.models.staff import Staff
+from agro_system.views.filter_helpers import read_filter
 
 @login_required
 def AlertView(request):
@@ -18,8 +19,7 @@ def AlertView(request):
     # =========================================================
     countryside_id = request.GET.get('countryside')
     lot_id = request.GET.get('lot')
-    campaing_id = request.GET.get('campaing')
-    crop_id = request.GET.get('crop')
+    campaing_id, crop_id = read_filter(request)
     selected_status = request.GET.get('status')
     search_query = request.GET.get('q')
 

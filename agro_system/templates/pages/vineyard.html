@@ -245,4 +245,269 @@
 
 </div>
 
+<!-- SECCIÓN ACOPIO -->
+<div class="geagro-dashboard-title mb-3 mt-2">
+  <h2 style="font-size:1.2rem; font-weight:600;">Acopio de granos</h2>
+</div>
+
+<!-- KPIs acopio -->
+<div class="row mb-4">
+
+  <div class="col-xl-4 col-md-6 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="geagro-card-header">
+          <h5 class="card-title">Silos propios</h5>
+          <i class="mdi mdi-silo geagro-card-icon text-primary"></i>
+        </div>
+        <div class="geagro-kpi-value">{{ acopio_silo_total|floatformat:1 }} tn</div>
+        <p class="geagro-kpi-meta mb-0">Stock total en silos</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-4 col-md-6 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="geagro-card-header">
+          <h5 class="card-title">Acopio externo</h5>
+          <i class="mdi mdi-warehouse geagro-card-icon text-info"></i>
+        </div>
+        <div class="geagro-kpi-value">{{ acopio_externo_total|floatformat:1 }} tn</div>
+        <p class="geagro-kpi-meta mb-0">Disponible en certificados</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-4 col-md-6 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="geagro-card-header">
+          <h5 class="card-title">Total en stock</h5>
+          <i class="mdi mdi-chart-bar-stacked geagro-card-icon text-warning"></i>
+        </div>
+        <div class="geagro-kpi-value">{{ acopio_total|floatformat:1 }} tn</div>
+        <p class="geagro-kpi-meta mb-0">Silos + acopio externo</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Silos y certificados -->
+<div class="row mb-4">
+
+  <!-- Silos con stock -->
+  <div class="col-xl-6 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Estado de silos</h5>
+        {% if silos_con_stock %}
+          {% for s in silos_con_stock %}
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="fw-semibold">{{ s.silo.name }}</span>
+              <span class="text-muted small">{{ s.stock|floatformat:1 }} / {{ s.capacity|floatformat:0 }} tn</span>
+            </div>
+            <div class="geagro-progress-summary">
+              <div class="progress-track">
+                <span style="width:{{ s.pct }}%; background:{% if s.pct > 80 %}#f46a6a{% elif s.pct > 50 %}#f1b44c{% else %}#34c38f{% endif %};"></span>
+              </div>
+            </div>
+            <div class="text-muted small mt-1">{{ s.silo.type }} · {{ s.silo.countryside }} · {{ s.pct }}% lleno</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-muted text-center py-3">Sin silos registrados</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Certificados de acopio externo -->
+  <div class="col-xl-6 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Certificados de acopio</h5>
+        {% if certs_con_stock %}
+          <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Nro.</th>
+                  <th>Acopiador</th>
+                  <th>Especie</th>
+                  <th class="text-end">Entrada</th>
+                  <th class="text-end">Disponible</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in certs_con_stock %}
+                <tr>
+                  <td class="small">{{ c.cert.number }}</td>
+                  <td class="small">{{ c.cert.storage_provider }}</td>
+                  <td class="small">{{ c.cert.specie }}</td>
+                  <td class="text-end small">{{ c.entrada|floatformat:1 }} tn</td>
+                  <td class="text-end small fw-semibold">{{ c.disponible|floatformat:1 }} tn</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-muted text-center py-3">Sin certificados activos</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- RENDIMIENTO POR CULTIVO -->
+{% if crops_yield_detail %}
+<div class="card mb-4">
+  <div class="card-body">
+
+    <div class="d-flex align-items-start justify-content-between mb-3">
+      <div>
+        <h5 class="card-title mb-1">Rendimiento por cultivo</h5>
+        <div class="text-muted small">
+          Campaña
+          {% if selected_campaing %}{{ selected_campaing.name }}{% endif %}
+          — estimado vs cosechado (tn/ha)
+        </div>
+      </div>
+      <i class="mdi mdi-sprout font-size-24 text-success"></i>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Especie</th>
+            <th>Actividad</th>
+            <th>Lote</th>
+            <th class="text-end">Ha plantadas</th>
+            <th class="text-end">Estimado</th>
+            <th class="text-end">Real</th>
+            <th style="min-width:140px;">Logro</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in crops_yield_detail %}
+          <tr>
+            <td><span class="badge bg-light text-dark border">{{ row.specie }}</span></td>
+            <td>{{ row.activity }}</td>
+            <td class="text-muted small">{{ row.lot }}</td>
+            <td class="text-end">{{ row.ha|floatformat:1 }} ha</td>
+            <td class="text-end">
+              {% if row.est %}{{ row.est|floatformat:2 }} tn/ha{% else %}<span class="text-muted">—</span>{% endif %}
+            </td>
+            <td class="text-end fw-semibold">
+              {% if row.real %}
+                <span class="{% if row.pct >= 90 %}text-success{% elif row.pct >= 70 %}text-warning{% else %}text-danger{% endif %}">
+                  {{ row.real|floatformat:2 }} tn/ha
+                </span>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if row.pct is not None %}
+              <div class="d-flex align-items-center gap-2">
+                <div class="geagro-progress-summary flex-grow-1 mb-0">
+                  <div class="progress-track">
+                    <span style="width:{{ row.pct|floatformat:0 }}%; background:{% if row.pct >= 90 %}#34c38f{% elif row.pct >= 70 %}#f1b44c{% else %}#f46a6a{% endif %};"></span>
+                  </div>
+                </div>
+                <span class="small fw-semibold" style="min-width:36px;">{{ row.pct }}%</span>
+              </div>
+              {% else %}
+              <span class="text-muted small">Sin datos</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+{% endif %}
+
+<!-- Chart acopiado vs vendido -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <div>
+            <h5 class="card-title mb-1">Acopiado vs Vendido por campaña</h5>
+            <div class="text-muted small">Toneladas ingresadas en almacenamiento y salidas por venta</div>
+          </div>
+          <i class="mdi mdi-chart-bar font-size-24 text-primary"></i>
+        </div>
+        <div style="position:relative; height:280px;">
+          <canvas id="chartVineyardAcopio"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
+
+{% block extra_javascript %}
+<script src="{% static 'libs/chart.js/dist/Chart.min.js' %}"></script>
+<script>
+(function () {
+  'use strict';
+  var labels   = {{ chart_labels_json|safe }};
+  var acopiado = {{ chart_acopiado_json|safe }};
+  var vendido  = {{ chart_vendido_json|safe }};
+
+  var ctx = document.getElementById('chartVineyardAcopio');
+  if (!ctx) return;
+
+  new Chart(ctx.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Acopiado (tn)',
+          data: acopiado,
+          backgroundColor: 'rgba(52, 120, 246, 0.75)',
+          borderColor: 'rgba(52, 120, 246, 1)',
+          borderWidth: 1,
+        },
+        {
+          label: 'Vendido (tn)',
+          data: vendido,
+          backgroundColor: 'rgba(52, 195, 143, 0.75)',
+          borderColor: 'rgba(52, 195, 143, 1)',
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      legend: { position: 'bottom', labels: { boxWidth: 12, fontSize: 11 } },
+      scales: {
+        xAxes: [{ gridLines: { display: false }, ticks: { fontSize: 12 } }],
+        yAxes: [{ ticks: { beginAtZero: true, fontSize: 12 }, gridLines: { color: 'rgba(0,0,0,0.05)' } }],
+      },
+      tooltips: {
+        callbacks: {
+          label: function (item, data) {
+            return data.datasets[item.datasetIndex].label + ': ' + item.yLabel.toLocaleString('es-AR') + ' tn';
+          },
+        },
+      },
+    },
+  });
+})();
+</script>
+{% endblock extra_javascript %}

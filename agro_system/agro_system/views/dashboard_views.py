@@ -1,6 +1,8 @@
+import json
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.db.models import Sum, Avg
 
 from producer.models.lot import Lot
 from producer.models.country_side import Countryside
@@ -11,6 +13,7 @@ from parameter.models.campaign import Campaing
 from operation.models.technical_plan import TechnicalPlan
 from operation.models.work_order import WorkOrder
 from operation.models.crop import Crop
+from operation.models.crop_yields import CropYields
 
 from weather.models.weather_data import WeatherData
 from weather.models.station_weather import WeatherStation
@@ -18,14 +21,27 @@ from weather.models.station_weather import WeatherStation
 from alert.models.alert import Alert
 from operation.models.input_work_order import InputWorkOrder
 
+from storage.models.silo_movement import SiloMovement
+from storage.models.storage_certificate import StorageCertificate
+from storage.models.storage_movement import StorageMovement
+
+from agro_system.views.filter_helpers import get_producer_ref
+
 # Panel principal
 @login_required
 def DashboardView(request):
 
     countryside_id = request.GET.get('countryside')
     lot_id = request.GET.get('lot')
-    campaing_id = request.GET.get('campaing')
-    crop_id = request.GET.get('crop')
+
+    # Persistir selección en sesión
+    if 'campaing' in request.GET:
+        request.session['filter_campaing_id'] = request.GET.get('campaing') or None
+    if 'crop' in request.GET:
+        request.session['filter_crop_id'] = request.GET.get('crop') or None
+
+    campaing_id = request.GET.get('campaing') or request.session.get('filter_campaing_id')
+    crop_id = request.GET.get('crop') or request.session.get('filter_crop_id')
 
     user = request.user
     staff = None
@@ -36,8 +52,9 @@ def DashboardView(request):
         crops = Crop.objects.filter(responsible=staff)
 
     elif user.type == 'Producer':
-        country_sides = Countryside.objects.filter(producer=user)
-        crops = Crop.objects.filter(producer=user)
+        _p = get_producer_ref(user)
+        country_sides = Countryside.objects.filter(producer=_p)
+        crops = Crop.objects.filter(producer=_p)
 
     elif user.type == 'Administration':
         country_sides = Countryside.objects.all()
@@ -268,6 +285,119 @@ def DashboardView(request):
         station = selected_crop.lot.station
         weather_data = WeatherData.objects.filter(station=station).last()
 
+    # =========================================================
+    # ACOPIO
+    # =========================================================
+    producer_ref = get_producer_ref(user)
+
+    sf = {'producer': producer_ref} if producer_ref else {}
+
+    silo_in  = SiloMovement.objects.filter(type='entry', **sf).aggregate(t=Sum('quantity_tons'))['t'] or 0
+    silo_out = SiloMovement.objects.filter(type__in=['exit', 'transfer'], **sf).aggregate(t=Sum('quantity_tons'))['t'] or 0
+    acopio_silo_stock = round(max(0, silo_in - silo_out), 2)
+
+    cert_qs   = StorageCertificate.objects.filter(state__in=['active', 'partial'], **sf)
+    cert_in   = cert_qs.aggregate(t=Sum('quantity_entry'))['t'] or 0
+    cert_out  = StorageMovement.objects.filter(
+        type__in=['sale_exit', 'withdrawal', 'transfer'],
+        **({'certificate__producer': producer_ref} if producer_ref else {})
+    ).aggregate(t=Sum('quantity_tons'))['t'] or 0
+    acopio_externo_stock = round(max(0, cert_in - cert_out), 2)
+
+    # =========================================================
+    # CHART: Acopiado vs Vendido por campaña (últimas 5)
+    # =========================================================
+    recent_campaigns = Campaing.objects.order_by('-date_init')[:5]
+    recent_campaigns = list(reversed(list(recent_campaigns)))
+
+    chart_labels   = []
+    chart_acopiado = []
+    chart_vendido  = []
+
+    for camp in recent_campaigns:
+        chart_labels.append(camp.name)
+
+        date_fin = camp.date_final
+
+        silo_in_c = SiloMovement.objects.filter(type='entry', date__gte=camp.date_init, **sf)
+        if date_fin:
+            silo_in_c = silo_in_c.filter(date__lte=date_fin)
+        silo_in_c = silo_in_c.aggregate(t=Sum('quantity_tons'))['t'] or 0
+
+        cert_in_c = StorageCertificate.objects.filter(campaing=camp, **sf).aggregate(t=Sum('quantity_entry'))['t'] or 0
+
+        silo_out_c = SiloMovement.objects.filter(type='exit', date__gte=camp.date_init, **sf)
+        if date_fin:
+            silo_out_c = silo_out_c.filter(date__lte=date_fin)
+        silo_out_c = silo_out_c.aggregate(t=Sum('quantity_tons'))['t'] or 0
+
+        cert_out_c = StorageMovement.objects.filter(
+            type='sale_exit',
+            **({'certificate__campaing': camp, 'certificate__producer': producer_ref} if producer_ref else {'certificate__campaing': camp})
+        ).aggregate(t=Sum('quantity_tons'))['t'] or 0
+
+        chart_acopiado.append(round(silo_in_c + cert_in_c, 2))
+        chart_vendido.append(round(silo_out_c + cert_out_c, 2))
+
+    # =========================================================
+    # RENDIMIENTO: estimado vs real del cultivo seleccionado (card)
+    # =========================================================
+    yield_estimate = None
+    yield_real = None
+    if selected_crop:
+        cy = CropYields.objects.filter(crop=selected_crop).first()
+        if cy:
+            yield_estimate = cy.yields_estimate
+            yield_real = cy.yields_real
+
+    # =========================================================
+    # CHART RENDIMIENTO: por especie a través de campañas (Opción A)
+    # Promedio tn/ha de cada especie en cada una de las últimas 5 campañas
+    # =========================================================
+    from parameter.models.specie import Specie
+
+    species_filter = {'crop__cropYields__isnull': False}
+    if producer_ref:
+        species_filter['crop__producer'] = producer_ref
+
+    active_species = Specie.objects.filter(
+        activity__crop__campaing__in=recent_campaigns,
+        **({'activity__crop__producer': producer_ref} if producer_ref else {})
+    ).distinct()
+
+    chart_species = []
+    SPECIES_COLORS = [
+        ('rgba(52,195,143,0.8)',  'rgba(52,195,143,1)'),   # verde — soja
+        ('rgba(241,180,76,0.8)', 'rgba(241,180,76,1)'),    # amarillo — trigo
+        ('rgba(244,106,106,0.8)','rgba(244,106,106,1)'),   # rojo — maíz
+        ('rgba(85,110,230,0.8)', 'rgba(85,110,230,1)'),    # azul — girasol
+        ('rgba(52,195,195,0.8)', 'rgba(52,195,195,1)'),    # turquesa
+    ]
+
+    for idx, specie in enumerate(active_species[:5]):
+        color_fill, color_border = SPECIES_COLORS[idx % len(SPECIES_COLORS)]
+        est_per_camp  = []
+        real_per_camp = []
+
+        for camp in recent_campaigns:
+            f = {'crop__campaing': camp, 'crop__activity__specie': specie}
+            if producer_ref:
+                f['crop__producer'] = producer_ref
+
+            est  = CropYields.objects.filter(**f).aggregate(v=Avg('yields_estimate'))['v']
+            real = CropYields.objects.filter(**f).aggregate(v=Avg('yields_real'))['v']
+
+            est_per_camp.append(round(est, 2) if est is not None else None)
+            real_per_camp.append(round(real, 2) if real is not None else None)
+
+        chart_species.append({
+            'name':      specie.name,
+            'estimado':  est_per_camp,
+            'real':      real_per_camp,
+            'color':     color_fill,
+            'border':    color_border,
+        })
+
     data = {
         'country_sides': country_sides,
         'lots': lots,
@@ -314,6 +444,23 @@ def DashboardView(request):
         'work_orders_pending': work_orders_pending,
         'work_orders_completed_percent': work_orders_completed_percent,
         'campaign_days_remaining': campaign_days_remaining,
+
+        # Acopio
+        'acopio_silo_stock': acopio_silo_stock,
+        'acopio_externo_stock': acopio_externo_stock,
+        'acopio_total': round(acopio_silo_stock + acopio_externo_stock, 2),
+
+        # Chart acopiado vs vendido
+        'chart_labels_json': json.dumps(chart_labels),
+        'chart_acopiado_json': json.dumps(chart_acopiado),
+        'chart_vendido_json': json.dumps(chart_vendido),
+
+        # Chart rendimiento por especie y campaña
+        'chart_species_json': json.dumps(chart_species),
+
+        # Rendimiento del cultivo seleccionado (para la card)
+        'yield_estimate': yield_estimate,
+        'yield_real': yield_real,
     }
 
     return render(request, 'pages/dashboard.html', data)

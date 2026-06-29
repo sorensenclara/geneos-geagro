@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-26 13:33-0300\n"
+"POT-Creation-Date: 2026-06-29 10:48-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1282,7 +1282,7 @@ msgstr "Acopio"
 
 #: storage/models/silo.py:14
 msgid "capacity (tons)"
-msgstr "Capacidad (toneladas)"
+msgstr "Capacidad (tn)"
 
 #: storage/models/silo.py:17
 msgid "Optional. Used for bag silos located in a specific lot."
@@ -1316,7 +1316,7 @@ msgstr "Stock del silo"
 #: storage/models/silo_movement.py:26 storage/models/silo_stock.py:17
 #: storage/models/storage_movement.py:27
 msgid "quantity (tons)"
-msgstr "Cantidad (toneladas)"
+msgstr "Cantidad (tn)"
 
 #: storage/models/silo_movement.py:28
 msgid "destination silo"
@@ -1334,11 +1334,11 @@ msgstr "Venta relacionada"
 msgid "remito number"
 msgstr "Numero de remito"
 
-#: storage/models/silo_movement.py:42
+#: storage/models/silo_movement.py:47
 msgid "silo movement"
 msgstr "Movimiento de silo"
 
-#: storage/models/silo_movement.py:43
+#: storage/models/silo_movement.py:48
 msgid "silo movements"
 msgstr "Movimientos de silo"
 
@@ -1396,7 +1396,7 @@ msgstr "Proveedor de acopio"
 
 #: storage/models/storage_certificate.py:36
 msgid "quantity at entry (tons)"
-msgstr "Cantidad al ingreso (toneladas)"
+msgstr "Cantidad al ingreso (tn)"
 
 #: storage/models/storage_certificate.py:37
 msgid "humidity at entry (%)"
@@ -1454,25 +1454,29 @@ msgstr "Certificado"
 msgid "destination"
 msgstr "Destino"
 
-#: storage/models/storage_movement.py:42
+#: storage/models/storage_movement.py:47
 msgid "storage movement"
 msgstr "Movimiento de acopio"
 
-#: storage/models/storage_movement.py:43
+#: storage/models/storage_movement.py:48
 msgid "storage movements"
 msgstr "Movimientos de acopio"
 
 #: storage/models/storage_service.py:17
 msgid "quantity affected (tons)"
-msgstr "Cantidad afectada (toneladas)"
+msgstr "Cantidad afectada (tn)"
 
 #: storage/models/storage_service.py:18
 msgid "shrinkage (tons)"
-msgstr "Merma (toneladas)"
+msgstr "Merma (tn)"
 
 #: storage/models/storage_service.py:19
 msgid "resulting humidity (%)"
 msgstr "Humedad resultante (%)"
+
+#: storage/models/storage_certificate.py
+msgid "quantity available (tons)"
+msgstr "Cantidad disponible (tn)"
 
 #: storage/models/storage_service.py:28
 msgid "storage service"
@@ -1639,7 +1643,7 @@ msgstr "Stock de seguridad"
 
 #: templates/admin/input/charts.html:145
 msgid "Quantity"
-msgstr "Cntidad"
+msgstr "Cantidad"
 
 #: templates/admin/login.html:25
 #, python-format

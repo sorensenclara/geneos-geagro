@@ -1,4 +1,5 @@
 # myapp/admin.py
+from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum
@@ -141,3 +142,51 @@ class MiAdmin(AdminSite):
 
 
 adminSite = MiAdmin(name='miadmin')
+
+
+PRODUCER_TYPES = ('Producer', 'Staff', 'Organization')
+
+
+class ProducerAwareMixin:
+    """
+    Permite que usuarios Producer/Staff/Organization vean y gestionen los modelos
+    del admin sin necesitar permisos Django explícitos.
+    - Producer: solo puede ver y agregar. No puede modificar ni eliminar.
+    - Staff/Organization: puede ver, agregar y modificar. No puede eliminar.
+    El filtrado de datos por productor se delega a get_queryset() de cada ModelAdmin.
+    """
+
+    def has_module_permission(self, request):
+        if request.user.is_active and request.user.type in PRODUCER_TYPES:
+            return True
+        return super().has_module_permission(request)
+
+    def has_view_permission(self, request, obj=None):
+        if request.user.is_active and request.user.type in PRODUCER_TYPES:
+            return True
+        return super().has_view_permission(request, obj)
+
+    def has_add_permission(self, request):
+        if request.user.is_active and request.user.type in PRODUCER_TYPES:
+            return True
+        return super().has_add_permission(request)
+
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_active and request.user.type in ('Staff', 'Organization'):
+            return True
+        if request.user.is_active and request.user.type == 'Producer':
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        # Ningún tipo no-admin puede eliminar registros desde el admin
+        if request.user.is_active and request.user.type in PRODUCER_TYPES:
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def get_exclude(self, request, obj=None):
+        excluded = list(super().get_exclude(request, obj) or [])
+        if not (request.user.is_superuser or request.user.type == 'Administration'):
+            if 'producer' not in excluded:
+                excluded.append('producer')
+        return excluded

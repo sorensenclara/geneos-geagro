@@ -115,6 +115,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'agro_system.context_processors.topbar_filter',
             ],
         },
     },
@@ -368,7 +369,7 @@ JAZZMIN_SETTINGS = {
     # PERSONALIZACIÓN DE LA INTERFAZ
 
     "custom_css": "css/jazzmin_custom.css",
-    "custom_js": None,
+    "custom_js": "js/sidebar_scroll.js",
     # Whether to link font from fonts.googleapis.com (use custom_css to supply font otherwise)
     "use_google_fonts_cdn": True,
     # Whether to show the UI customizer on the sidebar
@@ -406,7 +407,7 @@ JAZZMIN_UI_TWEAKS = {
     "navbar_fixed": True,
     "layout_boxed": False,
     "footer_fixed": True,
-    "sidebar_fixed": False,
+    "sidebar_fixed": True,
     "actions_sticky_top": False,
     "sidebar": "sidebar-dark-primary",
     "sidebar_nav_small_text": False,

@@ -463,6 +463,36 @@ button:active {
 .card-body {
     overflow: visible;
 }
+
+/* =========================================================
+   9b. SIDEBAR SCROLL INDEPENDIENTE
+   sidebar_fixed:True agrega layout-fixed al body, lo que
+   hace que .main-sidebar sea position:fixed con height:100vh.
+   Refinamos el scroll y la scrollbar con el ID #jazzy-sidebar.
+========================================================= */
+#jazzy-sidebar .sidebar {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* scrollbar fina estilizada */
+#jazzy-sidebar .sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+#jazzy-sidebar .sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+#jazzy-sidebar .sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+}
+#jazzy-sidebar .sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.45);
+}
+#jazzy-sidebar .sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.25) transparent;
+}
 /* ==========================================================
    10. ADMIN DASHBOARD AGRONÓMICO
 ========================================================== */

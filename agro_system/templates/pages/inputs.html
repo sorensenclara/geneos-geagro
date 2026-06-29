@@ -1,0 +1,388 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block title %}Insumos{% endblock %}
+
+{% block content %}
+
+<div class="geagro-dashboard-title mb-3">
+  <h1>Insumos</h1>
+  <div class="geagro-dashboard-context">
+    <span>Stock, movimientos y órdenes de compra</span>
+    {% if selected_crop %}
+      <i class="mdi mdi-chevron-right"></i>
+      <span>CULTIVO: {{ selected_crop.activity|default:selected_crop }}</span>
+    {% endif %}
+  </div>
+</div>
+
+<!-- FILTRO ALMACÉN -->
+<div class="card mb-4" style="border-left:3px solid #556ee6;">
+  <div class="card-body py-3">
+    <form method="get" class="d-flex align-items-center gap-3 flex-wrap">
+      <i class="mdi mdi-warehouse text-primary" style="font-size:20px;"></i>
+      <span class="fw-semibold text-muted small text-uppercase" style="letter-spacing:.05em;">Almacén</span>
+      <select name="store" class="form-select form-select-sm" style="max-width:260px;" onchange="this.form.submit()">
+        <option value="">Todos los almacenes</option>
+        {% for s in stores %}
+          <option value="{{ s.id }}" {% if selected_store.id == s.id %}selected{% endif %}>{{ s.name }}</option>
+        {% endfor %}
+      </select>
+      {% if selected_store %}
+        <a href="?store=" class="btn btn-sm btn-outline-secondary">
+          <i class="mdi mdi-close-circle-outline"></i> Limpiar
+        </a>
+        <span class="text-muted small">Mostrando stock real calculado desde movimientos</span>
+      {% else %}
+        <span class="text-muted small">Mostrando stock total acumulado del sistema</span>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="row g-3 mb-4">
+
+  <!-- ALERTAS: lista de nombres, no contador -->
+  <div class="col-xl-5">
+    <div class="card h-100 {% if sin_stock or bajo_minimo %}border-danger border-opacity-50{% endif %}">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <h5 class="card-title mb-0">Necesitan restock</h5>
+          <i class="mdi mdi-alert-circle-outline geagro-card-icon {% if sin_stock %}text-danger{% elif bajo_minimo %}text-warning{% else %}text-success{% endif %}"></i>
+        </div>
+
+        {% if sin_stock %}
+        <div class="mb-2">
+          <div class="text-muted small fw-semibold mb-1 text-uppercase" style="letter-spacing:.04em;">Sin stock</div>
+          {% for name in sin_stock %}
+            <span class="badge me-1 mb-1" style="background:#fdeeed;color:#b94a3a;font-size:12px;">{{ name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if bajo_minimo %}
+        <div class="mb-1">
+          <div class="text-muted small fw-semibold mb-1 text-uppercase" style="letter-spacing:.04em;">Bajo mínimo</div>
+          {% for name in bajo_minimo %}
+            <span class="badge me-1 mb-1" style="background:#fef9ec;color:#926b15;font-size:12px;">{{ name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if not sin_stock and not bajo_minimo %}
+          <div class="d-flex align-items-center gap-2 mt-2">
+            <i class="mdi mdi-check-circle-outline text-success" style="font-size:22px;"></i>
+            <span class="text-success fw-semibold">Todo en nivel correcto</span>
+          </div>
+          <p class="text-muted small mb-0 mt-1">
+            {% if selected_store %}En {{ selected_store.name }}{% else %}En todos los almacenes{% endif %}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- VALOR EN STOCK -->
+  <div class="col-xl-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="geagro-card-header">
+          <h5 class="card-title">Valor en stock</h5>
+          <i class="mdi mdi-cash-multiple geagro-card-icon text-success"></i>
+        </div>
+        <div class="geagro-kpi-value">$ {{ total_valor|floatformat:0 }}</div>
+        <p class="geagro-kpi-meta mb-0">
+          {% if selected_store %}
+            Costo × stock en <strong>{{ selected_store.name }}</strong>
+          {% else %}
+            Stock total global · {{ inputs_data|length }} insumos
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OC PENDIENTES -->
+  <div class="col-xl-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="geagro-card-header">
+          <h5 class="card-title">OC pendientes</h5>
+          <i class="mdi mdi-cart-outline geagro-card-icon text-warning"></i>
+        </div>
+        <div class="geagro-kpi-value">{{ oc_pendientes_count }}</div>
+        <p class="geagro-kpi-meta mb-0">
+          Órdenes sin confirmar{% if selected_store %} · {{ selected_store.name }}{% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TABLA DE STOCK -->
+<div class="card mb-4">
+  <div class="card-body">
+
+    <div class="d-flex align-items-start justify-content-between mb-3">
+      <div>
+        <h5 class="card-title mb-1">
+          Estado de stock
+          {% if selected_store %}<span class="text-muted fw-normal fs-6">— {{ selected_store.name }}</span>{% endif %}
+        </h5>
+        <div class="text-muted small">
+          {% if selected_store %}Stock calculado desde movimientos del almacén{% else %}Stock acumulado total · mínimo global · proyectado con pedidos en curso{% endif %}
+        </div>
+      </div>
+      <div class="d-flex gap-2 align-items-center small">
+        <span class="badge" style="background:#e8f5e2;color:#3a6b30;border:1px solid #acd4a0;">OK</span>
+        <span class="badge" style="background:#fef9ec;color:#926b15;border:1px solid #d4a926;">Bajo mín.</span>
+        <span class="badge" style="background:#fdeeed;color:#b94a3a;border:1px solid #d47a72;">Sin stock</span>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Insumo</th>
+            <th>Tipo</th>
+            <th class="text-end">Stock{% if selected_store %} ({{ selected_store.name }}){% endif %}</th>
+            <th class="text-end">Mínimo</th>
+            <th class="text-end">Pendiente</th>
+            <th class="text-end">Proyectado</th>
+            <th style="min-width:130px;">Nivel</th>
+            <th class="text-end">Costo unit.</th>
+            <th class="text-end">Valor</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in inputs_data %}
+          <tr>
+            <td class="fw-semibold">{{ row.input.name }}</td>
+            <td class="text-muted small">{{ row.input.type }}</td>
+
+            <td class="text-end font-monospace">
+              {{ row.stock|floatformat:2 }}
+              <span class="text-muted small">{{ row.input.unit_measure }}</span>
+            </td>
+
+            <td class="text-end text-muted font-monospace small">
+              {% if row.input.min_stock %}{{ row.input.min_stock|floatformat:2 }}{% else %}—{% endif %}
+            </td>
+
+            <td class="text-end font-monospace small">
+              {% if row.input.pending %}
+                <span class="text-info">+{{ row.input.pending|floatformat:2 }}</span>
+              {% else %}—{% endif %}
+            </td>
+
+            <td class="text-end fw-semibold font-monospace">{{ row.proyectado|floatformat:2 }}</td>
+
+            <td>
+              {% if row.input.min_stock and row.input.min_stock > 0 %}
+              <div class="geagro-progress-summary mb-0">
+                <div class="progress-track">
+                  <span style="width:{{ row.pct_stock }}%; background:
+                    {% if row.estado == 'sin_stock' %}#f46a6a
+                    {% elif row.estado == 'bajo' %}#f1b44c
+                    {% else %}#34c38f{% endif %};"></span>
+                </div>
+              </div>
+              <div class="text-muted" style="font-size:10px;">{{ row.pct_stock }}% del mínimo</div>
+              {% else %}
+              <span class="text-muted small">Sin límite</span>
+              {% endif %}
+            </td>
+
+            <td class="text-end text-muted small font-monospace">
+              {% if row.input.cost %}{{ row.input.cost|floatformat:2 }} {{ row.input.currency }}{% else %}—{% endif %}
+            </td>
+
+            <td class="text-end font-monospace small">
+              {% if row.valor %}$ {{ row.valor|floatformat:0 }}{% else %}—{% endif %}
+            </td>
+
+            <td>
+              {% if row.estado == 'sin_stock' %}
+                <span class="badge" style="background:#fdeeed;color:#b94a3a;">Sin stock</span>
+              {% elif row.estado == 'bajo' %}
+                <span class="badge" style="background:#fef9ec;color:#926b15;">Bajo mín.</span>
+              {% else %}
+                <span class="badge" style="background:#e8f5e2;color:#3a6b30;">OK</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="10" class="text-center text-muted py-4">
+              {% if selected_store %}No hay insumos con movimientos en {{ selected_store.name }}.
+              {% else %}Sin insumos con control de stock registrados.{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONSUMO POR CULTIVO -->
+{% if selected_crop and consumo_cultivo %}
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-3">
+      <div>
+        <h5 class="card-title mb-1">Consumo del cultivo seleccionado</h5>
+        <div class="text-muted small">
+          {{ selected_crop.activity }} — insumos usados en órdenes de trabajo{% if selected_store %} · {{ selected_store.name }}{% endif %}
+        </div>
+      </div>
+      <i class="mdi mdi-sprout font-size-24 text-success"></i>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Insumo</th>
+            <th class="text-end">Total usado</th>
+            <th class="text-end">Unidad</th>
+            <th class="text-end">Aplicaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in consumo_cultivo %}
+          <tr>
+            <td class="fw-semibold">{{ c.input.name }}</td>
+            <td class="text-end font-monospace">{{ c.total|floatformat:2 }}</td>
+            <td class="text-end text-muted small">{{ c.input.unit_measure }}</td>
+            <td class="text-end text-muted small">{{ c.movs|length }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- MOVIMIENTOS Y OC PENDIENTES -->
+<div class="row g-3">
+
+  <div class="col-xl-7">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <div>
+            <h5 class="card-title mb-1">Movimientos recientes</h5>
+            <div class="text-muted small">
+              Últimas 40 entradas y salidas{% if selected_store %} · {{ selected_store.name }}{% endif %}
+            </div>
+          </div>
+          <i class="mdi mdi-swap-horizontal font-size-24 text-info"></i>
+        </div>
+        <div class="table-responsive" style="max-height:420px;overflow-y:auto;">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light" style="position:sticky;top:0;z-index:1;">
+              <tr>
+                <th>Fecha</th>
+                <th>Insumo</th>
+                <th>Operación</th>
+                <th class="text-end">Cantidad</th>
+                <th class="text-end">Stock post</th>
+                <th>Depósito</th>
+                <th>Ref.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in movimientos %}
+              <tr>
+                <td class="text-muted small text-nowrap">{{ m.date|date:"d/m/Y" }}</td>
+                <td class="fw-semibold small">{{ m.input.name }}</td>
+                <td>
+                  {% if m.operation == 'purchase' %}
+                    <span class="badge" style="background:#e8f5e2;color:#3a6b30;">Compra</span>
+                  {% elif m.operation == 'output' %}
+                    <span class="badge" style="background:#fdeeed;color:#b94a3a;">Uso OT</span>
+                  {% elif m.operation == 'sale' %}
+                    <span class="badge" style="background:#fef9ec;color:#926b15;">Venta</span>
+                  {% else %}
+                    <span class="badge" style="background:#eef4fb;color:#3a70aa;">Ajuste</span>
+                  {% endif %}
+                </td>
+                <td class="text-end font-monospace small {% if m.quantity > 0 %}text-success{% else %}text-danger{% endif %}">
+                  {% if m.quantity > 0 %}+{% endif %}{{ m.quantity|floatformat:2 }}
+                  <span class="text-muted">{{ m.input.unit_measure }}</span>
+                </td>
+                <td class="text-end font-monospace small text-muted">{{ m.stock_after|floatformat:2 }}</td>
+                <td class="text-muted small">{{ m.store }}</td>
+                <td class="text-muted small">
+                  {% if m.work_order %}OT #{{ m.work_order.id }}
+                  {% elif m.purchase_reception %}RC
+                  {% else %}—{% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="7" class="text-center text-muted py-3">Sin movimientos registrados.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-5">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <div>
+            <h5 class="card-title mb-1">Órdenes de compra pendientes</h5>
+            <div class="text-muted small">Sin confirmar{% if selected_store %} · {{ selected_store.name }}{% endif %}</div>
+          </div>
+          <i class="mdi mdi-clipboard-list-outline font-size-24 text-warning"></i>
+        </div>
+
+        {% if ordenes_con_detalle %}
+          {% for item in ordenes_con_detalle %}
+          <div class="border rounded-3 p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <span class="fw-semibold">{{ item.oc.code }}</span>
+                <span class="text-muted small ms-2">{{ item.oc.provider }}</span>
+              </div>
+              <div class="text-end">
+                {% if item.oc.delivery_date %}
+                  <span class="small text-muted">Entrega: {{ item.oc.delivery_date|date:"d/m/Y" }}</span>
+                {% endif %}
+                <span class="badge ms-2" style="background:#fef9ec;color:#926b15;">Pendiente</span>
+              </div>
+            </div>
+            <div class="text-muted small mb-1">Depósito: {{ item.oc.store }}</div>
+            {% for det in item.detalles %}
+            <div class="d-flex justify-content-between align-items-center py-1 border-top">
+              <span class="small">{{ det.input.name }}</span>
+              <span class="small font-monospace fw-semibold">
+                {{ det.amount|floatformat:2 }} {{ det.input.unit_measure }}
+                {% if det.total %}<span class="text-muted">· $ {{ det.total|floatformat:0 }}</span>{% endif %}
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center text-muted py-4">
+            <i class="mdi mdi-check-circle-outline d-block mb-2" style="font-size:32px;color:#34c38f;"></i>
+            Sin órdenes de compra pendientes
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock content %}

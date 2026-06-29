@@ -477,6 +477,113 @@
 
   </div>
 
+  <!-- TERCERA FILA: ACOPIO -->
+  <div class="row g-3 mt-1">
+
+    <!-- CARD ACOPIO -->
+    <div class="col-xl-3 col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+
+          <div class="d-flex align-items-start justify-content-between mb-3">
+            <div>
+              <h4 class="card-title mb-1">Acopio</h4>
+              <div class="text-muted small">Stock actual de granos</div>
+            </div>
+            <i class="mdi mdi-silo font-size-24 text-warning"></i>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-12">
+              <div class="p-3 rounded-3 border">
+                <div class="text-muted small mb-1">Silos propios</div>
+                <div class="h4 mb-0 text-primary">{{ acopio_silo_stock|floatformat:1 }} <span class="small text-muted">tn</span></div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-3 rounded-3 border">
+                <div class="text-muted small mb-1">Acopio externo</div>
+                <div class="h4 mb-0 text-info">{{ acopio_externo_stock|floatformat:1 }} <span class="small text-muted">tn</span></div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-3 rounded-3 border" style="background:#f8f9fa;">
+                <div class="text-muted small mb-1">Total en stock</div>
+                <div class="h3 mb-0 fw-bold">{{ acopio_total|floatformat:1 }} <span class="small text-muted">tn</span></div>
+              </div>
+            </div>
+          </div>
+
+          {% if yield_estimate %}
+          <div class="border-top pt-3">
+            <div class="text-muted small mb-2">Rendimiento cultivo actual</div>
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="small">Estimado</span>
+              <strong>{{ yield_estimate|floatformat:2 }} tn/ha</strong>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="small">Real</span>
+              <strong class="{% if yield_real %}text-success{% else %}text-muted{% endif %}">
+                {{ yield_real|floatformat:2|default:"—" }} {% if yield_real %}tn/ha{% endif %}
+              </strong>
+            </div>
+            {% if yield_estimate and yield_real %}
+            <div class="geagro-progress-summary mt-2">
+              <div class="progress-track">
+                {% with pct=yield_real|floatformat:0 %}
+                <span style="width: {% widthratio yield_real yield_estimate 100 %}%;"></span>
+                {% endwith %}
+              </div>
+              <div class="text-muted small mt-1">
+                {% widthratio yield_real yield_estimate 100 %}% del estimado
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+    <!-- CHART: ACOPIADO VS VENDIDO POR CAMPAÑA -->
+    <div class="col-xl-5 col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-start justify-content-between mb-3">
+            <div>
+              <h4 class="card-title mb-1">Acopiado vs Vendido</h4>
+              <div class="text-muted small">Toneladas por campaña</div>
+            </div>
+            <i class="mdi mdi-chart-bar font-size-24 text-primary"></i>
+          </div>
+          <div style="position:relative; height:220px;">
+            <canvas id="chartAcopioVenta"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHART: RENDIMIENTO ESTIMADO VS REAL (todas las campañas) -->
+    <div class="col-xl-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-start justify-content-between mb-3">
+            <div>
+              <h4 class="card-title mb-1">Proyección vs Realidad</h4>
+              <div class="text-muted small">Rinde estimado y cosechado por campaña</div>
+            </div>
+            <i class="mdi mdi-chart-line font-size-24 text-success"></i>
+          </div>
+          <div style="position:relative; height:220px;">
+            <canvas id="chartRinde"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
 {% endblock content %}
@@ -485,4 +592,116 @@
   <script src="{% static 'libs/morris.js/morris.min.js' %}"></script>
   <script src="{% static 'libs/raphael/raphael.min.js' %}"></script>
   <script src="{% static 'js/pages/dashboard.init.js' %}"></script>
+  <script src="{% static 'libs/chart.js/dist/Chart.min.js' %}"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var labels   = {{ chart_labels_json|safe }};
+    var acopiado = {{ chart_acopiado_json|safe }};
+    var vendido  = {{ chart_vendido_json|safe }};
+
+    // Colores consistentes con el tema Geagro
+    var COLOR_ACOPIADO = 'rgba(52, 120, 246, 0.75)';
+    var COLOR_VENDIDO  = 'rgba(52, 195, 143, 0.75)';
+    var COLOR_BORDER_A = 'rgba(52, 120, 246, 1)';
+    var COLOR_BORDER_V = 'rgba(52, 195, 143, 1)';
+
+    // --- Chart 1: Acopiado vs Vendido ---
+    var ctx1 = document.getElementById('chartAcopioVenta');
+    if (ctx1) {
+      new Chart(ctx1.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Acopiado (tn)',
+              data: acopiado,
+              backgroundColor: COLOR_ACOPIADO,
+              borderColor: COLOR_BORDER_A,
+              borderWidth: 1,
+            },
+            {
+              label: 'Vendido (tn)',
+              data: vendido,
+              backgroundColor: COLOR_VENDIDO,
+              borderColor: COLOR_BORDER_V,
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: { position: 'bottom', labels: { boxWidth: 12, fontSize: 11 } },
+          scales: {
+            xAxes: [{ gridLines: { display: false }, ticks: { fontSize: 11 } }],
+            yAxes: [{ ticks: { beginAtZero: true, fontSize: 11 }, gridLines: { color: 'rgba(0,0,0,0.05)' } }],
+          },
+          tooltips: {
+            callbacks: {
+              label: function (item, data) {
+                return data.datasets[item.datasetIndex].label + ': ' + item.yLabel.toLocaleString('es-AR') + ' tn';
+              },
+            },
+          },
+        },
+      });
+    }
+
+    // --- Chart 2: Rendimiento por especie a través de campañas ---
+    var speciesData = {{ chart_species_json|safe }};
+    var rindeDatasets = [];
+    speciesData.forEach(function (sp) {
+      // barra estimado: color sólido
+      rindeDatasets.push({
+        label: sp.name + ' estimado',
+        data: sp.estimado,
+        backgroundColor: sp.color,
+        borderColor: sp.border,
+        borderWidth: 1,
+      });
+      // barra real: mismo color con patrón rayado simulado vía baja opacidad
+      rindeDatasets.push({
+        label: sp.name + ' real',
+        data: sp.real,
+        backgroundColor: sp.color.replace('0.8', '0.35'),
+        borderColor: sp.border,
+        borderWidth: 2,
+        borderDash: [4, 2],
+      });
+    });
+
+    var ctx2 = document.getElementById('chartRinde');
+    if (ctx2) {
+      new Chart(ctx2.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: rindeDatasets,
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: { position: 'bottom', labels: { boxWidth: 12, fontSize: 11 } },
+          scales: {
+            xAxes: [{ gridLines: { display: false }, ticks: { fontSize: 11 } }],
+            yAxes: [{ ticks: { beginAtZero: true, fontSize: 11 }, gridLines: { color: 'rgba(0,0,0,0.05)' } }],
+          },
+          tooltips: {
+            callbacks: {
+              label: function (item, data) {
+                var v = item.yLabel;
+                if (v === null || v === undefined) return null;
+                return data.datasets[item.datasetIndex].label + ': ' + v.toLocaleString('es-AR') + ' tn/ha';
+              },
+            },
+          },
+        },
+      });
+    }
+
+  })();
+  </script>
 {% endblock extra_javascript %}

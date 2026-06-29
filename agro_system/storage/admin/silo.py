@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from user.models.user_producer import UserProducer
 from storage.models.silo import Silo
 from storage.models.silo_stock import SiloStock
@@ -21,7 +21,7 @@ class SiloMovementInline(admin.TabularInline):
     fields = ['date', 'type', 'quantity_tons', 'destination_silo', 'remito_number', 'driver', 'related_sale']
 
 
-class SiloAdmin(admin.ModelAdmin):
+class SiloAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['name', 'type', 'capacity_tons', 'countryside', 'active', 'producer']
     list_filter = ['type', 'countryside', 'active']
     search_fields = ['name', 'countryside__name']
@@ -47,21 +47,13 @@ class SiloAdmin(admin.ModelAdmin):
                 return qs.filter(producer=producer)
         return qs.none()
 
-    def get_readonly_fields(self, request, obj=None):
-        if request.user.type == 'Producer':
-            return ['producer']
-        return super().get_readonly_fields(request, obj)
-
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'producer':
-            if request.user.type == 'Organization':
-                kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
-            elif request.user.type == 'Producer':
-                kwargs['queryset'] = UserProducer.objects.filter(email=request.user.email)
+        if db_field.name == 'producer' and request.user.type == 'Organization':
+            kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-class SiloMovementAdmin(admin.ModelAdmin):
+class SiloMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['date', 'type', 'silo', 'quantity_tons', 'remito_number', 'driver', 'producer']
     list_filter = ['type', 'silo', 'date']
     search_fields = ['silo__name', 'remito_number']
@@ -87,17 +79,9 @@ class SiloMovementAdmin(admin.ModelAdmin):
                 return qs.filter(producer=producer)
         return qs.none()
 
-    def get_readonly_fields(self, request, obj=None):
-        if request.user.type == 'Producer':
-            return ['producer']
-        return super().get_readonly_fields(request, obj)
-
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'producer':
-            if request.user.type == 'Organization':
-                kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
-            elif request.user.type == 'Producer':
-                kwargs['queryset'] = UserProducer.objects.filter(email=request.user.email)
+        if db_field.name == 'producer' and request.user.type == 'Organization':
+            kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 

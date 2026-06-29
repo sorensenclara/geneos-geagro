@@ -1,5 +1,5 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from operation.models.technical_plan_input import TechnicalPlanInput
 from operation.models.technical_plan_detail import TechnicalPlanDetail
 from operation.models.technical_plan import TechnicalPlan
@@ -45,7 +45,7 @@ def duplicate_plan(modeladmin, request, queryset):
             input.technical_plan = obj
             input.save()
 
-class TechnicalPlanAdmin(admin.ModelAdmin):
+class TechnicalPlanAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['code','activity','area','producer']
     list_filter = ['active', 'activity','area']
     search_fields = ['codce','activity','producer']
@@ -77,21 +77,6 @@ class TechnicalPlanAdmin(admin.ModelAdmin):
             if userProducer:
                 return queryset.filter(Q(producer=userProducer) | Q(producer__isnull=True))
         return queryset.none()
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
-        if request.user.type == 'Producer':
-            return ['producer']
-        return readonly_fields
-
-    #  Limitar choices del campo en el formulario
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "producer":
-            if request.user.type == "Organization":
-                kwargs["queryset"] = UserProducer.objects.filter(association=request.user)
-            elif request.user.type == "Producer":
-                kwargs["queryset"] = UserProducer.objects.filter(email=request.user.email)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 
