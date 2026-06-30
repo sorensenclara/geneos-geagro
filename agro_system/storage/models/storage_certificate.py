@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum, Q
 from django.utils.translation import gettext_lazy as _
 from datetime import date
 from parameter.models.specie import Specie
@@ -45,13 +46,29 @@ class StorageCertificate(models.Model):
     producer = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, verbose_name=_('producer'))
     notes = models.TextField(blank=True, verbose_name=_('notes'))
 
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        if self.is_warrant:
+            self.state = self.WARRANT
+        super().save(*args, **kwargs)
+        if is_new:
+            # El ingreso al acopiador ES un movimiento de entrada — se crea automáticamente
+            from .storage_movement import StorageMovement
+            StorageMovement.objects.create(
+                certificate=self,
+                type=StorageMovement.ENTRY,
+                date=self.date_issue,
+                quantity_tons=self.quantity_entry,
+                producer=self.producer,
+            )
+
     @property
     def quantity_available(self):
-        """ Cantidad disponible = entrada - total de salidas registradas en movimientos """
-        exits = self.movements.filter(type__in=['sale_exit', 'withdrawal', 'transfer']).aggregate(
-            total=models.Sum('quantity_tons')
-        )['total'] or 0
-        return self.quantity_entry - exits
+        totals = self.movements.aggregate(
+            entries=Sum('quantity_tons', filter=Q(type='entry')),
+            exits=Sum('quantity_tons', filter=Q(type__in=['sale_exit', 'withdrawal', 'transfer'])),
+        )
+        return max((totals['entries'] or 0) - (totals['exits'] or 0), 0)
 
     quantity_available.fget.short_description = _('quantity available (tons)')
 

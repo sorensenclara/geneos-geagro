@@ -15,11 +15,18 @@ class SiloStock(models.Model):
     campaing = models.ForeignKey(Campaing, on_delete=models.PROTECT, verbose_name=_('campaing'))
     crop = models.ForeignKey('operation.Crop', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('crop'))
     quantity_tons = models.FloatField(default=0, verbose_name=_('quantity (tons)'))
+    active = models.BooleanField(default=True, verbose_name=_('vigente'))
     humidity_pct = models.FloatField(null=True, blank=True, verbose_name=_('humidity (%)'))
     impurities_pct = models.FloatField(null=True, blank=True, verbose_name=_('impurities (%)'))
     protein_pct = models.FloatField(null=True, blank=True, verbose_name=_('protein (%)'))
     test_weight = models.FloatField(null=True, blank=True, verbose_name=_('test weight (kg/hl)'))
-    date_entry = models.DateField(default=date.today, verbose_name=_('date of entry'))
+    date_entry = models.DateField(default=date.today, verbose_name=_('date of last movement'))
+
+    def save(self, *args, **kwargs):
+        if self.crop_id:
+            self.specie = self.crop.activity.specie
+            self.campaing = self.crop.campaing
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.silo} - {self.specie} ({self.campaing})"

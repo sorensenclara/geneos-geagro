@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-29 10:48-0300\n"
+"POT-Creation-Date: 2026-06-30 13:50-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
 
-#: agro_system/settings/base.py:186
+#: agro_system/settings/base.py:187
 msgid "Español"
 msgstr "Español"
 
-#: agro_system/settings/base.py:318
+#: agro_system/settings/base.py:319
 msgid "Stock Charts"
 msgstr "Gráficos de Stock"
 
@@ -64,7 +64,7 @@ msgstr "Indicador"
 #: input/models/purchase_order.py:19 input/models/stock_movement.py:17
 #: operation/models/technical_crop_detail.py:17
 #: parameter/models/exchange_rate.py:12 sale/models/sales_receipt.py:17
-#: storage/models/silo_movement.py:25 storage/models/storage_movement.py:26
+#: storage/models/silo_movement.py:26 storage/models/storage_movement.py:26
 #: storage/models/storage_service.py:16 user/models/notification.py:12
 msgid "date"
 msgstr "Fecha"
@@ -80,8 +80,8 @@ msgstr "detalles"
 #: alert/models/alert.py:14 operation/models/crop.py:46
 #: operation/models/crop_yields.py:13 operation/models/partner_crop.py:13
 #: operation/models/technical_crop_detail.py:14
-#: operation/models/work_order.py:27 storage/models/silo_stock.py:16
-#: storage/models/storage_certificate.py:35
+#: operation/models/work_order.py:27 storage/models/silo_movement.py:24
+#: storage/models/silo_stock.py:16 storage/models/storage_certificate.py:36
 msgid "crop"
 msgstr "Cultivo"
 
@@ -180,23 +180,23 @@ msgstr "Registro de variables"
 msgid "variable registers"
 msgstr "Registros de variables"
 
-#: input/admin/input.py:24 input/admin/input.py:25
+#: input/admin/input.py:25 input/admin/input.py:26
 msgid "Stock per store"
 msgstr "Stock por almacén"
 
-#: input/admin/input.py:41
+#: input/admin/input.py:48
 msgid "Order Date"
 msgstr "Fecha de orden"
 
-#: input/admin/input.py:43
+#: input/admin/input.py:50
 msgid "Purchases"
 msgstr "Compras"
 
-#: input/admin/input.py:44 input/models/stock_movement.py:11
+#: input/admin/input.py:51 input/models/stock_movement.py:11
 msgid "Purchase"
 msgstr "Compra"
 
-#: input/admin/input.py:134
+#: input/admin/input.py:141
 #, python-format
 msgid ""
 "Automatic Reorder: A new pending order has been created for %s based on "
@@ -205,7 +205,7 @@ msgstr ""
 "Reorden automático: Se ha creado una nueva orden pendiente para %s basada en "
 "el historial."
 
-#: input/admin/input.py:151
+#: input/admin/input.py:158
 #, python-format
 msgid ""
 "Automatic Reorder: A new pending order has been created for %s using "
@@ -214,7 +214,7 @@ msgstr ""
 "Reorden automático: Se ha creado una nueva orden pendiente para %s usando "
 "valores predeterminados."
 
-#: input/admin/input.py:153
+#: input/admin/input.py:160
 #, python-format
 msgid "Automatic Reorder Failed for %s: No default provider or store found."
 msgstr ""
@@ -331,8 +331,8 @@ msgstr "Control de lote"
 #: operation/models/technical_plan.py:22 operation/models/work_order.py:40
 #: producer/models/country_side.py:25 producer/models/staff.py:33
 #: producer/models/store.py:14 sale/models/sales_receipt.py:31
-#: storage/models/silo.py:19 storage/models/silo_movement.py:36
-#: storage/models/storage_certificate.py:45
+#: storage/models/silo.py:19 storage/models/silo_movement.py:37
+#: storage/models/storage_certificate.py:46
 #: storage/models/storage_movement.py:36
 msgid "producer"
 msgstr "Productor"
@@ -526,8 +526,8 @@ msgstr "Operaciones"
 msgid "work order"
 msgstr "Orden de trabajo"
 
-#: input/models/stock_movement.py:56 storage/models/silo_movement.py:35
-#: storage/models/storage_certificate.py:46
+#: input/models/stock_movement.py:56 storage/models/silo_movement.py:36
+#: storage/models/storage_certificate.py:47
 #: storage/models/storage_movement.py:35 storage/models/storage_service.py:22
 msgid "notes"
 msgstr "Observaciones"
@@ -605,7 +605,7 @@ msgid "description"
 msgstr "Descripción"
 
 #: operation/models/activity.py:13 parameter/models/specie.py:14
-#: storage/models/silo_stock.py:14 storage/models/storage_certificate.py:33
+#: storage/models/silo_stock.py:14 storage/models/storage_certificate.py:34
 msgid "specie"
 msgstr "Especie"
 
@@ -627,7 +627,7 @@ msgid "activities"
 msgstr "Actividades"
 
 #: operation/models/crop.py:19 storage/models/silo_stock.py:15
-#: storage/models/storage_certificate.py:32
+#: storage/models/storage_certificate.py:33
 msgid "campaing"
 msgstr "Campaña"
 
@@ -652,7 +652,7 @@ msgid "responsible"
 msgstr "Responsable"
 
 #: operation/models/crop.py:25 producer/models/staff.py:31
-#: storage/models/storage_certificate.py:41
+#: storage/models/storage_certificate.py:42
 msgid "state"
 msgstr "Estado"
 
@@ -919,7 +919,7 @@ msgstr "Estado de ordenes de trabajo"
 
 #: operation/models/work_order.py:33 parameter/models/var_crop_technique.py:11
 #: producer/models/staff.py:27 storage/models/silo.py:13
-#: storage/models/silo_movement.py:24 storage/models/storage_movement.py:25
+#: storage/models/silo_movement.py:25 storage/models/storage_movement.py:25
 msgid "type"
 msgstr "Tipo"
 
@@ -1119,7 +1119,7 @@ msgstr "Variable técnica de cultivo"
 msgid "variables crop techniques"
 msgstr "Variables técnicas de cultivo"
 
-#: producer/admin/store.py:14 producer/admin/store.py:15
+#: producer/admin/store.py:15 producer/admin/store.py:16
 msgid "Input stock"
 msgstr "Stock de insumos"
 
@@ -1191,7 +1191,7 @@ msgstr "Apellido"
 msgid "date of birth"
 msgstr "Fecha de nacimiento"
 
-#: producer/models/staff.py:30 storage/models/silo_stock.py:22
+#: producer/models/staff.py:30
 msgid "date of entry"
 msgstr "Fecha de entrada"
 
@@ -1236,7 +1236,7 @@ msgid "carrier"
 msgstr "Transportista"
 
 #: sale/models/driver.py:24 sale/models/sales_receipt.py:30
-#: storage/models/silo_movement.py:34 storage/models/storage_movement.py:30
+#: storage/models/silo_movement.py:35 storage/models/storage_movement.py:30
 msgid "driver"
 msgstr "Chofer"
 
@@ -1288,7 +1288,7 @@ msgstr "Capacidad (tn)"
 msgid "Optional. Used for bag silos located in a specific lot."
 msgstr "Opcional. Se usa para silos bolsa ubicados en un lote específico."
 
-#: storage/models/silo.py:25 storage/models/silo_movement.py:21
+#: storage/models/silo.py:25 storage/models/silo_movement.py:22
 #: storage/models/silo_stock.py:13
 msgid "silo"
 msgstr "Silo"
@@ -1297,140 +1297,152 @@ msgstr "Silo"
 msgid "silos"
 msgstr "Silos"
 
-#: storage/models/silo_movement.py:16 storage/models/storage_movement.py:17
+#: storage/models/silo_movement.py:17 storage/models/storage_movement.py:17
 msgid "Entry"
 msgstr "Entrada"
 
-#: storage/models/silo_movement.py:17
+#: storage/models/silo_movement.py:18
 msgid "Exit"
 msgstr "Salida"
 
-#: storage/models/silo_movement.py:18
+#: storage/models/silo_movement.py:19
 msgid "Transfer to another silo"
 msgstr "Transferencia a otro silo"
 
-#: storage/models/silo_movement.py:23 storage/models/silo_stock.py:28
-msgid "silo stock"
-msgstr "Stock del silo"
-
-#: storage/models/silo_movement.py:26 storage/models/silo_stock.py:17
+#: storage/models/silo_movement.py:27 storage/models/silo_stock.py:17
 #: storage/models/storage_movement.py:27
 msgid "quantity (tons)"
 msgstr "Cantidad (tn)"
 
-#: storage/models/silo_movement.py:28
+#: storage/models/silo_movement.py:29
 msgid "destination silo"
 msgstr "Silo destino"
 
-#: storage/models/silo_movement.py:29
+#: storage/models/silo_movement.py:30
 msgid "Only for transfer movements."
 msgstr "Solo para movimientos de transferencia."
 
-#: storage/models/silo_movement.py:31 storage/models/storage_movement.py:34
+#: storage/models/silo_movement.py:32 storage/models/storage_movement.py:34
 msgid "related sale"
 msgstr "Venta relacionada"
 
-#: storage/models/silo_movement.py:32 storage/models/storage_movement.py:28
+#: storage/models/silo_movement.py:33 storage/models/storage_movement.py:28
 msgid "remito number"
 msgstr "Numero de remito"
 
-#: storage/models/silo_movement.py:47
+#: storage/models/silo_movement.py:39 storage/models/silo_stock.py:35
+msgid "silo stock"
+msgstr "Stock del silo"
+
+#: storage/models/silo_movement.py:94
 msgid "silo movement"
 msgstr "Movimiento de silo"
 
-#: storage/models/silo_movement.py:48
+#: storage/models/silo_movement.py:95
 msgid "silo movements"
 msgstr "Movimientos de silo"
 
 #: storage/models/silo_stock.py:18
+msgid "vigente"
+msgstr ""
+
+#: storage/models/silo_stock.py:19
 msgid "humidity (%)"
 msgstr "Humedad (%)"
 
-#: storage/models/silo_stock.py:19
+#: storage/models/silo_stock.py:20
 msgid "impurities (%)"
 msgstr "Impurezas (%)"
 
-#: storage/models/silo_stock.py:20
+#: storage/models/silo_stock.py:21
 msgid "protein (%)"
 msgstr "Proteína (%)"
 
-#: storage/models/silo_stock.py:21
+#: storage/models/silo_stock.py:22
 msgid "test weight (kg/hl)"
 msgstr "Peso hectolítrico (kg/hl)"
 
-#: storage/models/silo_stock.py:29
+#: storage/models/silo_stock.py:23
+msgid "date of last movement"
+msgstr "Fecha del ultimo movimiento"
+
+#: storage/models/silo_stock.py:36
 msgid "silo stocks"
 msgstr "Stock del silo"
 
-#: storage/models/storage_certificate.py:18
+#: storage/models/storage_certificate.py:19
 msgid "Active"
 msgstr "Activa"
 
-#: storage/models/storage_certificate.py:19
+#: storage/models/storage_certificate.py:20
 msgid "Partially withdrawn"
 msgstr "Retiro parcial"
 
-#: storage/models/storage_certificate.py:20
+#: storage/models/storage_certificate.py:21
 msgid "Cancelled"
 msgstr "Cancelado"
 
-#: storage/models/storage_certificate.py:21
+#: storage/models/storage_certificate.py:22
 msgid "Warrant"
 msgstr "Warrant"
 
-#: storage/models/storage_certificate.py:24
+#: storage/models/storage_certificate.py:25
 msgid "certificate number"
 msgstr "Numero certificado"
 
-#: storage/models/storage_certificate.py:25
+#: storage/models/storage_certificate.py:26
 msgid "issue date"
 msgstr "Fecha de emisión"
 
-#: storage/models/storage_certificate.py:26
+#: storage/models/storage_certificate.py:27
 msgid "expiry date"
 msgstr "Fecha de vencimiento"
 
-#: storage/models/storage_certificate.py:30
+#: storage/models/storage_certificate.py:31
 msgid "storage provider"
 msgstr "Proveedor de acopio"
 
-#: storage/models/storage_certificate.py:36
+#: storage/models/storage_certificate.py:37
 msgid "quantity at entry (tons)"
 msgstr "Cantidad al ingreso (tn)"
 
-#: storage/models/storage_certificate.py:37
+#: storage/models/storage_certificate.py:38
 msgid "humidity at entry (%)"
 msgstr "Humedad al ingreso (%)"
 
-#: storage/models/storage_certificate.py:38
+#: storage/models/storage_certificate.py:39
 msgid "impurities at entry (%)"
 msgstr "Impurezas al ingreso (%)"
 
-#: storage/models/storage_certificate.py:39
+#: storage/models/storage_certificate.py:40
 msgid "protein at entry (%)"
 msgstr "Proteína al ingreso (%)"
 
-#: storage/models/storage_certificate.py:40
+#: storage/models/storage_certificate.py:41
 msgid "test weight at entry (kg/hl)"
 msgstr "Peso hectolítrico al ingreso (kg/hl)"
 
-#: storage/models/storage_certificate.py:42
+#: storage/models/storage_certificate.py:43
 msgid "is warrant"
 msgstr "Es warrant"
 
-#: storage/models/storage_certificate.py:43
+#: storage/models/storage_certificate.py:44
 msgid "warrant entity"
 msgstr "Entidad del warrant"
 
-#: storage/models/storage_certificate.py:44
+#: storage/models/storage_certificate.py:45
 msgid "warrant expiry date"
 msgstr "Fecha de vencimiento del warrant"
 
-#: storage/models/storage_certificate.py:60
+#: storage/models/storage_certificate.py:73
+msgid "quantity available (tons)"
+msgstr "Cantidad disponible (tn)"
+
+#: storage/models/storage_certificate.py:79
 msgid "storage certificate"
 msgstr "Certificado de depósito"
 
-#: storage/models/storage_certificate.py:61
+#: storage/models/storage_certificate.py:80
 msgid "storage certificates"
 msgstr "Certificados de depósito"
 
@@ -1454,11 +1466,11 @@ msgstr "Certificado"
 msgid "destination"
 msgstr "Destino"
 
-#: storage/models/storage_movement.py:47
+#: storage/models/storage_movement.py:62
 msgid "storage movement"
 msgstr "Movimiento de acopio"
 
-#: storage/models/storage_movement.py:48
+#: storage/models/storage_movement.py:63
 msgid "storage movements"
 msgstr "Movimientos de acopio"
 
@@ -1473,10 +1485,6 @@ msgstr "Merma (tn)"
 #: storage/models/storage_service.py:19
 msgid "resulting humidity (%)"
 msgstr "Humedad resultante (%)"
-
-#: storage/models/storage_certificate.py
-msgid "quantity available (tons)"
-msgstr "Cantidad disponible (tn)"
 
 #: storage/models/storage_service.py:28
 msgid "storage service"

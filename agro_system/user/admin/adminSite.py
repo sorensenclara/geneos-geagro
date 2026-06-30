@@ -151,9 +151,9 @@ class ProducerAwareMixin:
     """
     Permite que usuarios Producer/Staff/Organization vean y gestionen los modelos
     del admin sin necesitar permisos Django explícitos.
-    - Producer: solo puede ver y agregar. No puede modificar ni eliminar.
-    - Staff/Organization: puede ver, agregar y modificar. No puede eliminar.
+    - Producer/Staff/Organization: puede ver, agregar y modificar.
     El filtrado de datos por productor se delega a get_queryset() de cada ModelAdmin.
+    La organización puede eliminar, pero el productor y su staff no.
     """
 
     def has_module_permission(self, request):
@@ -172,15 +172,14 @@ class ProducerAwareMixin:
         return super().has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):
-        if request.user.is_active and request.user.type in ('Staff', 'Organization'):
+        if request.user.is_active and request.user.type in PRODUCER_TYPES:
             return True
-        if request.user.is_active and request.user.type == 'Producer':
-            return False
         return super().has_change_permission(request, obj)
 
     def has_delete_permission(self, request, obj=None):
-        # Ningún tipo no-admin puede eliminar registros desde el admin
-        if request.user.is_active and request.user.type in PRODUCER_TYPES:
+        if request.user.is_active and request.user.type == 'Organization':
+            return True
+        if request.user.is_active and request.user.type in ('Producer', 'Staff'):
             return False
         return super().has_delete_permission(request, obj)
 

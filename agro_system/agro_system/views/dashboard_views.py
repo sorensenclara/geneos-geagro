@@ -22,6 +22,7 @@ from alert.models.alert import Alert
 from operation.models.input_work_order import InputWorkOrder
 
 from storage.models.silo_movement import SiloMovement
+from storage.models.silo_stock import SiloStock
 from storage.models.storage_certificate import StorageCertificate
 from storage.models.storage_movement import StorageMovement
 
@@ -292,17 +293,49 @@ def DashboardView(request):
 
     sf = {'producer': producer_ref} if producer_ref else {}
 
-    silo_in  = SiloMovement.objects.filter(type='entry', **sf).aggregate(t=Sum('quantity_tons'))['t'] or 0
-    silo_out = SiloMovement.objects.filter(type__in=['exit', 'transfer'], **sf).aggregate(t=Sum('quantity_tons'))['t'] or 0
-    acopio_silo_stock = round(max(0, silo_in - silo_out), 2)
+    # SiloStock ya tiene quantity_tons calculado y actualizado automáticamente
+    sf_stock = {'silo__producer': producer_ref} if producer_ref else {}
+    acopio_silo_stock = round(
+        SiloStock.objects.filter(**sf_stock).aggregate(t=Sum('quantity_tons'))['t'] or 0, 2
+    )
 
-    cert_qs   = StorageCertificate.objects.filter(state__in=['active', 'partial'], **sf)
-    cert_in   = cert_qs.aggregate(t=Sum('quantity_entry'))['t'] or 0
-    cert_out  = StorageMovement.objects.filter(
-        type__in=['sale_exit', 'withdrawal', 'transfer'],
-        **({'certificate__producer': producer_ref} if producer_ref else {})
+    # Chart: stock por silo y especie (horizontal bar apilado)
+    stock_items = (
+        SiloStock.objects.filter(quantity_tons__gt=0, **sf_stock)
+        .select_related('silo', 'specie')
+        .order_by('silo__name', 'specie__name')
+    )
+
+    _silo_names, _species_set, _silo_sp_map = [], [], {}
+    for item in stock_items:
+        sn, sp = item.silo.name, item.specie.name
+        if sn not in _silo_names:
+            _silo_names.append(sn)
+        if sp not in _species_set:
+            _species_set.append(sp)
+        # Acumular: puede haber varios SiloStock por silo+especie (distintas campañas)
+        _silo_sp_map[(sn, sp)] = round(_silo_sp_map.get((sn, sp), 0) + item.quantity_tons, 2)
+
+    _COLORS = [
+        'rgba(52,120,246,0.8)', 'rgba(52,195,143,0.8)',
+        'rgba(241,180,76,0.8)', 'rgba(244,106,106,0.8)',
+        'rgba(85,110,230,0.8)',
+    ]
+    chart_silo_datasets = [
+        {
+            'label': sp,
+            'data': [_silo_sp_map.get((sn, sp), 0) for sn in _silo_names],
+            'backgroundColor': _COLORS[i % len(_COLORS)],
+        }
+        for i, sp in enumerate(_species_set)
+    ]
+
+    sf_cert = {'certificate__producer': producer_ref} if producer_ref else {}
+    cert_entries = StorageMovement.objects.filter(type='entry', **sf_cert).aggregate(t=Sum('quantity_tons'))['t'] or 0
+    cert_exits   = StorageMovement.objects.filter(
+        type__in=['sale_exit', 'withdrawal', 'transfer'], **sf_cert
     ).aggregate(t=Sum('quantity_tons'))['t'] or 0
-    acopio_externo_stock = round(max(0, cert_in - cert_out), 2)
+    acopio_externo_stock = round(max(0, cert_entries - cert_exits), 2)
 
     # =========================================================
     # CHART: Acopiado vs Vendido por campaña (últimas 5)
@@ -454,6 +487,10 @@ def DashboardView(request):
         'chart_labels_json': json.dumps(chart_labels),
         'chart_acopiado_json': json.dumps(chart_acopiado),
         'chart_vendido_json': json.dumps(chart_vendido),
+
+        # Chart stock silo por especie
+        'chart_silo_labels_json': json.dumps(_silo_names),
+        'chart_silo_datasets_json': json.dumps(chart_silo_datasets),
 
         # Chart rendimiento por especie y campaña
         'chart_species_json': json.dumps(chart_species),

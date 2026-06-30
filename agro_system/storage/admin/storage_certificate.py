@@ -17,6 +17,9 @@ class StorageMovementInline(admin.TabularInline):
     model = StorageMovement
     extra = 0
     fields = ['date', 'type', 'quantity_tons', 'remito_number', 'driver', 'destination', 'port', 'related_sale']
+    readonly_fields = ['date', 'type', 'quantity_tons', 'remito_number', 'driver', 'destination', 'port', 'related_sale']
+    can_delete = False
+    def has_add_permission(self, request, obj=None): return False
 
 
 class StorageCertificateAdmin(ProducerAwareMixin, admin.ModelAdmin):
@@ -25,8 +28,15 @@ class StorageCertificateAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_filter = ['state', 'specie', 'campaing', 'storage_provider', 'is_warrant']
     search_fields = ['number', 'storage_provider__name']
     ordering = ['-date_issue']
-    readonly_fields = ['quantity_available']
+    readonly_fields = ['quantity_available', 'state']
     inlines = [StorageServiceInline, StorageMovementInline]
+
+    def get_readonly_fields(self, request, obj=None):
+        ro = list(super().get_readonly_fields(request, obj))
+        if obj:  # editando un existente
+            if 'quantity_entry' not in ro:
+                ro.append('quantity_entry')
+        return ro
 
     def save_model(self, request, obj, form, change):
         if not change:

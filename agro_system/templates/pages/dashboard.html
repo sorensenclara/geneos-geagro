@@ -481,7 +481,7 @@
   <div class="row g-3 mt-1">
 
     <!-- CARD ACOPIO -->
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl-4 col-md-6">
       <div class="card h-100">
         <div class="card-body">
 
@@ -494,24 +494,30 @@
           </div>
 
           <div class="row g-2 mb-3">
-            <div class="col-12">
-              <div class="p-3 rounded-3 border">
+            <div class="col-4">
+              <div class="p-2 rounded-3 border text-center">
                 <div class="text-muted small mb-1">Silos propios</div>
-                <div class="h4 mb-0 text-primary">{{ acopio_silo_stock|floatformat:1 }} <span class="small text-muted">tn</span></div>
+                <div class="h5 mb-0 text-primary">{{ acopio_silo_stock|floatformat:1 }} <span class="x-small text-muted">tn</span></div>
               </div>
             </div>
-            <div class="col-12">
-              <div class="p-3 rounded-3 border">
-                <div class="text-muted small mb-1">Acopio externo</div>
-                <div class="h4 mb-0 text-info">{{ acopio_externo_stock|floatformat:1 }} <span class="small text-muted">tn</span></div>
+            <div class="col-4">
+              <div class="p-2 rounded-3 border text-center">
+                <div class="text-muted small mb-1">Acopio ext.</div>
+                <div class="h5 mb-0 text-info">{{ acopio_externo_stock|floatformat:1 }} <span class="x-small text-muted">tn</span></div>
               </div>
             </div>
-            <div class="col-12">
-              <div class="p-3 rounded-3 border" style="background:#f8f9fa;">
-                <div class="text-muted small mb-1">Total en stock</div>
-                <div class="h3 mb-0 fw-bold">{{ acopio_total|floatformat:1 }} <span class="small text-muted">tn</span></div>
+            <div class="col-4">
+              <div class="p-2 rounded-3 border text-center" style="background:#f8f9fa;">
+                <div class="text-muted small mb-1">Total</div>
+                <div class="h5 mb-0 fw-bold">{{ acopio_total|floatformat:1 }} <span class="x-small text-muted">tn</span></div>
               </div>
             </div>
+          </div>
+
+          <!-- Chart: stock por silo y especie -->
+          <div class="text-muted small mb-2">Stock por silo y especie</div>
+          <div style="position:relative; height:170px;">
+            <canvas id="chartSiloStock"></canvas>
           </div>
 
           {% if yield_estimate %}
@@ -547,7 +553,7 @@
     </div>
 
     <!-- CHART: ACOPIADO VS VENDIDO POR CAMPAÑA -->
-    <div class="col-xl-5 col-md-6">
+    <div class="col-xl-4 col-md-6">
       <div class="card h-100">
         <div class="card-body">
           <div class="d-flex align-items-start justify-content-between mb-3">
@@ -565,7 +571,7 @@
     </div>
 
     <!-- CHART: RENDIMIENTO ESTIMADO VS REAL (todas las campañas) -->
-    <div class="col-xl-4">
+    <div class="col-xl-4 col-md-12">
       <div class="card h-100">
         <div class="card-body">
           <div class="d-flex align-items-start justify-content-between mb-3">
@@ -650,7 +656,36 @@
       });
     }
 
-    // --- Chart 2: Rendimiento por especie a través de campañas ---
+    // --- Chart 2: Stock por silo y especie (horizontal bar apilado) ---
+    var siloLabels   = {{ chart_silo_labels_json|safe }};
+    var siloDatasets = {{ chart_silo_datasets_json|safe }};
+
+    var ctx2 = document.getElementById('chartSiloStock');
+    if (ctx2) {
+      new Chart(ctx2.getContext('2d'), {
+        type: 'horizontalBar',
+        data: { labels: siloLabels, datasets: siloDatasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            xAxes: [{ stacked: true, ticks: { beginAtZero: true, fontSize: 10 }, gridLines: { color: 'rgba(0,0,0,0.05)' } }],
+            yAxes: [{ stacked: true, gridLines: { display: false }, ticks: { fontSize: 10 } }],
+          },
+          legend: { position: 'bottom', labels: { boxWidth: 10, fontSize: 10 } },
+          tooltips: {
+            callbacks: {
+              label: function (item, data) {
+                var ds = data.datasets[item.datasetIndex];
+                return ds.label + ': ' + item.xLabel.toLocaleString('es-AR') + ' tn';
+              },
+            },
+          },
+        },
+      });
+    }
+
+    // --- Chart 3: Rendimiento por especie a través de campañas ---
     var speciesData = {{ chart_species_json|safe }};
     var rindeDatasets = [];
     speciesData.forEach(function (sp) {

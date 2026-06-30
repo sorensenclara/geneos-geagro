@@ -39,6 +39,21 @@ class StorageMovement(models.Model):
         if not self.producer_id:
             self.producer = self.certificate.producer
         super().save(*args, **kwargs)
+        self._sync_certificate_state()
+
+    def _sync_certificate_state(self):
+        cert = self.certificate
+        if cert.is_warrant:
+            return
+        available = cert.quantity_available
+        if available <= 0:
+            new_state = StorageCertificate.CANCELLED
+        elif available < cert.quantity_entry:
+            new_state = StorageCertificate.PARTIAL
+        else:
+            new_state = StorageCertificate.ACTIVE
+        if cert.state != new_state:
+            StorageCertificate.objects.filter(pk=cert.pk).update(state=new_state)
 
     def __str__(self):
         return f"{self.get_type_display()} - {self.certificate} ({self.date})"
