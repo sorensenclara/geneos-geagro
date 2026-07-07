@@ -4,8 +4,23 @@ from operation.models.technical_plan_input import TechnicalPlanInput
 from operation.models.technical_plan_detail import TechnicalPlanDetail
 from operation.models.technical_plan import TechnicalPlan
 from user.models.user_producer import UserProducer
+from input.models.input import Input
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+
+
+def _filter_inputs(request):
+    user = request.user
+    if user.is_superuser or getattr(user, 'type', None) == 'Administration':
+        return Input.objects.all()
+    if getattr(user, 'type', None) == 'Organization':
+        producers = UserProducer.objects.filter(association=user)
+        return Input.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
+    if getattr(user, 'type', None) == 'Producer':
+        producer = UserProducer.objects.filter(email=user.email).first()
+        if producer:
+            return Input.objects.filter(Q(producer=producer) | Q(producer__isnull=True))
+    return Input.objects.filter(producer__isnull=True)
 
 
 class TechnicalPlanDetailInline(admin.StackedInline):
@@ -24,6 +39,8 @@ class TechnicalPlanInputInline(admin.StackedInline):
             kwargs["queryset"] = TechnicalPlanDetail.objects.filter(
                 technical_plan__id=technical_plan
             )
+        if db_field.name == "input":
+            kwargs["queryset"] = _filter_inputs(request)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 

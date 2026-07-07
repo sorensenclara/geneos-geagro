@@ -34,7 +34,7 @@ class WorkOrder(models.Model):
     # Responsable interno de ejecutar o controlar según corresponda
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE, verbose_name= _('staff'))
     # Si es una labor de terceros detallar el contratista
-    contractor = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, related_name="contractor_wo", null=True, blank=True,verbose_name= _('contractor'))
+    contractor = models.ForeignKey('producer.Contractor', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('contractor'))
     # Si es una labor de socios detallar el contratista
     partner =  models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, related_name="partner_wo", null=True, blank=True, verbose_name= _('partner'))
     producer = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, verbose_name= _('producer'))

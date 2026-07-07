@@ -39,13 +39,16 @@ class PurchaseInline(admin.StackedInline):
     model = PurchaseOrderDetail
     can_delete = False
     extra = 0
-    fields = ['date_order', 'amount', 'price_unit']
-    readonly_fields = ['date_order', 'amount', 'price_unit']
+    fields = ['date_order', 'amount', 'price_unit', 'currency', 'total_base']
+    readonly_fields = ['date_order', 'amount', 'price_unit', 'currency', 'total_base']
 
     def date_order(self, obj):
         return obj.purchase_order.date if obj.purchase_order else None
-
     date_order.short_description = _('Order Date')
+
+    def currency(self, obj):
+        return obj.purchase_order.currency if obj.purchase_order else None
+    currency.short_description = _('Currency')
 
     verbose_name_plural = _("Purchases")
     verbose_name = _("Purchase")
@@ -97,10 +100,32 @@ class InputResource(resources.ModelResource):
 class InputAdmin(ProducerAwareMixin, ImportExportModelAdmin):
     search_fields = ['name']
     inlines = [InputStockInline, PurchaseInline]
-    list_display = ['name', 'type', 'cost', 'stock', 'min_stock', 'pending', 'producer']
-    list_filter = ['type', 'unit_measure', 'currency']
+    list_display = ['name', 'type', 'cost', 'currency', 'cost_update_mode', 'stock', 'min_stock', 'pending', 'producer']
+    list_filter = ['type', 'unit_measure', 'currency', 'cost_update_mode']
     readonly_fields = ['pending']
     resource_class = InputResource
+
+    def get_readonly_fields(self, request, obj=None):
+        rf = list(super().get_readonly_fields(request, obj))
+        # En modos automáticos la moneda siempre es la base — no permitir edición manual
+        if obj and getattr(obj, 'cost_update_mode', 'manual') != 'manual':
+            if 'currency' not in rf:
+                rf.append('currency')
+        return rf
+
+    def get_fieldsets(self, request, obj=None):
+        show_producer = request.user.is_superuser or getattr(request.user, 'type', None) == 'Administration'
+        general_fields = ['name', 'type', 'unit_measure', 'presentation']
+        if show_producer:
+            general_fields.append('producer')
+        return [
+            (None, {'fields': general_fields}),
+            ('Costo', {
+                'fields': ['cost', 'currency', 'cost_update_mode'],
+                'description': 'Para modos automáticos, el precio se actualiza en moneda base al confirmar compras. El historial de conversión queda en cada orden de compra.',
+            }),
+            ('Stock', {'fields': ['control_stock', 'stock', 'min_stock', 'pending', 'control_lot']}),
+        ]
 
 
     def get_import_resource_kwargs(self, request, *args, **kwargs):
@@ -159,9 +184,15 @@ class InputAdmin(ProducerAwareMixin, ImportExportModelAdmin):
                     else:
                         messages.error(request, gettext("Automatic Reorder Failed for %s: No default provider or store found.") % obj.name)
 
+    def get_list_display(self, request):
+        cols = list(super().get_list_display(request))
+        if getattr(request.user, 'type', None) == 'Producer':
+            cols = [c for c in cols if c != 'producer']
+        return cols
+
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        
+        from django.db.models import Q
         if request.user.is_superuser:
             return queryset
         if request.user.type == 'Administration':
@@ -169,11 +200,11 @@ class InputAdmin(ProducerAwareMixin, ImportExportModelAdmin):
         if request.user.type == 'Organization':
             userProducer = UserProducer.objects.filter(association=request.user)
             if userProducer.exists():
-                return queryset.filter(producer__in=userProducer)
+                return queryset.filter(Q(producer__in=userProducer) | Q(producer__isnull=True))
         if request.user.type == 'Producer':
             userProducer = UserProducer.objects.filter(email=request.user.email).first()
             if userProducer:
-                return queryset.filter(producer=userProducer)
+                return queryset.filter(Q(producer=userProducer) | Q(producer__isnull=True))
         return queryset.none()
 
 adminSite.register(Input, InputAdmin)

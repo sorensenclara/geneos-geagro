@@ -308,10 +308,22 @@ JAZZMIN_SETTINGS = {
     "custom_links": {
         "operation": [
         {
-            "name": "Calendario de OP", 
-            "url": "/calendar/", 
+            "name": "Calendario de OP",
+            "url": "/calendar/",
             "icon": "fas fa-calendar-alt",
             "order": 2
+        },
+        {
+            "name": "Informe de Insumos",
+            "url": "operation:input_report",
+            "icon": "fas fa-file-alt",
+            "order": 3
+        },
+        {
+            "name": "Presupuesto vs Real",
+            "url": "operation:budget_vs_real",
+            "icon": "fas fa-chart-bar",
+            "order": 4
         }
         ],
         "input": [

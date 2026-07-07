@@ -26,9 +26,9 @@ class StockMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
             return ['date', 'operation', 'input', 'store', 'quantity',
                     'stock_before', 'stock_after', 'producer',
                     'purchase_reception', 'work_order', 'notes']
-        # Para ajuste: mostramos quantity con label claro (positivo suma, negativo resta)
+        # Registro nuevo (ajuste manual): producer se asigna automáticamente
         return ['date', 'operation', 'input', 'store', 'quantity',
-                'stock_before', 'stock_after', 'producer', 'notes']
+                'stock_before', 'stock_after', 'notes']
 
     def save_model(self, request, obj, form, change):
         if not change:

@@ -1,0 +1,534 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Informe de Insumos por Campaña{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .report-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  .filter-form {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .filter-form label {
+    font-weight: 600;
+    margin-bottom: 0;
+    color: #495057;
+    white-space: nowrap;
+  }
+  .filter-form select {
+    flex: 1;
+    max-width: 320px;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.95rem;
+  }
+  .filter-form button {
+    padding: 0.375rem 1rem;
+    background: #1E7D3B;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .filter-form button:hover { background: #155d2d; }
+  .filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-left: 1px solid #dee2e6;
+    padding-left: 0.75rem;
+    white-space: nowrap;
+  }
+  .filter-toggle input[type=checkbox] { width: 1rem; height: 1rem; cursor: pointer; }
+  .filter-toggle label { font-weight: 500; color: #495057; cursor: pointer; margin: 0; }
+
+  .mode-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  .mode-badge.base { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+  .mode-badge.by-currency { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+  .section-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .section-card .section-title {
+    background: #1E7D3B;
+    color: #fff;
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-card .currency-subtitle {
+    background: #e8f4e8;
+    color: #155724;
+    padding: 0.4rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    border-bottom: 1px solid #c3e6cb;
+  }
+  .section-card table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  .section-card table thead th {
+    background: #f4f6f4;
+    color: #2c3e50;
+    font-weight: 600;
+    padding: 0.55rem 0.75rem;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+  }
+  .section-card table tbody td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+  }
+  .section-card table tbody tr:hover { background: #f9fbf9; }
+  .section-card .totals-row td {
+    font-weight: 600;
+    background: #f4f6f4;
+    border-top: 2px solid #dee2e6;
+    border-bottom: none;
+  }
+  .text-right { text-align: right; }
+  .text-center { text-align: center; }
+  .empty-state {
+    padding: 2rem;
+    text-align: center;
+    color: #868e96;
+    font-style: italic;
+  }
+  .badge-estimated {
+    display: inline-block;
+    background: #d4edda;
+    color: #155724;
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-size: 0.8rem;
+  }
+  .badge-real {
+    display: inline-block;
+    background: #cce5ff;
+    color: #004085;
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-size: 0.8rem;
+  }
+  .currency-tag {
+    display: inline-block;
+    background: #e2e3e5;
+    color: #383d41;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 3px;
+  }
+  .no-data { color: #aaa; font-style: italic; }
+  @media print {
+    .filter-form, #header, .breadcrumbs, nav { display: none !important; }
+    .section-card { border: 1px solid #999; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <div class="report-header">
+    <h2><i class="fas fa-seedling mr-2"></i>Informe de Insumos por Campaña</h2>
+    {% if selected_campaing %}
+    <div style="display:flex;gap:0.5rem;">
+      <button onclick="window.print()" style="padding:0.375rem 1rem;border:1px solid #1E7D3B;color:#1E7D3B;background:#fff;border-radius:4px;cursor:pointer;">
+        <i class="fas fa-file-pdf mr-1"></i> PDF
+      </button>
+      <a href="{% url 'operation:input_report_excel' %}?campaing_id={{ selected_campaing.pk }}{% if use_base %}&use_base=1{% endif %}"
+         style="padding:0.375rem 1rem;border:1px solid #217346;color:#fff;background:#217346;border-radius:4px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">
+        <i class="fas fa-file-excel mr-1"></i> Excel
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <form method="get" class="filter-form">
+    <label for="campaing_id">Campaña:</label>
+    <select name="campaing_id" id="campaing_id">
+      <option value="">— Seleccionar campaña —</option>
+      {% for c in campaigns %}
+        <option value="{{ c.pk }}" {% if selected_campaing and selected_campaing.pk == c.pk %}selected{% endif %}>
+          {{ c.name }}
+        </option>
+      {% endfor %}
+    </select>
+    <div class="filter-toggle">
+      <input type="checkbox" name="use_base" id="use_base" value="1" {% if use_base %}checked{% endif %}>
+      <label for="use_base">
+        Ver en moneda base{% if base_currency %} ({{ base_currency }}){% endif %}
+      </label>
+    </div>
+    <button type="submit"><i class="fas fa-search mr-1"></i>Ver informe</button>
+  </form>
+
+  {% if selected_campaing %}
+
+  {% if use_base %}
+  <div class="mode-badge base">
+    <i class="fas fa-exchange-alt"></i>
+    Todos los precios convertidos a moneda base{% if base_currency %}: {{ base_currency }}{% endif %}
+  </div>
+  {% else %}
+  <div class="mode-badge by-currency">
+    <i class="fas fa-coins"></i>
+    Precios detallados por moneda
+  </div>
+  {% endif %}
+
+  {# ══════════════════════════════════════════════════════════ #}
+  {# MODO MONEDA BASE                                          #}
+  {# ══════════════════════════════════════════════════════════ #}
+  {% if use_base %}
+
+  {# Compras en moneda base #}
+  <div class="section-card">
+    <div class="section-title">
+      <i class="fas fa-shopping-cart"></i>
+      Compras de insumos — {{ selected_campaing.name }}
+      {% if selected_campaing.date_init and selected_campaing.date_final %}
+        <small style="font-weight:400;margin-left:0.5rem;">
+          ({{ selected_campaing.date_init }} al {{ selected_campaing.date_final }})
+        </small>
+      {% endif %}
+    </div>
+
+    {% if purchases %}
+    <table>
+      <thead>
+        <tr>
+          <th>Insumo</th>
+          <th>Proveedor</th>
+          <th>Fecha OC</th>
+          <th>N° OC</th>
+          <th>Moneda OC</th>
+          <th class="text-right">Cantidad</th>
+          <th>Unidad</th>
+          <th class="text-right">Total original</th>
+          <th class="text-right">Total en base</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in purchases %}
+        <tr>
+          <td>{{ p.input.name }}</td>
+          <td>{{ p.purchase_order.provider }}</td>
+          <td>{{ p.purchase_order.date }}</td>
+          <td>OC{{ p.purchase_order.number|stringformat:"04d" }}</td>
+          <td>{% if p.purchase_order.currency %}{{ p.purchase_order.currency }}{% else %}<span class="no-data">—</span>{% endif %}</td>
+          <td class="text-right">{{ p.amount|floatformat:2 }}</td>
+          <td>{% if p.input.unit_measure %}{{ p.input.unit_measure.name }}{% else %}-{% endif %}</td>
+          <td class="text-right">
+            {% if p.total %}{{ p.total|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td class="text-right" style="font-weight:600;">
+            {% if p.total_base is not None %}{{ p.total_base|floatformat:2 }}
+            {% elif p.total %}{{ p.total|floatformat:2 }}
+            {% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="totals-row">
+          <td colspan="8" class="text-right">Total en {{ base_currency }}:</td>
+          <td class="text-right">{{ purchases_total|floatformat:2 }}</td>
+        </tr>
+      </tfoot>
+    </table>
+    {% else %}
+    <div class="empty-state">No hay compras confirmadas registradas en el período de esta campaña.</div>
+    {% endif %}
+  </div>
+
+  {# PMP en moneda base #}
+  <div class="section-card">
+    <div class="section-title">
+      <i class="fas fa-balance-scale"></i>
+      Precio medio ponderado — {{ selected_campaing.name }}
+      <small style="font-weight:400;">(en {{ base_currency }})</small>
+    </div>
+    {% if pmp_list %}
+    <table>
+      <thead>
+        <tr>
+          <th>Insumo</th>
+          <th class="text-right">Cantidad total</th>
+          <th>Unidad</th>
+          <th class="text-right">Costo total base</th>
+          <th class="text-right">PMP en base</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pmp_list %}
+        <tr>
+          <td>{{ p.name }}</td>
+          <td class="text-right">{{ p.qty|floatformat:2 }}</td>
+          <td>{{ p.unit }}</td>
+          <td class="text-right">{{ p.cost|floatformat:2 }}</td>
+          <td class="text-right" style="font-weight:600;color:#1E7D3B;">{{ p.pmp|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">No hay compras con precio registrado para calcular el promedio.</div>
+    {% endif %}
+  </div>
+
+  {# Uso en OTs (moneda base) #}
+  <div class="section-card">
+    <div class="section-title" style="background:#2c6e9e;">
+      <i class="fas fa-tasks"></i>
+      Uso en órdenes de trabajo — {{ selected_campaing.name }}
+      <small style="font-weight:400;">(convertido a {{ base_currency }})</small>
+    </div>
+    {% if usages %}
+    <table>
+      <thead>
+        <tr>
+          <th>Insumo</th>
+          <th>Moneda insumo</th>
+          <th>Orden de trabajo</th>
+          <th>Cultivo</th>
+          <th class="text-right">Dosis planif.</th>
+          <th class="text-right">Dosis aplicada</th>
+          <th>Unidad</th>
+          <th class="text-right">Valor est. en base</th>
+          <th class="text-right">Valor real en base</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in usages %}
+        <tr>
+          <td>{{ u.obj.input.name }}</td>
+          <td>{% if u.obj.input.currency %}{{ u.obj.input.currency }}{% else %}<span class="no-data">—</span>{% endif %}</td>
+          <td>{{ u.obj.work_order.code }}</td>
+          <td>{{ u.obj.work_order.crop }}</td>
+          <td class="text-right">{{ u.obj.dose|floatformat:2 }}</td>
+          <td class="text-right">
+            {% if u.obj.dose_applied %}{{ u.obj.dose_applied|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td>{% if u.obj.input.unit_measure %}{{ u.obj.input.unit_measure.name }}{% else %}-{% endif %}</td>
+          <td class="text-right">
+            {% if u.value_estimated_base is not None %}
+              <span class="badge-estimated">{{ u.value_estimated_base|floatformat:2 }}</span>
+            {% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td class="text-right">
+            {% if u.value_real_base is not None %}
+              <span class="badge-real">{{ u.value_real_base|floatformat:2 }}</span>
+            {% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">No hay insumos registrados en órdenes de trabajo de esta campaña.</div>
+    {% endif %}
+  </div>
+
+  {# ══════════════════════════════════════════════════════════ #}
+  {# MODO POR MONEDA                                           #}
+  {# ══════════════════════════════════════════════════════════ #}
+  {% else %}
+
+  {# Compras agrupadas por moneda #}
+  {% if purchases_groups %}
+    {% for group in purchases_groups %}
+    <div class="section-card">
+      <div class="section-title">
+        <i class="fas fa-shopping-cart"></i>
+        Compras — {{ selected_campaing.name }}
+      </div>
+      <div class="currency-subtitle">
+        <i class="fas fa-coins mr-1"></i> Moneda: {{ group.currency_name }}
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Insumo</th>
+            <th>Proveedor</th>
+            <th>Fecha OC</th>
+            <th>N° OC</th>
+            <th class="text-right">Cantidad</th>
+            <th>Unidad</th>
+            <th class="text-right">Precio unitario</th>
+            <th class="text-right">Impuesto</th>
+            <th class="text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in group.items %}
+          <tr>
+            <td>{{ p.input.name }}</td>
+            <td>{{ p.purchase_order.provider }}</td>
+            <td>{{ p.purchase_order.date }}</td>
+            <td>OC{{ p.purchase_order.number|stringformat:"04d" }}</td>
+            <td class="text-right">{{ p.amount|floatformat:2 }}</td>
+            <td>{% if p.input.unit_measure %}{{ p.input.unit_measure.name }}{% else %}-{% endif %}</td>
+            <td class="text-right">
+              {% if p.price_unit %}{{ p.price_unit|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+            </td>
+            <td class="text-right">
+              {% if p.tax %}{{ p.tax|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+            </td>
+            <td class="text-right">
+              {% if p.total %}{{ p.total|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="totals-row">
+            <td colspan="8" class="text-right">Total en {{ group.currency_name }}:</td>
+            <td class="text-right">{{ group.total|floatformat:2 }}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      {# PMP dentro del grupo de moneda #}
+      {% if group.pmp_list %}
+      <div style="background:#f8f9fa;border-top:2px solid #dee2e6;padding:0.65rem 1rem;font-size:0.88rem;font-weight:600;color:#2c3e50;">
+        <i class="fas fa-balance-scale mr-1"></i> Precio medio ponderado — {{ group.currency_name }}
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Insumo</th>
+            <th class="text-right">Cantidad total</th>
+            <th>Unidad</th>
+            <th class="text-right">Costo total</th>
+            <th class="text-right">PMP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in group.pmp_list %}
+          <tr>
+            <td>{{ p.name }}</td>
+            <td class="text-right">{{ p.qty|floatformat:2 }}</td>
+            <td>{{ p.unit }}</td>
+            <td class="text-right">{{ p.cost|floatformat:2 }}</td>
+            <td class="text-right" style="font-weight:600;color:#1E7D3B;">{{ p.pmp|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+    </div>
+    {% endfor %}
+  {% else %}
+  <div class="section-card">
+    <div class="section-title"><i class="fas fa-shopping-cart"></i> Compras</div>
+    <div class="empty-state">No hay compras confirmadas registradas en el período de esta campaña.</div>
+  </div>
+  {% endif %}
+
+  {# Uso en OTs por moneda #}
+  <div class="section-card">
+    <div class="section-title" style="background:#2c6e9e;">
+      <i class="fas fa-tasks"></i>
+      Uso en órdenes de trabajo — {{ selected_campaing.name }}
+    </div>
+    {% if usages %}
+    <table>
+      <thead>
+        <tr>
+          <th>Insumo</th>
+          <th>Moneda</th>
+          <th>Orden de trabajo</th>
+          <th>Cultivo</th>
+          <th class="text-right">Dosis planif.</th>
+          <th class="text-right">Dosis aplicada</th>
+          <th>Unidad</th>
+          <th class="text-right">Valor estimado</th>
+          <th class="text-right">Valor real</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in usages %}
+        <tr>
+          <td>{{ u.input.name }}</td>
+          <td>
+            {% if u.input.currency %}
+              <span class="currency-tag">{{ u.input.currency }}</span>
+            {% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td>{{ u.work_order.code }}</td>
+          <td>{{ u.work_order.crop }}</td>
+          <td class="text-right">{{ u.dose|floatformat:2 }}</td>
+          <td class="text-right">
+            {% if u.dose_applied %}{{ u.dose_applied|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td>{% if u.input.unit_measure %}{{ u.input.unit_measure.name }}{% else %}-{% endif %}</td>
+          <td class="text-right">
+            {% if u.value_estimated %}
+              <span class="badge-estimated">{{ u.value_estimated|floatformat:2 }}</span>
+            {% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td class="text-right">
+            {% if u.value_real %}
+              <span class="badge-real">{{ u.value_real|floatformat:2 }}</span>
+            {% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">No hay insumos registrados en órdenes de trabajo de esta campaña.</div>
+    {% endif %}
+  </div>
+
+  {% endif %}{# end if use_base #}
+
+  {% endif %}{# end if selected_campaing #}
+
+</div>
+{% endblock %}

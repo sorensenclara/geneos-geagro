@@ -11,11 +11,33 @@ class InputWorkOrder(models.Model):
     input = models.ForeignKey(Input, models.CASCADE, verbose_name= _('input'))
     dose = models.FloatField(verbose_name= _('planned dose'))
     dose_applied = models.FloatField(null=True, blank=True, verbose_name= _('dose applied'))
+    value_estimated = models.FloatField(null=True, blank=True, verbose_name=_('estimated value (base currency)'))
+    value_real = models.FloatField(null=True, blank=True, verbose_name=_('real value'))
+    currency = models.ForeignKey('parameter.Currency', models.SET_NULL, null=True, blank=True, verbose_name=_('currency (real)'))
+    exchange_rate = models.FloatField(null=True, blank=True, verbose_name=_('exchange rate'))
+    value_real_base = models.FloatField(null=True, blank=True, verbose_name=_('real value (base currency)'))
     store = models.ForeignKey(Store, models.SET_NULL, null=True, blank=True, verbose_name=_('store'))
     details = models.TextField(null=True, blank=True, verbose_name= _('details'))
 
+    def save(self, *args, **kwargs):
+        if self.value_real is not None:
+            if self.currency_id:
+                from parameter.models.currency import Currency
+                currency = Currency.objects.filter(pk=self.currency_id).first()
+                if currency:
+                    if currency.is_base:
+                        self.exchange_rate = 1.0
+                    elif not self.exchange_rate:
+                        from parameter.models.exchange_rate import exchangeRate
+                        fetched = exchangeRate.get_rate(currency)
+                        if fetched:
+                            self.exchange_rate = fetched
+            rate = self.exchange_rate or 1.0
+            self.value_real_base = round(self.value_real * rate, 2)
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.work_order} - {self.input} - {self.dose}"    
+        return f"{self.work_order} - {self.input} - {self.dose}"
 
     class Meta:
         verbose_name =  _('input work order')

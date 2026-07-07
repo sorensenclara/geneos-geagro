@@ -67,7 +67,7 @@ def process_plan(modeladmin, request, queryset):
             contractor = None
             if detail.subcontracted:
                 type_wo = 'TPW'
-                contractor = detail.contractor
+                contractor = detail.contractor  # ya es Contractor
             elif detail.with_partner:
                 type_wo = 'PW'
                 partner = detail.partner
@@ -109,6 +109,7 @@ def process_plan(modeladmin, request, queryset):
                     work_order=order,
                     input=input,
                     dose=dose_total,
+                    value_estimated=input.cost or None,
                     store=item_input.store,
                     details=details,
                 )

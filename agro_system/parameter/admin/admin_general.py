@@ -1,5 +1,6 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite
+from django.utils.translation import gettext_lazy as _
+from user.admin.adminSite import adminSite, ProducerAwareMixin
 from parameter.models.country import Country
 from parameter.models.province import Province
 from parameter.models.city import City
@@ -36,9 +37,37 @@ adminSite.register(Port)
 adminSite.register(VarCropTechnique)
 adminSite.register(Specie)
 adminSite.register(Area)
-adminSite.register(MaensureUnit)
-adminSite.register(Currency)
-adminSite.register(exchangeRate)
+
+
+class MeasureUnitAdmin(ProducerAwareMixin, admin.ModelAdmin):
+    list_display = ['name', 'is_reference', 'multiplier']
+    list_filter = ['is_reference']
+    search_fields = ['name']
+
+adminSite.register(MaensureUnit, MeasureUnitAdmin)
+class CurrencyAdmin(ProducerAwareMixin, admin.ModelAdmin):
+    list_display = ['name', 'is_base']
+    list_filter = ['is_base']
+
+adminSite.register(Currency, CurrencyAdmin)
+class ExchangeRateAdmin(ProducerAwareMixin, admin.ModelAdmin):
+    list_display = ['currency_origin', 'rate', 'date', 'currency_destination']
+    list_filter = ['currency_origin', 'date']
+    ordering = ['-date']
+    fields = ['currency_origin', 'rate', 'date', 'currency_destination']
+
+    def get_changeform_initial_data(self, request):
+        initial = super().get_changeform_initial_data(request)
+        base = Currency.objects.filter(is_base=True).first()
+        if base:
+            initial['currency_destination'] = base.pk
+        return initial
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('currency_origin', 'currency_destination')
+
+
+adminSite.register(exchangeRate, ExchangeRateAdmin)
 adminSite.register(TypeVarCropTechnique)
 adminSite.register(SiloType)
 adminSite.register(StorageServiceType)

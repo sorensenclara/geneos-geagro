@@ -1,3 +1,4 @@
+from .contractor import Contractor
 from .cost_center import CostCenter
 from .country_side import Countryside
 from .staff import Staff

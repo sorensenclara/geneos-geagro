@@ -14,6 +14,9 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
 def input_charts_view(request):
+    # Muestra gráficos de stock e historial de movimientos para los insumos del usuario.
+    # Filtra los insumos según el tipo de usuario (Administración, Organización o Productor).
+    # Si se recibe un input_id por GET, genera también un gráfico de evolución acumulada del stock.
     extra_context = {}
 
     # Filtro de privacidad por productor (mismo criterio que el Admin)
@@ -80,6 +83,9 @@ def input_charts_view(request):
     return render(request, 'admin/input/charts.html', extra_context)
 
 def InputPendingPDFView(request):
+    # Genera un PDF con los detalles de órdenes de compra que tienen cantidades pendientes de recepción.
+    # Filtra las órdenes según el tipo de usuario y descarga el archivo directamente como adjunto.
+    # Si no hay pendientes, redirige a la página anterior con un mensaje de error.
 
     # Recupera los registros de lineas de ordenes con pendientes
    pendings = []
@@ -120,3 +126,39 @@ def InputPendingPDFView(request):
    else:
       messages.error(request, "No hay pendientes para generar el reporte.")
       return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def exchange_rate_api(request):
+    # API JSON que devuelve la tasa de conversión de una moneda a la moneda base.
+    # Recibe currency_id por GET. Si la moneda ya es la base, devuelve rate=1.0.
+    # Usado por el JS del formulario de orden de compra para autocompletar la tasa.
+    currency_id = request.GET.get('currency_id')
+    if not currency_id:
+        return JsonResponse({'error': 'missing currency_id'}, status=400)
+    try:
+        from parameter.models.currency import Currency
+        from parameter.models.exchange_rate import exchangeRate
+        currency = Currency.objects.get(pk=currency_id)
+        if currency.is_base:
+            return JsonResponse({'rate': 1.0, 'is_base': True})
+        rate = exchangeRate.get_rate(currency)
+        return JsonResponse({'rate': rate, 'is_base': False})
+    except Currency.DoesNotExist:
+        return JsonResponse({'error': 'not found'}, status=404)
+
+
+def input_cost_api(request):
+    # API JSON que devuelve el costo unitario y la moneda de un insumo dado su ID.
+    # Recibe id por GET. Usado por el JS de la orden de trabajo para autocompletar el valor estimado.
+    input_id = request.GET.get('id')
+    if not input_id:
+        return JsonResponse({'error': 'missing id'}, status=400)
+    try:
+        inp = Input.objects.select_related('currency').get(pk=input_id)
+        return JsonResponse({
+            'cost': inp.cost,
+            'currency': str(inp.currency) if inp.currency else '',
+            'currency_id': inp.currency_id,
+        })
+    except Input.DoesNotExist:
+        return JsonResponse({'error': 'not found'}, status=404)

@@ -9,10 +9,11 @@ from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
-
+from input.utils import update_input_cost
 
 @admin.action(description=_("Process Purchase Order"))
 def procesar_purchase_order(modeladmin, request, queryset):
+   
     for obj in queryset:
         if obj.state == 'confirm':
             messages.error(request, _("The order %s is already confirmed.") % obj.number)
@@ -27,6 +28,7 @@ def procesar_purchase_order(modeladmin, request, queryset):
             item.input.pending += item.amount
             item.input.save()
             item.save()
+            update_input_cost(item.input)
 
         # Crear recepción pendiente automáticamente si todavía no existe una
         if not PurchaseReception.objects.filter(purchase_order=obj).exists():
@@ -82,7 +84,7 @@ def input_pending_pdf(modeladmin, request, queryset):
 
 class PurchaseOrderDetailInline(admin.StackedInline):
     model = PurchaseOrderDetail
-    readonly_fields = ['pending_amount', 'total']
+    readonly_fields = ['pending_amount', 'total', 'total_base']
     extra = 0
     
     def has_add_permission(self, request, obj=None):
@@ -108,12 +110,24 @@ class PurchaseOrderDetailInline(admin.StackedInline):
         return super().get_readonly_fields(request, obj)
     
 class PurchaseOrderAdmin(ProducerAwareMixin, admin.ModelAdmin):
-    list_display = ['code', 'date', 'provider', 'store', 'state']
-    list_filter = ['state', 'provider']
+    list_display = ['code', 'date', 'provider', 'store', 'currency', 'state']
+    list_filter = ['state', 'provider', 'currency']
     search_fields = ['number']
     ordering = ['-number']
     inlines = [PurchaseOrderDetailInline]
     actions = [procesar_purchase_order, cancelar_purchase_order, input_pending_pdf]
+
+    def get_changeform_initial_data(self, request):
+        from parameter.models.currency import Currency
+        initial = super().get_changeform_initial_data(request)
+        base = Currency.objects.filter(is_base=True).first()
+        if base:
+            initial['currency'] = base.pk
+            initial['exchange_rate'] = 1.0
+        return initial
+
+    class Media:
+        js = ('js/admin_purchase_order_currency.js',)
 
     def changelist_view(self, request, extra_context=None):
         if 'action' in request.POST and (request.POST['action'] == 'input_pending_pdf'):

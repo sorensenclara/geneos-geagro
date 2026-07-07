@@ -17,6 +17,7 @@ class TechnicalPlanInput(models.Model):
     technical_plan_detail = models.ForeignKey(TechnicalPlanDetail, models.CASCADE, verbose_name= _('technical plan detail'))
     input = models.ForeignKey(Input, models.CASCADE, verbose_name= _('input'))
     dose = models.FloatField(verbose_name= _('dose'))
+    value = models.FloatField(null=True, blank=True, verbose_name=_('estimated value'))
     store = models.ForeignKey(Store, models.SET_NULL, null=True, blank=True, verbose_name=_('store'))
     detail = models.TextField(null=True, blank=True, verbose_name= _('detail'))
 

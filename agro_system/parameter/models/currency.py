@@ -5,7 +5,14 @@ class Currency(models.Model):
 
     """ Modelo para representar las monedas """
 
-    name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
+    name = models.CharField(max_length=200, unique=True, verbose_name=_('name'))
+    is_base = models.BooleanField(default=False, verbose_name=_('base currency'),
+                                  help_text=_('Only one currency can be the base currency of the system'))
+
+    def save(self, *args, **kwargs):
+        if self.is_base:
+            Currency.objects.exclude(pk=self.pk).update(is_base=False)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name}"
