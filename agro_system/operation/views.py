@@ -12,9 +12,12 @@ from django.db.models.functions import TruncMonth, Coalesce
 from collections import defaultdict
 from parameter.models.campaign import Campaing
 from parameter.models.ot_state import OTState
+from parameter.models.area import Area
 from input.models.purchase_order_detail import PurchaseOrderDetail
 from user.models.user_producer import UserProducer
 from parameter.models.currency import Currency
+from operation.models.crop import Crop
+from producer.models.contractor import Contractor
 
 
 def WorkOrderPDFView(request):
@@ -251,6 +254,23 @@ def _build_budget_data(request):
                 real = (real_base or 0) * (real_dose or 0)
                 crop_map[crop][month]['presupuestado'] += est
                 crop_map[crop][month]['real'] += real
+
+            # Incluir costo de contratista por OT (en moneda base)
+            wo_qs = WorkOrder.objects.filter(
+                campaing_id=campaing_id,
+                contractor_cost__isnull=False,
+            ).select_related('crop')
+            if producer_filter is not None:
+                wo_qs = wo_qs.filter(producer__in=producer_filter)
+            if state_id:
+                wo_qs = wo_qs.filter(stateOT_id=state_id)
+            for wo in wo_qs:
+                if not wo.date_init or not wo.contractor_cost:
+                    continue
+                month = wo.date_init.replace(day=1)
+                months_set.add(month)
+                crop = wo.crop.name if wo.crop else '(sin cultivo)'
+                crop_map[crop][month]['real'] += wo.contractor_cost
         else:
             usage_items = InputWorkOrder.objects.filter(
                 work_order__campaing_id=campaing_id,
@@ -277,6 +297,25 @@ def _build_budget_data(request):
                 real = (real_val or 0) * (real_dose or 0)
                 crop_map[crop_key][month]['presupuestado'] += est
                 crop_map[crop_key][month]['real'] += real
+
+            # Incluir costo de contratista (siempre en moneda base)
+            base_currency_name = str(base_currency) if base_currency else 'Sin moneda'
+            wo_qs = WorkOrder.objects.filter(
+                campaing_id=campaing_id,
+                contractor_cost__isnull=False,
+            ).select_related('crop')
+            if producer_filter is not None:
+                wo_qs = wo_qs.filter(producer__in=producer_filter)
+            if state_id:
+                wo_qs = wo_qs.filter(stateOT_id=state_id)
+            for wo in wo_qs:
+                if not wo.date_init or not wo.contractor_cost:
+                    continue
+                month = wo.date_init.replace(day=1)
+                months_set.add(month)
+                crop = wo.crop.name if wo.crop else '(sin cultivo)'
+                crop_key = f"[{base_currency_name}] {crop}"
+                crop_map[crop_key][month]['real'] += wo.contractor_cost
 
         months = sorted(months_set)
         context['months'] = months
@@ -590,3 +629,143 @@ def budget_vs_real_excel(request):
     resp['Content-Disposition'] = f'attachment; filename="presupuesto_vs_real_{campaign_name}.xlsx"'
     wb.save(resp)
     return resp
+
+
+def _build_work_orders_data(request):
+    user = request.user
+    campaing_id = request.GET.get('campaing_id')
+    state_ids = request.GET.getlist('state_ids')
+    crop_id = request.GET.get('crop_id')
+    area_id = request.GET.get('area_id')
+    contractor_id = request.GET.get('contractor_id')
+    wo_type = request.GET.get('wo_type')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    producer_filter = _producer_filter(user)
+
+    selected_campaing = None
+    orders = []
+    all_crops = []
+    all_contractors_qs = Contractor.objects.order_by('name')
+    if producer_filter is not None:
+        all_contractors_qs = all_contractors_qs.filter(producer__in=producer_filter)
+
+    if campaing_id:
+        try:
+            selected_campaing = Campaing.objects.get(pk=campaing_id)
+        except Campaing.DoesNotExist:
+            pass
+
+        all_crops = list(Crop.objects.filter(campaing_id=campaing_id).order_by('name'))
+
+        qs = WorkOrder.objects.filter(
+            campaing_id=campaing_id,
+        ).select_related(
+            'crop', 'crop__area', 'stage', 'service', 'stateOT', 'contractor', 'staff', 'area',
+        ).order_by('date_init', 'code')
+
+        if producer_filter is not None:
+            qs = qs.filter(producer__in=producer_filter)
+        if state_ids:
+            qs = qs.filter(stateOT_id__in=state_ids)
+        if crop_id:
+            qs = qs.filter(crop_id=crop_id)
+        if area_id:
+            qs = qs.filter(area_id=area_id)
+        if contractor_id:
+            qs = qs.filter(contractor_id=contractor_id)
+        if wo_type:
+            qs = qs.filter(type=wo_type)
+        if date_from:
+            qs = qs.filter(date_init__gte=date_from)
+        if date_to:
+            qs = qs.filter(date_init__lte=date_to)
+
+        orders = list(qs)
+
+    return {
+        'campaigns': Campaing.objects.all().order_by('-date_init'),
+        'all_states': OTState.objects.all().order_by('name'),
+        'all_areas': Area.objects.order_by('name'),
+        'all_crops': all_crops,
+        'all_contractors': list(all_contractors_qs),
+        'wo_types': WorkOrder.types,
+        'selected_campaing': selected_campaing,
+        'selected_campaing_id': campaing_id,
+        'selected_state_ids': state_ids,
+        'selected_crop_id': crop_id,
+        'selected_area_id': area_id,
+        'selected_contractor_id': contractor_id,
+        'selected_wo_type': wo_type,
+        'selected_date_from': date_from,
+        'selected_date_to': date_to,
+        'orders': orders,
+    }
+
+
+@login_required
+def work_orders_report_view(request):
+    ctx = _build_work_orders_data(request)
+    return render(request, 'operations/report_work_orders.html', ctx)
+
+
+@login_required
+def work_orders_report_excel(request):
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment
+    from openpyxl.utils import get_column_letter
+
+    ctx = _build_work_orders_data(request)
+    selected_campaing = ctx['selected_campaing']
+    orders = ctx['orders']
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'Órdenes de Trabajo'
+
+    header_fill = PatternFill('solid', fgColor='1E7D3B')
+    header_font = Font(color='FFFFFF', bold=True, size=9)
+    header_align = Alignment(horizontal='center', vertical='center', wrap_text=True)
+
+    headers = ['Código', 'Inicio', 'Fin', 'Cultivo', 'Estadio', 'Servicio',
+               'Tipo', 'Estado', 'Contratista', 'Costo labor', 'Personal']
+
+    for col, h in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=h)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = header_align
+
+    TYPE_LABELS = {'TPW': 'Plan técnico', 'OW': 'Propia', 'PW': 'Contratada'}
+
+    for row_idx, wo in enumerate(orders, 2):
+        row_data = [
+            wo.code,
+            wo.date_init.strftime('%d/%m/%Y') if wo.date_init else '',
+            wo.date_fin.strftime('%d/%m/%Y') if wo.date_fin else '',
+            str(wo.crop) if wo.crop else '',
+            str(wo.stage) if wo.stage else '',
+            str(wo.service) if wo.service else '',
+            TYPE_LABELS.get(wo.type, wo.type) if wo.type else '',
+            str(wo.stateOT) if wo.stateOT else '',
+            str(wo.contractor) if wo.contractor else '',
+            round(float(wo.contractor_cost), 2) if wo.contractor_cost else '',
+            str(wo.staff) if wo.staff else '',
+        ]
+        for col, val in enumerate(row_data, 1):
+            ws.cell(row=row_idx, column=col, value=val)
+
+    for col in range(1, len(headers) + 1):
+        max_len = max(
+            (len(str(ws.cell(row=r, column=col).value or '')) for r in range(1, ws.max_row + 1)),
+            default=10,
+        )
+        ws.column_dimensions[get_column_letter(col)].width = min(max_len + 3, 40)
+
+    ws.freeze_panes = 'A2'
+
+    campaign_slug = selected_campaing.name.replace(' ', '_') if selected_campaing else 'sin_campana'
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="ordenes-{campaign_slug}.xlsx"'
+    wb.save(response)
+    return response

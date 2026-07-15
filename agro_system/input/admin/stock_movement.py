@@ -14,6 +14,12 @@ class StockMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
     search_fields = ['input__name', 'notes']
     ordering = ['-date', '-id']
 
+    def get_list_display(self, request):
+        cols = list(super().get_list_display(request))
+        if getattr(request.user, 'type', None) in ('Producer', 'Staff'):
+            cols = [c for c in cols if c != 'producer']
+        return cols
+
     def get_readonly_fields(self, request, obj=None):
         if obj and obj.operation in AUTO_OPERATIONS:
             # Registros creados automáticamente: solo lectura
@@ -23,9 +29,11 @@ class StockMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         if obj and obj.operation in AUTO_OPERATIONS:
-            return ['date', 'operation', 'input', 'store', 'quantity',
-                    'stock_before', 'stock_after', 'producer',
-                    'purchase_reception', 'work_order', 'notes']
+            fields = ['date', 'operation', 'input', 'store', 'quantity',
+                      'stock_before', 'stock_after', 'purchase_reception', 'work_order', 'notes']
+            if request.user.is_superuser or getattr(request.user, 'type', None) == 'Administration':
+                fields.insert(fields.index('purchase_reception'), 'producer')
+            return fields
         # Registro nuevo (ajuste manual): producer se asigna automáticamente
         return ['date', 'operation', 'input', 'store', 'quantity',
                 'stock_before', 'stock_after', 'notes']

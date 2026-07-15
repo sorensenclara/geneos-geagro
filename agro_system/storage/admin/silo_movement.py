@@ -15,6 +15,12 @@ class SiloMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
     ordering = ['-date', '-id']
     readonly_fields = ['silo_stock']
 
+    def get_list_display(self, request):
+        cols = list(super().get_list_display(request))
+        if getattr(request.user, 'type', None) in ('Producer', 'Staff'):
+            cols = [c for c in cols if c != 'producer']
+        return cols
+
     # Funcion para que aparezca el silo destino en caso de que sea un movimiento de transferencia
     class Media:
         js = ('js/admin_silo_movement.js',)

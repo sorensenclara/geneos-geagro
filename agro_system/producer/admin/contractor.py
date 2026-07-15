@@ -10,6 +10,12 @@ class ContractorAdmin(ProducerAwareMixin, admin.ModelAdmin):
     search_fields = ['name', 'cuit', 'email']
     ordering = ['name']
 
+    def get_list_display(self, request):
+        cols = list(super().get_list_display(request))
+        if getattr(request.user, 'type', None) in ('Producer', 'Staff'):
+            cols = [c for c in cols if c != 'producer']
+        return cols
+
     def save_model(self, request, obj, form, change):
         if not change:
             producer = UserProducer.objects.filter(email=request.user.email).first()

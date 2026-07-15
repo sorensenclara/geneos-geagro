@@ -1,0 +1,373 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Listado de Órdenes de Trabajo{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .report-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  .filter-form {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .filter-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .filter-group label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #495057;
+  }
+  .filter-group select,
+  .filter-group input[type=date] {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    min-width: 160px;
+  }
+  .state-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding-top: 0.2rem;
+  }
+  .state-pill input[type=checkbox] { display: none; }
+  .state-pill label {
+    display: inline-block;
+    padding: 0.3rem 0.85rem;
+    border: 1.5px solid #ced4da;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #495057;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .state-pill input[type=checkbox]:checked + label {
+    background: #1E7D3B;
+    border-color: #1E7D3B;
+    color: #fff;
+    font-weight: 600;
+  }
+  .state-pill label:hover {
+    border-color: #1E7D3B;
+    color: #1E7D3B;
+  }
+  .state-pill input[type=checkbox]:checked + label:hover {
+    background: #155d2d;
+    border-color: #155d2d;
+    color: #fff;
+  }
+  .filter-actions {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    padding-bottom: 2px;
+  }
+  .btn-filter {
+    padding: 0.4rem 1.1rem;
+    background: #1E7D3B;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .btn-filter:hover { background: #155d2d; }
+  .btn-clear {
+    padding: 0.4rem 0.9rem;
+    background: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+  .btn-clear:hover { background: #545b62; color: #fff; }
+
+  .section-card {
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .section-card-header {
+    background: #2c3e50;
+    color: #fff;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .badge-count {
+    background: rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  .wo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  .wo-table th {
+    background: #f4f6f8;
+    padding: 0.55rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+  }
+  .wo-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+  }
+  .wo-table tr:last-child td { border-bottom: none; }
+  .wo-table tr:hover td { background: #f8f9fa; }
+  .state-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: #e9ecef;
+    color: #495057;
+  }
+  .type-badge {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .type-TPW { background: #fff3cd; color: #856404; }
+  .type-OW  { background: #d1e7dd; color: #0f5132; }
+  .type-PW  { background: #cfe2ff; color: #084298; }
+  .empty-msg {
+    text-align: center;
+    color: #6c757d;
+    padding: 2.5rem;
+    font-size: 0.95rem;
+  }
+  .summary-bar {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    font-size: 0.88rem;
+    color: #495057;
+  }
+  .summary-item strong { color: #2c3e50; }
+  @page { margin: 1cm; }
+  @media print {
+    #header, nav, .main-sidebar, #nav-sidebar, .breadcrumbs,
+    .filter-form, .no-print, .messagelist,
+    footer, .main-footer, #footer { display: none !important; }
+    #main, .main, body { margin-left: 0 !important; padding-left: 0 !important; }
+    .section-card { border: 1px solid #ccc; }
+    .wo-table th { background-color: #f4f6f8 !important; -webkit-print-color-adjust: exact; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+<div class="report-header">
+  <h2>Listado de Órdenes de Trabajo</h2>
+  {% if selected_campaing %}
+  <div class="no-print" style="display:flex;gap:0.5rem;">
+    <button onclick="window.print()" style="padding:0.375rem 1rem;border:1px solid #1E7D3B;color:#1E7D3B;background:#fff;border-radius:4px;cursor:pointer;">
+      <i class="fas fa-file-pdf mr-1"></i> PDF
+    </button>
+    <a href="{% url 'operation:work_orders_report_excel' %}?campaing_id={{ selected_campaing.pk }}{% for sid in selected_state_ids %}&state_ids={{ sid }}{% endfor %}{% if selected_crop_id %}&crop_id={{ selected_crop_id }}{% endif %}{% if selected_area_id %}&area_id={{ selected_area_id }}{% endif %}{% if selected_contractor_id %}&contractor_id={{ selected_contractor_id }}{% endif %}{% if selected_wo_type %}&wo_type={{ selected_wo_type }}{% endif %}{% if selected_date_from %}&date_from={{ selected_date_from }}{% endif %}{% if selected_date_to %}&date_to={{ selected_date_to }}{% endif %}"
+       style="padding:0.375rem 1rem;border:1px solid #217346;color:#fff;background:#217346;border-radius:4px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">
+      <i class="fas fa-file-excel mr-1"></i> Excel
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<form method="get" class="filter-form">
+  <div class="filter-row" style="margin-bottom:0.85rem;">
+    <div class="filter-group">
+      <label>Campaña</label>
+      <select name="campaing_id" required>
+        <option value="">— Seleccionar —</option>
+        {% for c in campaigns %}
+          <option value="{{ c.pk }}" {% if c.pk|stringformat:"s" == selected_campaing_id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Cultivo</label>
+      <select name="crop_id">
+        <option value="">— Todos —</option>
+        {% for c in all_crops %}
+          <option value="{{ c.pk }}" {% if c.pk|stringformat:"s" == selected_crop_id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Campo</label>
+      <select name="area_id">
+        <option value="">— Todos —</option>
+        {% for a in all_areas %}
+          <option value="{{ a.pk }}" {% if a.pk|stringformat:"s" == selected_area_id %}selected{% endif %}>{{ a.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Tipo de orden</label>
+      <select name="wo_type">
+        <option value="">— Todos —</option>
+        {% for val, label in wo_types %}
+          <option value="{{ val }}" {% if val == selected_wo_type %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <div class="filter-group">
+      <label>Fecha desde</label>
+      <input type="date" name="date_from" value="{{ selected_date_from|default:'' }}">
+    </div>
+    <div class="filter-group">
+      <label>Fecha hasta</label>
+      <input type="date" name="date_to" value="{{ selected_date_to|default:'' }}">
+    </div>
+    <div class="filter-group">
+      <label>Contratista</label>
+      <select name="contractor_id">
+        <option value="">— Todos —</option>
+        {% for con in all_contractors %}
+          <option value="{{ con.pk }}" {% if con.pk|stringformat:"s" == selected_contractor_id %}selected{% endif %}>{{ con.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Estado</label>
+      <div class="state-pills">
+        {% for s in all_states %}
+          <span class="state-pill">
+            <input type="checkbox" name="state_ids" value="{{ s.pk }}"
+                   id="state_{{ s.pk }}"
+                   {% if s.pk|stringformat:"s" in selected_state_ids %}checked{% endif %}>
+            <label for="state_{{ s.pk }}">{{ s.name }}</label>
+          </span>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="btn-filter">Filtrar</button>
+      {% if selected_campaing_id %}
+        <a href="?" class="btn-clear">Limpiar</a>
+      {% endif %}
+    </div>
+  </div>
+</form>
+
+{% if selected_campaing %}
+  <div class="section-card">
+    <div class="section-card-header">
+      Campaña: {{ selected_campaing.name }}
+      {% if selected_state_ids %}
+        — Filtrado por estado
+      {% endif %}
+      <span class="badge-count">{{ orders|length }} orden{{ orders|length|pluralize:"es" }}</span>
+    </div>
+
+    {% if orders %}
+      {% if orders|length > 1 %}
+        <div style="padding: 0.75rem 1rem 0;">
+          <div class="summary-bar">
+            <span><strong>Total órdenes:</strong> {{ orders|length }}</span>
+            {% regroup orders by stateOT as by_state %}
+            {% for group in by_state %}
+              <span><strong>{{ group.grouper }}:</strong> {{ group.list|length }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <div style="overflow-x: auto;">
+        <table class="wo-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              <th>Cultivo</th>
+              <th>Estadio</th>
+              <th>Servicio</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Contratista</th>
+              <th>Costo labor</th>
+              <th>Personal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for wo in orders %}
+            <tr>
+              <td><strong>{{ wo.code }}</strong></td>
+              <td>{{ wo.date_init|date:"d/m/Y" }}</td>
+              <td>{{ wo.date_fin|date:"d/m/Y" }}</td>
+              <td>{{ wo.crop }}</td>
+              <td>{{ wo.stage }}</td>
+              <td>{{ wo.service }}</td>
+              <td><span class="type-badge type-{{ wo.type }}">{{ wo.get_type_display }}</span></td>
+              <td><span class="state-badge">{{ wo.stateOT }}</span></td>
+              <td>{{ wo.contractor|default:"—" }}</td>
+              <td>{% if wo.contractor_cost %}{{ wo.contractor_cost|floatformat:2 }}{% else %}—{% endif %}</td>
+              <td>{{ wo.staff }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="empty-msg">No hay órdenes de trabajo para los filtros seleccionados.</p>
+    {% endif %}
+  </div>
+
+{% elif selected_campaing_id %}
+  <p class="empty-msg">Campaña no encontrada.</p>
+{% else %}
+  <p class="empty-msg">Seleccioná una campaña para ver el listado.</p>
+{% endif %}
+</div>
+{% endblock %}

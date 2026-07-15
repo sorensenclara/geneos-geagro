@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-07 11:55-0300\n"
+"POT-Creation-Date: 2026-07-15 09:33-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -328,7 +328,8 @@ msgstr "Modo de actualización de costo"
 
 #: input/models/input.py:32
 msgid "Determines how the base cost is updated when a purchase is confirmed"
-msgstr "Determina cómo se actualiza el costo base cuando se confirma una compra"
+msgstr ""
+"Determina cómo se actualiza el costo base cuando se confirma una compra"
 
 #: input/models/input.py:34
 msgid "control of stock"
@@ -358,7 +359,7 @@ msgstr "Control de lote"
 #: input/models/input.py:39 input/models/provider.py:20
 #: input/models/purchase_order.py:31 input/models/purchase_reception.py:22
 #: input/models/stock_movement.py:22 operation/models/crop.py:37
-#: operation/models/technical_plan.py:22 operation/models/work_order.py:40
+#: operation/models/technical_plan.py:22 operation/models/work_order.py:41
 #: producer/models/contractor.py:16 producer/models/country_side.py:25
 #: producer/models/staff.py:33 producer/models/store.py:14
 #: sale/models/sales_receipt.py:31 storage/models/silo.py:19
@@ -561,7 +562,7 @@ msgid "operation"
 msgstr "Operaciones"
 
 #: input/models/stock_movement.py:54 operation/models/input_work_order.py:10
-#: operation/models/work_order.py:50
+#: operation/models/work_order.py:51
 msgid "work order"
 msgstr "Orden de trabajo"
 
@@ -819,7 +820,7 @@ msgstr "Insumos de ordenes de trabajo"
 
 #: operation/models/partner_crop.py:14
 #: operation/models/technical_plan_detail.py:23
-#: operation/models/work_order.py:39
+#: operation/models/work_order.py:40
 msgid "partner"
 msgstr "Socio"
 
@@ -987,7 +988,11 @@ msgstr "Tipo"
 msgid "staff"
 msgstr "Personal"
 
-#: operation/models/work_order.py:51
+#: operation/models/work_order.py:38
+msgid "contractor cost"
+msgstr "Costo de labor"
+
+#: operation/models/work_order.py:52
 msgid "work orders"
 msgstr "Orden de trabajo"
 

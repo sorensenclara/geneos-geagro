@@ -70,6 +70,12 @@ class StorageMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
     search_fields = ['certificate__number', 'remito_number', 'destination']
     ordering = ['-date', '-id']
 
+    def get_list_display(self, request):
+        cols = list(super().get_list_display(request))
+        if getattr(request.user, 'type', None) in ('Producer', 'Staff'):
+            cols = [c for c in cols if c != 'producer']
+        return cols
+
     def save_model(self, request, obj, form, change):
         if not change:
             user_producer = UserProducer.objects.filter(email=request.user.email).first()

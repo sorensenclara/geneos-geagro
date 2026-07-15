@@ -25,6 +25,9 @@ class InputStockInline(admin.TabularInline):
     verbose_name = _('Stock per store')
     verbose_name_plural = _('Stock per store')
 
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_active
+
     def has_add_permission(self, request, obj=None):
         return False
 
@@ -33,6 +36,16 @@ class InputStockInline(admin.TabularInline):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser or getattr(request.user, 'type', None) in ('Administration', 'Organization'):
+            return qs
+        if getattr(request.user, 'type', None) in ('Producer', 'Staff'):
+            producer = UserProducer.objects.filter(email=request.user.email).first()
+            if producer:
+                return qs.filter(store__producer=producer)
+        return qs.none()
 
 
 class PurchaseInline(admin.StackedInline):
@@ -102,7 +115,7 @@ class InputAdmin(ProducerAwareMixin, ImportExportModelAdmin):
     inlines = [InputStockInline, PurchaseInline]
     list_display = ['name', 'type', 'cost', 'currency', 'cost_update_mode', 'stock', 'min_stock', 'pending', 'producer']
     list_filter = ['type', 'unit_measure', 'currency', 'cost_update_mode']
-    readonly_fields = ['pending']
+    readonly_fields = ['pending', 'stock']
     resource_class = InputResource
 
     def get_readonly_fields(self, request, obj=None):

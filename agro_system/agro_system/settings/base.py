@@ -324,6 +324,12 @@ JAZZMIN_SETTINGS = {
             "url": "operation:budget_vs_real",
             "icon": "fas fa-chart-bar",
             "order": 4
+        },
+        {
+            "name": "Listado de Órdenes",
+            "url": "operation:work_orders_report",
+            "icon": "fas fa-clipboard-list",
+            "order": 5
         }
         ],
         "input": [
@@ -332,6 +338,12 @@ JAZZMIN_SETTINGS = {
                 "url": "input:input_charts",
                 "icon": "fas fa-chart-bar",
                 "order": 1
+            },
+            {
+                "name": "Catálogo de Insumos",
+                "url": "input:input_catalog",
+                "icon": "fas fa-list",
+                "order": 2
             }
         ]
     },

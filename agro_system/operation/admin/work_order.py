@@ -110,7 +110,7 @@ class WorkOrderAdmin(ProducerAwareMixin, admin.ModelAdmin):
     actions = [finish_order, download_pdf]
 
     class Media:
-        js = ('js/admin_input_autocost.js',)
+        js = ('js/admin_input_autocost.js', 'js/admin_work_order.js')
 
     def save_model(self, request, obj, form, change):
         userProducer = UserProducer.objects.filter(email=request.user.email).first()

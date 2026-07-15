@@ -71,6 +71,12 @@ class TechnicalPlanAdmin(ProducerAwareMixin, admin.ModelAdmin):
 
     inlines = [TechnicalPlanDetailInline, TechnicalPlanInputInline]
 
+    def get_list_display(self, request):
+        cols = list(super().get_list_display(request))
+        if getattr(request.user, 'type', None) in ('Producer', 'Staff'):
+            cols = [c for c in cols if c != 'producer']
+        return cols
+
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado
         userProducer = UserProducer.objects.filter(email=request.user.email).first()
