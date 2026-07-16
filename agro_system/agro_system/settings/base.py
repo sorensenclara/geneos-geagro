@@ -314,6 +314,11 @@ JAZZMIN_SETTINGS = {
             "order": 2
         },
         {
+            "name": "Informes",
+            "url": "",
+            "icon": ""
+        },
+        {
             "name": "Informe de Insumos",
             "url": "operation:input_report",
             "icon": "fas fa-file-alt",
@@ -334,6 +339,11 @@ JAZZMIN_SETTINGS = {
         ],
         "input": [
             {
+                "name": "Informes",
+                "url": "",
+                "icon": ""
+            },
+            {
                 "name": _("Stock Charts"),
                 "url": "input:input_charts",
                 "icon": "fas fa-chart-bar",
@@ -344,6 +354,50 @@ JAZZMIN_SETTINGS = {
                 "url": "input:input_catalog",
                 "icon": "fas fa-list",
                 "order": 2
+            }
+        ],
+        "storage": [
+            {
+                "name": "Informes",
+                "url": "",
+                "icon": ""
+            },
+            {
+                "name": "Posición de Stock",
+                "url": "storage:stock_position",
+                "icon": "fas fa-layer-group"
+            },
+            {
+                "name": "Ledger de Acopio",
+                "url": "storage:acopio_ledger",
+                "icon": "fas fa-exchange-alt"
+            },
+            {
+                "name": "Conciliación Rinde",
+                "url": "storage:conciliation",
+                "icon": "fas fa-balance-scale"
+            },
+            {
+                "name": "Costos de Acopio",
+                "url": "storage:storage_cost",
+                "icon": "fas fa-dollar-sign"
+            },
+            {
+                "name": "Antigüedad de Stock",
+                "url": "storage:aging",
+                "icon": "fas fa-hourglass-half"
+            }
+        ],
+        "sale": [
+            {
+                "name": "Informes",
+                "url": "",
+                "icon": ""
+            },
+            {
+                "name": "Trazabilidad Ventas",
+                "url": "sale:traceability",
+                "icon": "fas fa-route"
             }
         ]
     },

@@ -1,0 +1,513 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Posición de Stock Acopiado{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .report-header h2 { margin: 0; font-size: 1.4rem; font-weight: 600; color: #2c3e50; }
+
+  .filter-form {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .filter-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 0.3rem; }
+  .filter-group label { font-weight: 600; font-size: 0.82rem; color: #495057; }
+  .filter-group select,
+  .filter-group input[type=date] {
+    padding: 0.35rem 0.65rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    min-width: 160px;
+  }
+  .toggle-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .toggle-group label.lbl { font-weight: 600; font-size: 0.82rem; color: #495057; }
+  .toggle-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border: 1.5px solid #ced4da;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #495057;
+    background: #fff;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .toggle-pill input[type=checkbox] { display: none; }
+  .toggle-pill.active {
+    border-color: #1E7D3B;
+    background: #1E7D3B;
+    color: #fff;
+    font-weight: 600;
+  }
+  .btn-filter {
+    padding: 0.38rem 1.1rem;
+    background: #1E7D3B;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.88rem;
+  }
+  .btn-filter:hover { background: #155d2d; }
+  .btn-clear {
+    padding: 0.38rem 0.9rem;
+    background: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    text-decoration: none;
+  }
+  .btn-clear:hover { background: #545b62; color: #fff; }
+
+  /* Summary cards */
+  .summary-bar {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .summary-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 0.7rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 160px;
+  }
+  .summary-card .sc-label {
+    font-size: 0.72rem;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .summary-card .sc-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    font-variant-numeric: tabular-nums;
+  }
+  .sc-green .sc-value { color: #1E7D3B; }
+  .sc-blue  .sc-value { color: #2c6e9e; }
+  .sc-dark  .sc-value { color: #2c3e50; }
+
+  /* Section cards */
+  .section-card {
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    overflow: hidden;
+    margin-bottom: 1.75rem;
+  }
+  .section-card-header {
+    padding: 0.65rem 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+  }
+  .hdr-green { background: #1E7D3B; }
+  .hdr-blue  { background: #2c6e9e; }
+  .badge-count {
+    background: rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  /* Silo group block */
+  .silo-group {
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0;
+  }
+  .silo-group:last-child { border-bottom: none; }
+  .silo-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    flex-wrap: wrap;
+  }
+  .silo-name { font-weight: 700; font-size: 0.95rem; color: #2c3e50; }
+  .silo-meta { font-size: 0.82rem; color: #6c757d; }
+  .silo-capacity-bar {
+    flex: 1;
+    min-width: 120px;
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .cap-track {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .cap-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .pct-low  .cap-fill { background: #198754; }
+  .pct-mid  .cap-fill { background: #fd7e14; }
+  .pct-high .cap-fill { background: #dc3545; }
+  .cap-label { font-size: 0.75rem; color: #495057; font-variant-numeric: tabular-nums; }
+
+  /* Tables */
+  .rpt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .rpt-table th {
+    background: #f4f6f8;
+    padding: 0.45rem 0.7rem;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+  }
+  .rpt-table th.num { text-align: right; }
+  .rpt-table td {
+    padding: 0.4rem 0.7rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+  }
+  .rpt-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .rpt-table tr:last-child td { border-bottom: none; }
+  .rpt-table tr:hover td { background: #f8f9fa; }
+
+  /* Age badges */
+  .age-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .age-fresh     { background: #d1e7dd; color: #0f5132; }
+  .age-moderate  { background: #fff3cd; color: #664d03; }
+  .age-old       { background: #ffe0b2; color: #7a3000; }
+  .age-very-old  { background: #f8d7da; color: #58151c; }
+
+  /* State badges (certificates) */
+  .state-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .state-active   { background: #d1e7dd; color: #0f5132; }
+  .state-partial  { background: #fff3cd; color: #664d03; }
+  .state-cancelled{ background: #e9ecef; color: #495057; }
+  .state-warrant  { background: #cfe2ff; color: #084298; }
+
+  /* Pct bar inside certs table */
+  .pct-bar-wrap { display: flex; align-items: center; gap: 0.5rem; }
+  .pct-bar-track {
+    flex: 1;
+    min-width: 60px;
+    max-width: 100px;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .pct-bar-fill { height: 100%; border-radius: 3px; background: #2c6e9e; }
+  .pct-num { font-size: 0.78rem; color: #495057; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .qty-big { font-weight: 700; color: #2c3e50; }
+  .empty-msg { text-align: center; color: #6c757d; padding: 2.5rem; font-size: 0.92rem; }
+
+  @page { margin: 1cm; }
+  @media print {
+    #header, nav, .main-sidebar, #nav-sidebar, .breadcrumbs,
+    .filter-form, .no-print, .messagelist,
+    footer, .main-footer, #footer { display: none !important; }
+    #main, .main, body { margin-left: 0 !important; padding-left: 0 !important; }
+    .section-card { border: 1px solid #ccc; }
+    .rpt-table th { background-color: #f4f6f8 !important; -webkit-print-color-adjust: exact; }
+    .silo-header { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; }
+    .cap-fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+<div class="report-header">
+  <h2><i class="fas fa-layer-group mr-2"></i>Posición de Stock Acopiado</h2>
+  <div class="no-print" style="display:flex;gap:0.5rem;">
+    <button onclick="window.print()" style="padding:0.375rem 1rem;border:1px solid #1E7D3B;color:#1E7D3B;background:#fff;border-radius:4px;cursor:pointer;">
+      <i class="fas fa-file-pdf mr-1"></i> PDF
+    </button>
+    <a href="{% url 'storage:stock_position_excel' %}?{{ request.GET.urlencode }}"
+       style="padding:0.375rem 1rem;border:1px solid #217346;color:#fff;background:#217346;border-radius:4px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">
+      <i class="fas fa-file-excel mr-1"></i> Excel
+    </a>
+  </div>
+</div>
+
+<form method="get" class="filter-form">
+  <div class="filter-row">
+    <div class="filter-group">
+      <label>Campaña</label>
+      <select name="campaing_id">
+        <option value="">— Todas —</option>
+        {% for c in campaigns %}
+          <option value="{{ c.pk }}" {% if c.pk|stringformat:"s" == selected_campaing_id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Especie</label>
+      <select name="specie_id">
+        <option value="">— Todas —</option>
+        {% for sp in species %}
+          <option value="{{ sp.pk }}" {% if sp.pk|stringformat:"s" == selected_specie_id %}selected{% endif %}>{{ sp.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Origen</label>
+      <select name="source">
+        <option value="" {% if selected_source == '' %}selected{% endif %}>— Todos —</option>
+        <option value="silo"   {% if selected_source == 'silo'   %}selected{% endif %}>Silos propios</option>
+        <option value="acopio" {% if selected_source == 'acopio' %}selected{% endif %}>Acopio externo</option>
+      </select>
+    </div>
+    <div class="toggle-group">
+      <label class="lbl">Stock</label>
+      <label class="toggle-pill {% if only_active == '1' %}active{% endif %}" onclick="this.querySelector('input').click();">
+        <input type="checkbox" name="only_active" value="1" {% if only_active == '1' %}checked{% endif %}
+               onchange="this.closest('form').submit();">
+        <i class="fas fa-filter mr-1"></i> Solo con stock
+      </label>
+    </div>
+    <div style="display:flex;gap:0.5rem;align-items:flex-end;">
+      <button type="submit" class="btn-filter"><i class="fas fa-search mr-1"></i>Filtrar</button>
+      {% if selected_campaing_id or selected_specie_id or selected_source %}
+        <a href="?only_active={{ only_active }}" class="btn-clear">Limpiar filtros</a>
+      {% endif %}
+    </div>
+  </div>
+</form>
+
+{# ── Summary ──────────────────────────────────────────────────────── #}
+<div class="summary-bar no-print">
+  <div class="summary-card sc-dark">
+    <span class="sc-label">Total acopiado</span>
+    <span class="sc-value">{{ total_tons|floatformat:3 }} t</span>
+  </div>
+  {% if selected_source != 'acopio' %}
+  <div class="summary-card sc-green">
+    <span class="sc-label">Silos propios</span>
+    <span class="sc-value">{{ total_silo_tons|floatformat:3 }} t</span>
+  </div>
+  {% endif %}
+  {% if selected_source != 'silo' %}
+  <div class="summary-card sc-blue">
+    <span class="sc-label">Acopio externo</span>
+    <span class="sc-value">{{ total_cert_tons|floatformat:3 }} t</span>
+  </div>
+  {% endif %}
+  {% if selected_source != 'acopio' %}
+  <div class="summary-card">
+    <span class="sc-label">Silos con stock</span>
+    <span class="sc-value">{{ silo_groups|length }}</span>
+  </div>
+  {% endif %}
+  {% if selected_source != 'silo' %}
+  <div class="summary-card">
+    <span class="sc-label">Certificados activos</span>
+    <span class="sc-value">{{ certs_list|length }}</span>
+  </div>
+  {% endif %}
+</div>
+
+{# ── Sección 1: Silos propios ─────────────────────────────────────── #}
+{% if selected_source != 'acopio' %}
+<div class="section-card">
+  <div class="section-card-header hdr-green">
+    <span><i class="fas fa-silo mr-2"></i>Silos propios</span>
+    <span class="badge-count">{{ silo_groups|length }} silo{{ silo_groups|length|pluralize:"s" }} · {{ total_silo_tons|floatformat:3 }} t</span>
+  </div>
+  {% if silo_groups %}
+    {% for sg in silo_groups %}
+    <div class="silo-group">
+      <div class="silo-header">
+        <div>
+          <div class="silo-name">{{ sg.silo.name }}</div>
+          <div class="silo-meta">{{ sg.silo.countryside }} · {{ sg.silo.type }} · Cap: {{ sg.silo.capacity_tons|floatformat:1 }} t</div>
+          {% if show_producer %}<div class="silo-meta">{{ sg.producer }}</div>{% endif %}
+        </div>
+        <div>
+          <div class="silo-meta" style="font-weight:600;font-size:0.9rem;color:#2c3e50;">
+            {{ sg.total_tons|floatformat:3 }} t en stock
+          </div>
+        </div>
+        {% if sg.pct_capacity is not None %}
+        <div class="silo-capacity-bar {{ sg.pct_class }}">
+          <div class="cap-track">
+            <div class="cap-fill" style="width:{% if sg.pct_capacity > 100 %}100{% else %}{{ sg.pct_capacity|floatformat:0 }}{% endif %}%;"></div>
+          </div>
+          <div class="cap-label">{{ sg.pct_capacity }}% capacidad ocupada</div>
+        </div>
+        {% endif %}
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="rpt-table">
+          <thead>
+            <tr>
+              <th>Especie</th>
+              <th>Campaña</th>
+              <th>Cultivo</th>
+              <th class="num">Stock (t)</th>
+              <th class="num">Humedad %</th>
+              <th class="num">Impurezas %</th>
+              <th class="num">Proteína %</th>
+              <th class="num">Peso esp.</th>
+              <th>Último movim.</th>
+              <th>Antigüedad</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for st in sg.stocks %}
+            <tr>
+              <td><strong>{{ st.specie }}</strong></td>
+              <td>{{ st.campaing }}</td>
+              <td>{{ st.crop }}</td>
+              <td class="num qty-big">{{ st.quantity_tons|floatformat:3 }}</td>
+              <td class="num">{% if st.humidity_pct is not None %}{{ st.humidity_pct|floatformat:1 }}{% else %}—{% endif %}</td>
+              <td class="num">{% if st.impurities_pct is not None %}{{ st.impurities_pct|floatformat:1 }}{% else %}—{% endif %}</td>
+              <td class="num">{% if st.protein_pct is not None %}{{ st.protein_pct|floatformat:1 }}{% else %}—{% endif %}</td>
+              <td class="num">{% if st.test_weight is not None %}{{ st.test_weight|floatformat:1 }}{% else %}—{% endif %}</td>
+              <td style="white-space:nowrap;">{{ st.date_entry|date:"d/m/Y"|default:"—" }}</td>
+              <td>
+                {% if st.age_days is not None %}
+                <span class="age-badge {{ st.age_class }}">{{ st.age_days }} días</span>
+                {% else %}—{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="empty-msg">No hay silos con stock para los filtros seleccionados.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{# ── Sección 2: Acopio externo (certificados) ─────────────────────── #}
+{% if selected_source != 'silo' %}
+<div class="section-card">
+  <div class="section-card-header hdr-blue">
+    <span><i class="fas fa-certificate mr-2"></i>Acopio externo (certificados)</span>
+    <span class="badge-count">{{ certs_list|length }} certificado{{ certs_list|length|pluralize:"s" }} · {{ total_cert_tons|floatformat:3 }} t</span>
+  </div>
+  {% if certs_list %}
+  <div style="overflow-x:auto;">
+    <table class="rpt-table">
+      <thead>
+        <tr>
+          <th>Certificado</th>
+          <th>Acopiador</th>
+          <th>Especie</th>
+          <th>Campaña</th>
+          <th>Cultivo</th>
+          <th class="num">Ingreso inicial (t)</th>
+          <th class="num">Disponible (t)</th>
+          <th>% disponible</th>
+          <th>Estado</th>
+          <th>Fecha emisión</th>
+          <th>Antigüedad</th>
+          {% if show_producer %}<th>Productor</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in certs_list %}
+        <tr>
+          <td>
+            <strong>{{ c.cert.number }}</strong>
+            {% if c.is_warrant %}<span style="font-size:0.72rem;background:#cfe2ff;color:#084298;padding:0.1rem 0.4rem;border-radius:8px;margin-left:0.3rem;">Warrant</span>{% endif %}
+          </td>
+          <td>{{ c.cert.storage_provider }}</td>
+          <td><strong>{{ c.cert.specie }}</strong></td>
+          <td>{{ c.cert.campaing }}</td>
+          <td>{{ c.cert.crop|default:"—" }}</td>
+          <td class="num">{{ c.qty_entry|floatformat:3 }}</td>
+          <td class="num qty-big">{{ c.qty_available|floatformat:3 }}</td>
+          <td>
+            {% if c.pct_remaining is not None %}
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track">
+                <div class="pct-bar-fill" style="width:{{ c.pct_remaining|floatformat:0 }}%;"></div>
+              </div>
+              <span class="pct-num">{{ c.pct_remaining }}%</span>
+            </div>
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            <span class="state-badge state-{{ c.state_raw }}">{{ c.state }}</span>
+          </td>
+          <td style="white-space:nowrap;">{{ c.cert.date_issue|date:"d/m/Y" }}</td>
+          <td>
+            {% if c.age_days is not None %}
+            <span class="age-badge {{ c.age_class }}">{{ c.age_days }} días</span>
+            {% else %}—{% endif %}
+          </td>
+          {% if show_producer %}<td>{{ c.producer }}</td>{% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="empty-msg">No hay certificados activos para los filtros seleccionados.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+</div>
+{% endblock %}

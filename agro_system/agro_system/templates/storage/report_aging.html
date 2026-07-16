@@ -1,0 +1,445 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Antigüedad de Stock en Terceros{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .report-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .report-header h2 { margin: 0; font-size: 1.4rem; font-weight: 600; color: #2c3e50; }
+
+  /* Filter */
+  .filter-form {
+    background: #fff; border: 1px solid #dee2e6; border-radius: 6px;
+    padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+  }
+  .filter-row { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+  .filter-group { display: flex; flex-direction: column; gap: 0.3rem; }
+  .filter-group label { font-weight: 600; font-size: 0.82rem; color: #495057; }
+  .filter-group select {
+    padding: 0.35rem 0.65rem; border: 1px solid #ced4da;
+    border-radius: 4px; font-size: 0.88rem; min-width: 155px;
+  }
+  .btn-filter {
+    padding: 0.38rem 1.1rem; background: #1E7D3B; color: #fff;
+    border: none; border-radius: 4px; cursor: pointer; font-size: 0.88rem;
+  }
+  .btn-filter:hover { background: #155d2d; }
+  .btn-clear {
+    padding: 0.38rem 0.9rem; background: #6c757d; color: #fff; border: none;
+    border-radius: 4px; cursor: pointer; font-size: 0.88rem;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-clear:hover { background: #545b62; color: #fff; }
+
+  /* Summary cards */
+  .summary-bar { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .summary-card {
+    background: #fff; border: 1px solid #dee2e6; border-radius: 6px;
+    padding: 0.65rem 1.1rem; display: flex; flex-direction: column; gap: 0.1rem;
+    min-width: 150px;
+  }
+  .summary-card .sc-label {
+    font-size: 0.72rem; color: #6c757d; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .summary-card .sc-value {
+    font-size: 1.22rem; font-weight: 700; color: #2c3e50;
+    font-variant-numeric: tabular-nums;
+  }
+  .sc-green .sc-value { color: #1E7D3B; }
+  .sc-blue  .sc-value { color: #2c6e9e; }
+  .sc-warn  .sc-value { color: #e67e22; }
+
+  /* Section card */
+  .section-card {
+    background: #fff; border-radius: 6px; border: 1px solid #dee2e6;
+    overflow: hidden; margin-bottom: 1.5rem;
+  }
+  .section-card-header {
+    padding: 0.65rem 1rem; font-weight: 600; font-size: 0.95rem;
+    display: flex; justify-content: space-between; align-items: center; color: #fff;
+  }
+  .hdr-green { background: #1E7D3B; }
+  .hdr-blue  { background: #2c6e9e; }
+  .badge-count {
+    background: rgba(255,255,255,0.2); border-radius: 12px;
+    padding: 0.1rem 0.6rem; font-size: 0.8rem;
+  }
+
+  /* Table */
+  .rpt-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+  .rpt-table th {
+    background: #f4f6f8; padding: 0.5rem 0.65rem; text-align: left;
+    font-weight: 600; color: #495057; border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+  }
+  .rpt-table th.num { text-align: right; }
+  .rpt-table td { padding: 0.42rem 0.65rem; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  .rpt-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .rpt-table tr:last-child td { border-bottom: none; }
+  .rpt-table tr:hover td { background: #f8f9fa; }
+  .rpt-table tfoot td {
+    font-weight: 700; background: #2c3e50; color: #fff;
+    padding: 0.5rem 0.65rem; border-top: 2px solid #dee2e6;
+  }
+  .rpt-table tfoot td.num { text-align: right; }
+
+  /* Age badges */
+  .age-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.22rem 0.7rem; border-radius: 10px;
+    font-size: 0.8rem; font-weight: 700; font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .age-fresh     { background: #d1e7dd; color: #0f5132; }
+  .age-moderate  { background: #fff3cd; color: #664d03; }
+  .age-old       { background: #ffe0b2; color: #7c3700; }
+  .age-very-old  { background: #f8d7da; color: #58151c; }
+
+  /* Bucket summary progress bar */
+  .bucket-bar {
+    display: flex; height: 10px; border-radius: 4px; overflow: hidden;
+    margin-bottom: 0.6rem;
+  }
+  .bucket-segment { height: 100%; transition: width 0.3s; }
+  .bucket-segment.age-fresh    { background: #1E7D3B; }
+  .bucket-segment.age-moderate { background: #f0ad00; }
+  .bucket-segment.age-old      { background: #e67e22; }
+  .bucket-segment.age-very-old { background: #dc3545; }
+
+  /* Expiry warning */
+  .expiry-warn { color: #dc3545; font-weight: 700; font-size: 0.8rem; }
+  .expiry-soon { color: #e67e22; font-weight: 600; font-size: 0.8rem; }
+  .expiry-ok   { color: #6c757d; font-size: 0.82rem; }
+
+  /* Warrant tag */
+  .warrant-tag {
+    display: inline-block; padding: 0.1rem 0.45rem;
+    background: #cfe2ff; color: #084298; border-radius: 8px;
+    font-size: 0.72rem; font-weight: 700; margin-left: 0.3rem;
+  }
+
+  /* Clickable bucket filter pills */
+  .bucket-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  .bucket-pill {
+    padding: 0.25rem 0.8rem; border-radius: 14px; border: 1.5px solid;
+    font-size: 0.8rem; font-weight: 600; cursor: pointer; text-decoration: none;
+    display: inline-block;
+  }
+  .pill-fresh    { border-color: #1E7D3B; color: #1E7D3B; }
+  .pill-fresh.active, .pill-fresh:hover    { background: #1E7D3B; color: #fff; }
+  .pill-moderate { border-color: #b48a00; color: #b48a00; }
+  .pill-moderate.active, .pill-moderate:hover { background: #f0ad00; color: #fff; }
+  .pill-old      { border-color: #e67e22; color: #e67e22; }
+  .pill-old.active, .pill-old:hover      { background: #e67e22; color: #fff; }
+  .pill-very-old { border-color: #dc3545; color: #dc3545; }
+  .pill-very-old.active, .pill-very-old:hover { background: #dc3545; color: #fff; }
+
+  .pct-bar-wrap { width: 80px; background: #e9ecef; border-radius: 4px; height: 6px; display: inline-block; vertical-align: middle; }
+  .pct-bar-fill { height: 6px; border-radius: 4px; background: #1E7D3B; }
+
+  .dash { color: #adb5bd; }
+  .empty-msg { text-align: center; color: #6c757d; padding: 2.5rem; font-size: 0.92rem; }
+
+  @page { margin: 1cm; size: landscape; }
+  @media print {
+    #header, nav, .main-sidebar, #nav-sidebar, .breadcrumbs,
+    .filter-form, .no-print, .messagelist, footer, .main-footer, #footer { display: none !important; }
+    #main, .main, body { margin-left: 0 !important; padding-left: 0 !important; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+<div class="report-header">
+  <h2><i class="fas fa-hourglass-half mr-2"></i>Antigüedad de Stock en Terceros</h2>
+  <div class="no-print" style="display:flex;gap:0.5rem;">
+    <button onclick="window.print()"
+      style="padding:0.375rem 1rem;border:1px solid #1E7D3B;color:#1E7D3B;background:#fff;border-radius:4px;cursor:pointer;">
+      <i class="fas fa-file-pdf mr-1"></i> PDF
+    </button>
+    <a href="{% url 'storage:aging_excel' %}?{{ request.GET.urlencode }}"
+      style="padding:0.375rem 1rem;border:1px solid #217346;color:#fff;background:#217346;border-radius:4px;text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">
+      <i class="fas fa-file-excel mr-1"></i> Excel
+    </a>
+  </div>
+</div>
+
+{# ── Filters ────────────────────────────────────────────────────── #}
+<form method="get" class="filter-form">
+  <div class="filter-row">
+
+    <div class="filter-group">
+      <label>Campaña</label>
+      <select name="campaing_id">
+        <option value="">— Todas —</option>
+        {% for c in campaigns %}
+          <option value="{{ c.pk }}" {% if c.pk|stringformat:"s" == selected_campaing_id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Acopiador</label>
+      <select name="provider_id">
+        <option value="">— Todos —</option>
+        {% for p in providers %}
+          <option value="{{ p.pk }}" {% if p.pk|stringformat:"s" == selected_provider_id %}selected{% endif %}>{{ p.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Especie</label>
+      <select name="specie_id">
+        <option value="">— Todas —</option>
+        {% for sp in species %}
+          <option value="{{ sp.pk }}" {% if sp.pk|stringformat:"s" == selected_specie_id %}selected{% endif %}>{{ sp.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {# hidden bucket field carried over on form submit #}
+    {% if selected_bucket %}
+    <input type="hidden" name="bucket" value="{{ selected_bucket }}">
+    {% endif %}
+
+    <div style="display:flex;gap:0.5rem;align-items:flex-end;">
+      <button type="submit" class="btn-filter"><i class="fas fa-search mr-1"></i>Filtrar</button>
+      {% if selected_campaing_id or selected_provider_id or selected_specie_id or selected_bucket %}
+        <a href="?" class="btn-clear">Limpiar</a>
+      {% endif %}
+    </div>
+
+  </div>
+</form>
+
+{% if rows %}
+
+{# ── Summary cards ──────────────────────────────────────────────── #}
+<div class="summary-bar no-print">
+  <div class="summary-card sc-green">
+    <span class="sc-label">Certificados activos</span>
+    <span class="sc-value">{{ total_certs }}</span>
+  </div>
+  <div class="summary-card sc-blue">
+    <span class="sc-label">Tn disponibles</span>
+    <span class="sc-value">{{ total_tons|floatformat:1 }}</span>
+  </div>
+  <div class="summary-card">
+    <span class="sc-label">Promedio días</span>
+    <span class="sc-value">{{ avg_days|floatformat:0 }}</span>
+  </div>
+  {% for b in bucket_summary %}
+    {% if b.count > 0 and b.css == 'age-very-old' %}
+  <div class="summary-card sc-warn">
+    <span class="sc-label">&gt; 180 días</span>
+    <span class="sc-value">{{ b.count }} cert. · {{ b.tons|floatformat:1 }} tn</span>
+  </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+{# ── Bucket breakdown ───────────────────────────────────────────── #}
+<div class="section-card no-print">
+  <div class="section-card-header hdr-green">
+    <span><i class="fas fa-chart-bar mr-2"></i>Distribución por tramo</span>
+  </div>
+  <div style="padding:1rem 1.25rem;">
+
+    {# Stacked bar #}
+    <div class="bucket-bar">
+      {% for b in bucket_summary %}
+        {% if b.pct_tons > 0 %}
+        <div class="bucket-segment {{ b.css }}" style="width:{{ b.pct_tons }}%;" title="{{ b.label }}: {{ b.pct_tons }}%"></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {# Clickable pills to filter detail table #}
+    <div class="bucket-pills">
+      {% for b in bucket_summary %}
+        {% if b.label == '0–30 días' %}{% with pill_css='pill-fresh' %}
+        <a href="?{% if selected_campaing_id %}campaing_id={{ selected_campaing_id }}&{% endif %}{% if selected_provider_id %}provider_id={{ selected_provider_id }}&{% endif %}{% if selected_specie_id %}specie_id={{ selected_specie_id }}&{% endif %}bucket={{ b.label }}"
+           class="bucket-pill {{ pill_css }} {% if selected_bucket == b.label %}active{% endif %}">
+          {{ b.label }} &nbsp;<strong>{{ b.count }}</strong> cert. · {{ b.tons|floatformat:1 }} tn
+        </a>
+        {% endwith %}{% endif %}
+        {% if b.label == '31–90 días' %}{% with pill_css='pill-moderate' %}
+        <a href="?{% if selected_campaing_id %}campaing_id={{ selected_campaing_id }}&{% endif %}{% if selected_provider_id %}provider_id={{ selected_provider_id }}&{% endif %}{% if selected_specie_id %}specie_id={{ selected_specie_id }}&{% endif %}bucket={{ b.label }}"
+           class="bucket-pill {{ pill_css }} {% if selected_bucket == b.label %}active{% endif %}">
+          {{ b.label }} &nbsp;<strong>{{ b.count }}</strong> cert. · {{ b.tons|floatformat:1 }} tn
+        </a>
+        {% endwith %}{% endif %}
+        {% if b.label == '91–180 días' %}{% with pill_css='pill-old' %}
+        <a href="?{% if selected_campaing_id %}campaing_id={{ selected_campaing_id }}&{% endif %}{% if selected_provider_id %}provider_id={{ selected_provider_id }}&{% endif %}{% if selected_specie_id %}specie_id={{ selected_specie_id }}&{% endif %}bucket={{ b.label }}"
+           class="bucket-pill {{ pill_css }} {% if selected_bucket == b.label %}active{% endif %}">
+          {{ b.label }} &nbsp;<strong>{{ b.count }}</strong> cert. · {{ b.tons|floatformat:1 }} tn
+        </a>
+        {% endwith %}{% endif %}
+        {% if b.label == '>180 días' %}{% with pill_css='pill-very-old' %}
+        <a href="?{% if selected_campaing_id %}campaing_id={{ selected_campaing_id }}&{% endif %}{% if selected_provider_id %}provider_id={{ selected_provider_id }}&{% endif %}{% if selected_specie_id %}specie_id={{ selected_specie_id }}&{% endif %}bucket={{ b.label }}"
+           class="bucket-pill {{ pill_css }} {% if selected_bucket == b.label %}active{% endif %}">
+          {{ b.label }} &nbsp;<strong>{{ b.count }}</strong> cert. · {{ b.tons|floatformat:1 }} tn
+        </a>
+        {% endwith %}{% endif %}
+      {% endfor %}
+      {% if selected_bucket %}
+      <a href="?{% if selected_campaing_id %}campaing_id={{ selected_campaing_id }}&{% endif %}{% if selected_provider_id %}provider_id={{ selected_provider_id }}&{% endif %}{% if selected_specie_id %}specie_id={{ selected_specie_id }}&{% endif %}"
+         style="padding:0.25rem 0.8rem;border-radius:14px;border:1.5px solid #6c757d;color:#6c757d;font-size:0.8rem;text-decoration:none;">
+        Ver todos
+      </a>
+      {% endif %}
+    </div>
+
+    {# Bucket summary mini-table #}
+    <table class="rpt-table" style="margin-top:0.5rem;">
+      <thead>
+        <tr>
+          <th>Tramo</th>
+          <th class="num">Certificados</th>
+          <th class="num">Tn disponibles</th>
+          <th class="num">% del total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in bucket_summary %}
+        <tr>
+          <td><span class="age-badge {{ b.css }}">{{ b.label }}</span></td>
+          <td class="num">{% if b.count %}{{ b.count }}{% else %}<span class="dash">—</span>{% endif %}</td>
+          <td class="num">{% if b.tons %}{{ b.tons|floatformat:1 }}{% else %}<span class="dash">—</span>{% endif %}</td>
+          <td class="num">
+            {% if b.pct_tons %}
+            <span class="pct-bar-wrap"><span class="pct-bar-fill" style="width:{{ b.pct_tons }}%;"></span></span>
+            &nbsp;{{ b.pct_tons }}%
+            {% else %}<span class="dash">—</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>TOTAL</td>
+          <td class="num">{{ total_certs }}</td>
+          <td class="num">{{ total_tons|floatformat:1 }}</td>
+          <td class="num">100 %</td>
+        </tr>
+      </tfoot>
+    </table>
+
+  </div>
+</div>
+
+{# ── Detail table ───────────────────────────────────────────────── #}
+<div class="section-card">
+  <div class="section-card-header hdr-blue">
+    <span>
+      <i class="fas fa-list mr-2"></i>
+      Detalle de certificados{% if selected_bucket %} — {{ selected_bucket }}{% endif %}
+    </span>
+    <span class="badge-count">{{ rows|length }} certificado{{ rows|length|pluralize:"s" }} · ordenado{{ rows|length|pluralize:"s" }} por antigüedad</span>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="rpt-table">
+      <thead>
+        <tr>
+          <th>Antigüedad</th>
+          <th>Certificado</th>
+          <th>Acopiador</th>
+          <th>Campaña</th>
+          <th>Especie</th>
+          <th>Fecha emisión</th>
+          <th class="num">Tn entrada</th>
+          <th class="num">Tn disponibles</th>
+          <th class="num">% restante</th>
+          <th>Vencimiento</th>
+          {% if show_producer %}<th>Productor</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          {# Age badge #}
+          <td>
+            <span class="age-badge {{ r.age_class }}">
+              {{ r.age_days }} d
+            </span>
+          </td>
+
+          {# Certificate number + warrant tag #}
+          <td>
+            <span style="font-family:monospace;font-size:0.82rem;">{{ r.number }}</span>
+            {% if r.is_warrant %}<span class="warrant-tag">W</span>{% endif %}
+          </td>
+
+          <td>{{ r.provider }}</td>
+          <td>{{ r.campaing }}</td>
+          <td><strong>{{ r.specie }}</strong></td>
+          <td>{{ r.date_issue }}</td>
+
+          {# Quantities #}
+          <td class="num">{{ r.qty_entry|floatformat:3 }}</td>
+          <td class="num"><strong>{{ r.qty_available|floatformat:3 }}</strong></td>
+          <td class="num">
+            {% if r.pct_remaining is not None %}
+              <span class="pct-bar-wrap"><span class="pct-bar-fill" style="width:{{ r.pct_remaining }}%;"></span></span>
+              &nbsp;{{ r.pct_remaining }}%
+            {% else %}<span class="dash">—</span>{% endif %}
+          </td>
+
+          {# Expiry #}
+          <td>
+            {% if r.date_expiry %}
+              {% if r.days_to_expiry is not None %}
+                {% if r.days_to_expiry < 0 %}
+                  <span class="expiry-warn"><i class="fas fa-exclamation-triangle"></i> Vencido ({{ r.days_to_expiry|floatformat:0 }} d)</span>
+                {% elif r.days_to_expiry <= 30 %}
+                  <span class="expiry-soon"><i class="fas fa-clock"></i> {{ r.date_expiry }} ({{ r.days_to_expiry }} d)</span>
+                {% else %}
+                  <span class="expiry-ok">{{ r.date_expiry }}</span>
+                {% endif %}
+              {% else %}
+                <span class="expiry-ok">{{ r.date_expiry }}</span>
+              {% endif %}
+            {% else %}
+              <span class="dash">—</span>
+            {% endif %}
+          </td>
+
+          {% if show_producer %}<td>{{ r.producer }}</td>{% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{# Legend #}
+<div class="no-print" style="display:flex;gap:1.5rem;flex-wrap:wrap;font-size:0.8rem;color:#6c757d;margin-bottom:1rem;">
+  <span><span class="age-badge age-fresh">≤ 30 d</span> Stock reciente</span>
+  <span><span class="age-badge age-moderate">31–90 d</span> Tiempo normal</span>
+  <span><span class="age-badge age-old">91–180 d</span> Tiempo prolongado</span>
+  <span><span class="age-badge age-very-old">&gt; 180 d</span> Tiempo crítico</span>
+  <span style="margin-left:1rem;"><strong>W</strong> = certificado con warrant</span>
+  <span>Solo incluye certificados activos, parciales o con warrant con stock disponible &gt; 0.</span>
+</div>
+
+{% else %}
+  <p class="empty-msg">
+    {% if selected_campaing_id or selected_provider_id or selected_specie_id %}
+      No hay certificados activos para los filtros seleccionados.
+    {% else %}
+      No hay certificados activos con stock disponible en este momento.
+    {% endif %}
+  </p>
+{% endif %}
+
+</div>
+{% endblock %}

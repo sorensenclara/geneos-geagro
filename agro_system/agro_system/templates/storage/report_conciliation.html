@@ -1,0 +1,370 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Conciliación Rinde vs. Acopiado{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .report-header h2 { margin: 0; font-size: 1.4rem; font-weight: 600; color: #2c3e50; }
+
+  .filter-form {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .filter-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 0.3rem; }
+  .filter-group label { font-weight: 600; font-size: 0.82rem; color: #495057; }
+  .filter-group select {
+    padding: 0.35rem 0.65rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    min-width: 160px;
+  }
+  .toggle-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.38rem 0.85rem;
+    border: 1.5px solid #ced4da;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #495057;
+    background: #fff;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .toggle-pill input[type=checkbox] { display: none; }
+  .toggle-pill.active { border-color: #1E7D3B; background: #1E7D3B; color: #fff; font-weight: 600; }
+  .btn-filter {
+    padding: 0.38rem 1.1rem;
+    background: #1E7D3B; color: #fff; border: none;
+    border-radius: 4px; cursor: pointer; font-size: 0.88rem;
+  }
+  .btn-filter:hover { background: #155d2d; }
+  .btn-clear {
+    padding: 0.38rem 0.9rem;
+    background: #6c757d; color: #fff; border: none;
+    border-radius: 4px; cursor: pointer; font-size: 0.88rem; text-decoration: none;
+  }
+  .btn-clear:hover { background: #545b62; color: #fff; }
+
+  /* Summary */
+  .summary-bar { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .summary-card {
+    background: #fff; border: 1px solid #dee2e6; border-radius: 6px;
+    padding: 0.65rem 1.1rem; display: flex; flex-direction: column;
+    gap: 0.1rem; min-width: 160px;
+  }
+  .summary-card .sc-label {
+    font-size: 0.72rem; color: #6c757d; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .summary-card .sc-value {
+    font-size: 1.25rem; font-weight: 700; color: #2c3e50; font-variant-numeric: tabular-nums;
+  }
+  .sc-green .sc-value { color: #1E7D3B; }
+  .sc-blue  .sc-value { color: #2c6e9e; }
+  .sc-warn  .sc-value { color: #856404; }
+  .sc-red   .sc-value { color: #dc3545; }
+
+  /* Section */
+  .section-card {
+    background: #fff; border-radius: 6px; border: 1px solid #dee2e6;
+    overflow: hidden; margin-bottom: 1.5rem;
+  }
+  .section-card-header {
+    padding: 0.65rem 1rem; font-weight: 600; font-size: 0.95rem;
+    display: flex; justify-content: space-between; align-items: center; color: #fff;
+    background: #1E7D3B;
+  }
+  .badge-count {
+    background: rgba(255,255,255,0.2); border-radius: 12px;
+    padding: 0.1rem 0.6rem; font-size: 0.8rem;
+  }
+
+  /* Table */
+  .rpt-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+  .rpt-table th {
+    background: #f4f6f8; padding: 0.5rem 0.65rem; text-align: left;
+    font-weight: 600; color: #495057; border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+  }
+  .rpt-table th.num { text-align: right; }
+  .rpt-table td { padding: 0.42rem 0.65rem; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  .rpt-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .rpt-table tr:last-child td { border-bottom: none; }
+  .rpt-table tr:hover td { background: #f8f9fa; }
+  .rpt-table tfoot td {
+    font-weight: 700; background: #2c3e50; color: #fff;
+    padding: 0.5rem 0.65rem; border-top: 2px solid #dee2e6;
+  }
+  .rpt-table tfoot td.num { text-align: right; }
+
+  /* Column groups: thin separators between logical groups */
+  .rpt-table th.grp-start,
+  .rpt-table td.grp-start { border-left: 2px solid #dee2e6; }
+
+  /* % badge */
+  .pct-badge {
+    display: inline-block; padding: 0.18rem 0.6rem;
+    border-radius: 10px; font-size: 0.78rem; font-weight: 700;
+    white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .pct-ok      { background: #d1e7dd; color: #0f5132; }
+  .pct-warn    { background: #fff3cd; color: #664d03; }
+  .pct-low     { background: #f8d7da; color: #58151c; }
+  .pct-over    { background: #cfe2ff; color: #084298; }
+  .pct-unknown { background: #e9ecef; color: #6c757d; }
+
+  /* Desvío sign coloring */
+  .dev-pos { color: #856404; font-weight: 600; }  /* grain unaccounted for */
+  .dev-neg { color: #084298; font-weight: 600; }  /* more stored than yield */
+  .dev-zero { color: #198754; font-weight: 600; }
+
+  .dash { color: #adb5bd; }
+  .empty-msg { text-align: center; color: #6c757d; padding: 2.5rem; font-size: 0.92rem; }
+
+  /* Column header groups */
+  .th-group {
+    background: #e8f4e8 !important; color: #0f5132 !important;
+    font-size: 0.72rem; text-align: center !important; font-weight: 700;
+    border-bottom: 1px solid #dee2e6 !important; padding: 0.25rem !important;
+    white-space: nowrap;
+  }
+  .th-group-blue { background: #dce8f5 !important; color: #0d3c6e !important; }
+  .th-group-dark { background: #e9ecef !important; color: #2c3e50 !important; }
+
+  @page { margin: 1cm; size: landscape; }
+  @media print {
+    #header, nav, .main-sidebar, #nav-sidebar, .breadcrumbs,
+    .filter-form, .no-print, .messagelist,
+    footer, .main-footer, #footer { display: none !important; }
+    #main, .main, body { margin-left: 0 !important; padding-left: 0 !important; }
+    .section-card { border: 1px solid #ccc; }
+    .rpt-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+<div class="report-header">
+  <h2><i class="fas fa-balance-scale mr-2"></i>Conciliación Rinde vs. Acopiado</h2>
+  <div class="no-print" style="display:flex;gap:0.5rem;">
+    <button onclick="window.print()" style="padding:0.375rem 1rem;border:1px solid #1E7D3B;color:#1E7D3B;background:#fff;border-radius:4px;cursor:pointer;">
+      <i class="fas fa-file-pdf mr-1"></i> PDF
+    </button>
+    <a href="{% url 'storage:conciliation_excel' %}?{{ request.GET.urlencode }}"
+       style="padding:0.375rem 1rem;border:1px solid #217346;color:#fff;background:#217346;border-radius:4px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">
+      <i class="fas fa-file-excel mr-1"></i> Excel
+    </a>
+  </div>
+</div>
+
+<form method="get" class="filter-form">
+  <div class="filter-row">
+    <div class="filter-group">
+      <label>Campaña</label>
+      <select name="campaing_id">
+        <option value="">— Todas —</option>
+        {% for c in campaigns %}
+          <option value="{{ c.pk }}" {% if c.pk|stringformat:"s" == selected_campaing_id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Especie</label>
+      <select name="specie_id">
+        <option value="">— Todas —</option>
+        {% for sp in species %}
+          <option value="{{ sp.pk }}" {% if sp.pk|stringformat:"s" == selected_specie_id %}selected{% endif %}>{{ sp.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Datos</label>
+      <label class="toggle-pill {% if only_with_real %}active{% endif %}">
+        <input type="checkbox" name="only_with_real" value="1"
+               {% if only_with_real %}checked{% endif %}
+               onchange="this.closest('form').submit();">
+        Solo con rinde real
+      </label>
+    </div>
+    <div style="display:flex;gap:0.5rem;align-items:flex-end;">
+      <button type="submit" class="btn-filter"><i class="fas fa-search mr-1"></i>Filtrar</button>
+      {% if selected_campaing_id or selected_specie_id %}
+        <a href="?{% if only_with_real %}only_with_real=1{% endif %}" class="btn-clear">Limpiar</a>
+      {% endif %}
+    </div>
+  </div>
+</form>
+
+{% if rows %}
+
+{# ── Summary bar ─────────────────────────────────────────────── #}
+<div class="summary-bar no-print">
+  <div class="summary-card">
+    <span class="sc-label">Cultivos</span>
+    <span class="sc-value">{{ rows|length }}</span>
+  </div>
+  <div class="summary-card sc-green">
+    <span class="sc-label">Tn estimadas</span>
+    <span class="sc-value">{{ total_tn_est|floatformat:1 }}</span>
+  </div>
+  <div class="summary-card sc-blue">
+    <span class="sc-label">Tn rinde real</span>
+    <span class="sc-value">{{ total_tn_real|floatformat:1 }}</span>
+  </div>
+  <div class="summary-card sc-green">
+    <span class="sc-label">Total acopiado</span>
+    <span class="sc-value">{{ total_tn_acopiado|floatformat:1 }}</span>
+  </div>
+  <div class="summary-card {% if total_desvio > 0.01 %}sc-warn{% elif total_desvio < -0.01 %}sc-red{% else %}sc-green{% endif %}">
+    <span class="sc-label">Desvío total (real − acopiado)</span>
+    <span class="sc-value">{% if total_desvio > 0 %}+{% endif %}{{ total_desvio|floatformat:1 }} tn</span>
+  </div>
+</div>
+
+{# ── Table ───────────────────────────────────────────────────── #}
+<div class="section-card">
+  <div class="section-card-header">
+    <span><i class="fas fa-balance-scale mr-2"></i>Por cultivo</span>
+    <span class="badge-count">{{ rows|length }} cultivo{{ rows|length|pluralize:"s" }}</span>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="rpt-table">
+      <thead>
+        {# Row 1: group headers #}
+        <tr>
+          <th class="th-group" colspan="{% if show_producer %}6{% else %}5{% endif %}"></th>
+          <th class="th-group" colspan="3" style="background:#e8f4e8!important;color:#0f5132!important;">Rinde (tn/ha → tn totales)</th>
+          <th class="th-group grp-start" colspan="3" style="background:#dce8f5!important;color:#0d3c6e!important;">Acopiado actual</th>
+          <th class="th-group grp-start" colspan="2" style="background:#e9ecef!important;color:#2c3e50!important;">Conciliación</th>
+        </tr>
+        {# Row 2: column headers #}
+        <tr>
+          <th>Campaña</th>
+          <th>Campo</th>
+          <th>Lote</th>
+          <th>Especie</th>
+          <th>Ha cosech.</th>
+          {% if show_producer %}<th>Productor</th>{% endif %}
+          <th class="num">Est. (t/ha)</th>
+          <th class="num">Tn est.</th>
+          <th class="num">Real (t/ha)</th>
+          <th class="num">Tn reales</th>
+          <th class="num grp-start">Propio</th>
+          <th class="num">Externo</th>
+          <th class="num">Total</th>
+          <th class="num grp-start">Desvío (tn)</th>
+          <th class="num">% conciliado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td>{{ r.campaing }}</td>
+          <td>{{ r.countryside }}</td>
+          <td>{{ r.lot }}</td>
+          <td><strong>{{ r.specie }}</strong></td>
+          <td class="num">{{ r.ha|floatformat:1 }}</td>
+          {% if show_producer %}<td>{{ r.producer }}</td>{% endif %}
+
+          {# Rinde estimado #}
+          <td class="num">
+            {% if r.est_rate is not None %}{{ r.est_rate|floatformat:3 }}{% else %}<span class="dash">—</span>{% endif %}
+          </td>
+          <td class="num">
+            {% if r.tn_est is not None %}{{ r.tn_est|floatformat:1 }}{% else %}<span class="dash">—</span>{% endif %}
+          </td>
+
+          {# Rinde real #}
+          <td class="num">
+            {% if r.real_rate is not None %}<strong>{{ r.real_rate|floatformat:3 }}</strong>{% else %}<span class="dash">—</span>{% endif %}
+          </td>
+          <td class="num">
+            {% if r.tn_real is not None %}<strong>{{ r.tn_real|floatformat:1 }}</strong>{% else %}<span class="dash">—</span>{% endif %}
+          </td>
+
+          {# Acopiado #}
+          <td class="num grp-start">{{ r.tn_silo|floatformat:1 }}</td>
+          <td class="num">{{ r.tn_cert|floatformat:1 }}</td>
+          <td class="num"><strong>{{ r.tn_total|floatformat:1 }}</strong></td>
+
+          {# Desvío #}
+          <td class="num grp-start">
+            {% if r.desvio is not None %}
+              <span class="{% if r.desvio > 0.01 %}dev-pos{% elif r.desvio < -0.01 %}dev-neg{% else %}dev-zero{% endif %}">
+                {% if r.desvio > 0 %}+{% endif %}{{ r.desvio|floatformat:1 }}
+              </span>
+            {% else %}<span class="dash">—</span>{% endif %}
+          </td>
+
+          {# % conciliado #}
+          <td class="num">
+            {% if r.pct is not None %}
+              <span class="pct-badge {{ r.pct_class }}">{{ r.pct|floatformat:1 }}%</span>
+            {% else %}<span class="dash">—</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="{% if show_producer %}6{% else %}5{% endif %}">TOTAL</td>
+          <td class="num"></td>
+          <td class="num">{{ total_tn_est|floatformat:1 }}</td>
+          <td class="num"></td>
+          <td class="num">{{ total_tn_real|floatformat:1 }}</td>
+          <td class="num grp-start">{{ rows|length }}</td>
+          <td class="num"></td>
+          <td class="num">{{ total_tn_acopiado|floatformat:1 }}</td>
+          <td class="num grp-start">
+            {% if total_desvio > 0 %}+{% endif %}{{ total_desvio|floatformat:1 }}
+          </td>
+          <td class="num"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+{# Legend #}
+<div class="no-print" style="display:flex;gap:1.5rem;flex-wrap:wrap;font-size:0.8rem;color:#6c757d;margin-bottom:1rem;">
+  <span><span class="pct-badge pct-ok">≥ 95%</span> Bien conciliado</span>
+  <span><span class="pct-badge pct-warn">80–95%</span> Diferencia menor</span>
+  <span><span class="pct-badge pct-low">&lt; 80%</span> Diferencia significativa</span>
+  <span><span class="pct-badge pct-over">&gt; 100%</span> Acopiado supera el rinde</span>
+  <span style="margin-left:1rem;"><strong>Desvío</strong> = Tn rinde real − Total acopiado</span>
+</div>
+
+{% else %}
+  <p class="empty-msg">
+    {% if selected_campaing_id or selected_specie_id %}
+      No hay cultivos con datos para los filtros seleccionados.
+    {% else %}
+      Seleccioná una campaña o especie para ver la conciliación.
+    {% endif %}
+  </p>
+{% endif %}
+
+</div>
+{% endblock %}

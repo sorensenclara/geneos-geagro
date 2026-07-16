@@ -428,6 +428,36 @@ button:active {
     align-items: center;
 }
 
+/* ── Separador de sección tipo "Informes" en el treeview ──────────
+   Cualquier custom_link con url vacía se renderiza como href="#".
+   Ningún item real del nav tiene ese href, así que el selector es seguro.
+*/
+.main-sidebar .nav-treeview a.nav-link[href="#"] {
+    pointer-events: none;
+    cursor: default;
+    padding-top: 14px;
+    padding-bottom: 3px;
+    margin-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.main-sidebar .nav-treeview a.nav-link[href="#"] p {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+}
+
+.main-sidebar .nav-treeview a.nav-link[href="#"] .nav-icon {
+    display: none;
+}
+
+.main-sidebar .nav-treeview a.nav-link[href="#"]:hover {
+    background: transparent !important;
+}
+
 /* =========================================================
    8. PANEL DE ACCIONES STICKY
 ========================================================= */
