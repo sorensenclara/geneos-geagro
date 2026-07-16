@@ -37,8 +37,19 @@ class SiloMovement(models.Model):
     producer = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, verbose_name=_('producer'))
     silo_stock = models.ForeignKey(SiloStock, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='movements', verbose_name=_('silo stock'))
-    
+
+    def clean(self):
+        # Un ingreso de cosecha a silo propio solo se permite si el cultivo de
+        # origen ya tiene un rinde real cargado, y respetando ese techo de
+        # producción (las transferencias/salidas no ingresan grano nuevo).
+        if self.type == self.ENTRY and self.crop_id:
+            from storage.services import validate_crop_storage_entry
+            validate_crop_storage_entry(
+                self.crop, self.quantity_tons, silo_movement_exclude_pk=self.pk)
+        super().clean()
+
     def save(self, *args, **kwargs):
+        self.clean()
         if not self.producer_id:
             self.producer = self.silo.producer
         super().save(*args, **kwargs)

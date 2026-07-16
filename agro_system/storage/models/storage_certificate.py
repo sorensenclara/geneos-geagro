@@ -46,7 +46,18 @@ class StorageCertificate(models.Model):
     producer = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, verbose_name=_('producer'))
     notes = models.TextField(blank=True, verbose_name=_('notes'))
 
+    def clean(self):
+        # El ingreso a un acopiador tercero solo se permite si el cultivo de
+        # origen ya tiene un rinde real cargado, respetando ese techo (junto con
+        # lo ya acopiado en silos propios y en otros certificados del mismo cultivo).
+        if self.crop_id:
+            from storage.services import validate_crop_storage_entry
+            validate_crop_storage_entry(
+                self.crop, self.quantity_entry, certificate_exclude_pk=self.pk)
+        super().clean()
+
     def save(self, *args, **kwargs):
+        self.clean()
         is_new = self.pk is None
         if self.is_warrant:
             self.state = self.WARRANT

@@ -13,7 +13,13 @@ from sale.models.driver import Driver
 class SalesReceipt(models.Model):
 
     """ Modelo para representar los comprobantes de venta"""
-    
+
+    states = [
+        ('pending', _('pending')),
+        ('confirm', _('confirm')),
+        ('cancel', _('cancel')),
+    ]
+
     date =  models.DateField(default=date.today(), verbose_name = _('date'))
     type = models.ForeignKey(TypeSalesReceipt, on_delete=models.CASCADE, verbose_name = _('type of sales receipt'))
     number = models.CharField(max_length=200, unique=True, verbose_name = _('number'))
@@ -29,6 +35,7 @@ class SalesReceipt(models.Model):
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE, null=True, blank=True, verbose_name = _('provider'))
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE, null=True, blank=True, verbose_name = _('driver'))
     producer = models.ForeignKey('user.UserProducer', on_delete=models.RESTRICT, verbose_name= _('producer'))
+    state = models.CharField(max_length=7, choices=states, default='pending', verbose_name=_('state'))
 
     def __str__(self):
         return f"{self.number}"
