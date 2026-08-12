@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from producer.models.store import Store
 from input.models.provider import Provider
 from user.models.user_producer import UserProducer
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from input.models.purchase_order import PurchaseOrder
 from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.input import Input
@@ -42,7 +42,7 @@ class InputStockInline(admin.TabularInline):
         if request.user.is_superuser or getattr(request.user, 'type', None) in ('Administration', 'Organization'):
             return qs
         if getattr(request.user, 'type', None) in ('Producer', 'Staff'):
-            producer = UserProducer.objects.filter(email=request.user.email).first()
+            producer = get_producer_for_request(request)
             if producer:
                 return qs.filter(store__producer=producer)
         return qs.none()
@@ -146,7 +146,7 @@ class InputAdmin(ProducerAwareMixin, ImportExportModelAdmin):
 
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado
-        userProducer = UserProducer.objects.filter(email=request.user.email).first()
+        userProducer = get_producer_for_request(request)
         if userProducer:
             obj.producer = userProducer
         super().save_model(request, obj, form, change)
@@ -215,7 +215,7 @@ class InputAdmin(ProducerAwareMixin, ImportExportModelAdmin):
             if userProducer.exists():
                 return queryset.filter(Q(producer__in=userProducer) | Q(producer__isnull=True))
         if request.user.type == 'Producer':
-            userProducer = UserProducer.objects.filter(email=request.user.email).first()
+            userProducer = get_producer_for_request(request)
             if userProducer:
                 return queryset.filter(Q(producer=userProducer) | Q(producer__isnull=True))
         return queryset.none()

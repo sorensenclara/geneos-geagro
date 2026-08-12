@@ -1,5 +1,5 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from producer.models.country_side import Countryside
 from user.models.user_producer import UserProducer
 # from producer.models.staff import Staff
@@ -15,25 +15,16 @@ class LotAdmin(ProducerAwareMixin, LeafletGeoAdmin):
 
 
         
-    # def formfield_for_foreignkey(self, db_field, request, **kwargs):
-
-    #     if db_field.name == "responsible":
-    #         staff_qs = Staff.objects.none()
-    #         # superuser ve todos
-    #         if request.user.is_superuser or request.user.type in ['Administration']:
-    #             staff_qs = Staff.objects.all()
-    #         # si es una organización → ve todos los staff de sus productores
-    #         elif request.user.type == 'Organization':
-    #             user_producers = UserProducer.objects.filter(association=request.user)
-    #             staff_qs = Staff.objects.filter(producer__in=user_producers)
-    #         # si es un productor → ve solo sus staff
-    #         elif request.user.type == 'Producer':
-    #             user_producer = UserProducer.objects.filter(email=request.user.email).first()
-    #             if user_producer:
-    #                 staff_qs = Staff.objects.filter(producer=user_producer)
-    #         kwargs["queryset"] = staff_qs
-        
-    #     return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        from producer.models.country_side import Countryside
+        from producer.models.staff import Staff
+        producers = self._producers_for_user(request)
+        if producers is not None:
+            if db_field.name == 'countryside':
+                kwargs['queryset'] = Countryside.objects.filter(producer__in=producers)
+            elif db_field.name == 'responsible':
+                kwargs['queryset'] = Staff.objects.filter(producer__in=producers)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -45,9 +36,9 @@ class LotAdmin(ProducerAwareMixin, LeafletGeoAdmin):
         if request.user.type == 'Organization':
             userProducer = UserProducer.objects.filter(association=request.user)
             if userProducer.exists():
-                return queryset.filter(countryside_producer__in=userProducer)
+                return queryset.filter(countryside__producer__in=userProducer)
         if request.user.type == 'Producer':
-            userProducer = UserProducer.objects.filter(email=request.user.email).first()
+            userProducer = get_producer_for_request(request)
             if userProducer:
                 countrysides = Countryside.objects.filter(producer=userProducer)
                 return queryset.filter(countryside__in=countrysides)

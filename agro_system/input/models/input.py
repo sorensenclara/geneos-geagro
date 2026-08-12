@@ -46,7 +46,7 @@ class Input(models.Model):
                 if currency.is_base:
                     self.cost_base = self.cost
                 else:
-                    rate = exchangeRate.get_rate(currency)
+                    rate = exchangeRate.get_rate(currency, producer=self.producer)
                     self.cost_base = round(self.cost * rate, 2) if rate else None
         super().save(*args, **kwargs)
 

@@ -29,7 +29,8 @@ class InputWorkOrder(models.Model):
                         self.exchange_rate = 1.0
                     elif not self.exchange_rate:
                         from parameter.models.exchange_rate import exchangeRate
-                        fetched = exchangeRate.get_rate(currency)
+                        producer = self.work_order.producer if self.work_order_id else None
+                        fetched = exchangeRate.get_rate(currency, producer=producer)
                         if fetched:
                             self.exchange_rate = fetched
             rate = self.exchange_rate or 1.0

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from producer.models.contractor import Contractor
 from user.models.user_producer import UserProducer
 
@@ -18,7 +18,7 @@ class ContractorAdmin(ProducerAwareMixin, admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change:
-            producer = UserProducer.objects.filter(email=request.user.email).first()
+            producer = get_producer_for_request(request)
             if producer:
                 obj.producer = producer
         super().save_model(request, obj, form, change)
@@ -31,7 +31,7 @@ class ContractorAdmin(ProducerAwareMixin, admin.ModelAdmin):
             producers = UserProducer.objects.filter(association=request.user)
             return qs.filter(producer__in=producers)
         if request.user.type == 'Producer':
-            producer = UserProducer.objects.filter(email=request.user.email).first()
+            producer = get_producer_for_request(request)
             if producer:
                 return qs.filter(producer=producer)
         return qs.none()

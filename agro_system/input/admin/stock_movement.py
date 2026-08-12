@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from user.models.user_producer import UserProducer
 from input.models.stock_movement import StockMovement
 from input.models.input_stock import InputStock
@@ -38,9 +38,21 @@ class StockMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
         return ['date', 'operation', 'input', 'store', 'quantity',
                 'stock_before', 'stock_after', 'notes']
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        from django.db.models import Q
+        producers = self._producers_for_user(request)
+        if producers is not None:
+            if db_field.name == 'input':
+                from operation.admin.technical_plan import _filter_inputs
+                kwargs['queryset'] = _filter_inputs(request)
+            elif db_field.name == 'store':
+                from producer.models.store import Store
+                kwargs['queryset'] = Store.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def save_model(self, request, obj, form, change):
         if not change:
-            producer = UserProducer.objects.filter(email=request.user.email).first()
+            producer = get_producer_for_request(request)
             if producer:
                 obj.producer = producer
 
@@ -76,7 +88,7 @@ class StockMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
             producers = UserProducer.objects.filter(association=request.user)
             return qs.filter(producer__in=producers)
         if request.user.type == 'Producer':
-            producer = UserProducer.objects.filter(email=request.user.email).first()
+            producer = get_producer_for_request(request)
             if producer:
                 return qs.filter(producer=producer)
         return qs.none()

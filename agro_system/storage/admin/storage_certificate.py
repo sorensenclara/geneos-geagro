@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from user.models.user_producer import UserProducer
 from storage.models.storage_certificate import StorageCertificate
 from storage.models.storage_service import StorageService
@@ -40,7 +40,7 @@ class StorageCertificateAdmin(ProducerAwareMixin, admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change:
-            user_producer = UserProducer.objects.filter(email=request.user.email).first()
+            user_producer = get_producer_for_request(request)
             if user_producer:
                 obj.producer = user_producer
         super().save_model(request, obj, form, change)
@@ -53,14 +53,20 @@ class StorageCertificateAdmin(ProducerAwareMixin, admin.ModelAdmin):
             producers = UserProducer.objects.filter(association=request.user)
             return qs.filter(producer__in=producers)
         if request.user.type == 'Producer':
-            producer = UserProducer.objects.filter(email=request.user.email).first()
+            producer = get_producer_for_request(request)
             if producer:
                 return qs.filter(producer=producer)
         return qs.none()
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'producer' and request.user.type == 'Organization':
-            kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
+        producers = self._producers_for_user(request)
+        if producers is not None:
+            if db_field.name == 'crop':
+                from operation.models.crop import Crop
+                kwargs['queryset'] = Crop.objects.filter(producer__in=producers)
+        elif db_field.name == 'producer':
+            if request.user.type == 'Organization':
+                kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -78,7 +84,7 @@ class StorageMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change:
-            user_producer = UserProducer.objects.filter(email=request.user.email).first()
+            user_producer = get_producer_for_request(request)
             if user_producer:
                 obj.producer = user_producer
         super().save_model(request, obj, form, change)
@@ -91,14 +97,19 @@ class StorageMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
             producers = UserProducer.objects.filter(association=request.user)
             return qs.filter(producer__in=producers)
         if request.user.type == 'Producer':
-            producer = UserProducer.objects.filter(email=request.user.email).first()
+            producer = get_producer_for_request(request)
             if producer:
                 return qs.filter(producer=producer)
         return qs.none()
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'producer' and request.user.type == 'Organization':
-            kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
+        producers = self._producers_for_user(request)
+        if producers is not None:
+            if db_field.name == 'certificate':
+                kwargs['queryset'] = StorageCertificate.objects.filter(producer__in=producers)
+        elif db_field.name == 'producer':
+            if request.user.type == 'Organization':
+                kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 

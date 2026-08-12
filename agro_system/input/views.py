@@ -1,3 +1,4 @@
+from user.admin.adminSite import get_producer_for_request
 import json
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template.loader import get_template
@@ -40,7 +41,7 @@ def input_charts_view(request):
             else:
                 queryset = queryset.none()
         elif request.user.type == 'Producer':
-            user_producer = UserProducer.objects.filter(email=request.user.email).first()
+            user_producer = get_producer_for_request(request)
             if user_producer:
                 queryset = queryset.filter(producer=user_producer)
             else:
@@ -65,7 +66,7 @@ def input_charts_view(request):
     extra_context['selected_input_name'] = _("Select an input") # Default value
 
     if input_id:
-        input_obj = Input.objects.filter(id=input_id).first()
+        input_obj = queryset.filter(id=input_id).first()
         if input_obj:
             extra_context['selected_input_name'] = input_obj.name
             
@@ -94,29 +95,28 @@ def input_charts_view(request):
     return render(request, 'admin/input/charts.html', extra_context)
 
 def InputPendingPDFView(request):
-    # Genera un PDF con los detalles de órdenes de compra que tienen cantidades pendientes de recepción.
-    # Filtra las órdenes según el tipo de usuario y descarga el archivo directamente como adjunto.
-    # Si no hay pendientes, redirige a la página anterior con un mensaje de error.
+    pendings = []
+    purchase = PurchaseOrder.objects.filter(state="pending")
 
-    # Recupera los registros de lineas de ordenes con pendientes
-   pendings = []
-   purchase = PurchaseOrder.objects.filter(state="pending")
-   if request.user.is_superuser:
-            pendings = PurchaseOrderDetail.objects.filter(pending_amount__gt=0,purchase_order__in=purchase)
-   if request.user.type == 'Administration':
-            pendings = PurchaseOrderDetail.objects.filter(pending_amount__gt=0, purchase_order__in=purchase)
-   if request.user.type == 'Organization':
-      userProducer = UserProducer.objects.filter(association=request.user)
-      if userProducer.exists():
+    if request.user.is_superuser or getattr(request.user, 'type', None) == 'Administration':
+        pendings = PurchaseOrderDetail.objects.filter(pending_amount__gt=0, purchase_order__in=purchase)
+    elif getattr(request.user, 'type', None) == 'Organization':
+        userProducer = UserProducer.objects.filter(association=request.user)
+        if userProducer.exists():
             purchase = purchase.filter(producer__in=userProducer)
             pendings = PurchaseOrderDetail.objects.filter(pending_amount__gt=0, purchase_order__in=purchase)
-   if request.user.type == 'Producer':
-         userProducer = UserProducer.objects.filter(email=request.user.email).first()
-         if userProducer:
-            purchase = purchase.filter(producer__in=userProducer)
+    elif getattr(request.user, 'type', None) == 'Producer':
+        userProducer = get_producer_for_request(request)
+        if userProducer:
+            purchase = purchase.filter(producer=userProducer)
             pendings = PurchaseOrderDetail.objects.filter(pending_amount__gt=0, purchase_order__in=purchase)
-    
-   if pendings:
+    elif getattr(request.user, 'type', None) == 'Staff':
+        userProducer = get_producer_for_request(request)
+        if userProducer:
+            purchase = purchase.filter(producer=userProducer)
+            pendings = PurchaseOrderDetail.objects.filter(pending_amount__gt=0, purchase_order__in=purchase)
+
+    if pendings:
       # Renderiza la plantilla HTML y pasa el queryset como contexto
       context = {'pendientes': pendings}
 
@@ -134,9 +134,9 @@ def InputPendingPDFView(request):
       if pisa_status.err:
          return HttpResponse('Errores: <pre>' + html + '</pre>')
       return response
-   else:
-      messages.error(request, "No hay pendientes para generar el reporte.")
-      return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    else:
+        messages.error(request, "No hay pendientes para generar el reporte.")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 def _build_catalog_data(request):
@@ -255,10 +255,20 @@ def exchange_rate_api(request):
         currency = Currency.objects.get(pk=currency_id)
         if currency.is_base:
             return JsonResponse({'rate': 1.0, 'is_base': True})
-        rate = exchangeRate.get_rate(currency)
+        from agro_system.views.filter_helpers import get_producer_ref
+        producer = get_producer_ref(request.user)
+        rate = exchangeRate.get_rate(currency, producer=producer)
         return JsonResponse({'rate': rate, 'is_base': False})
     except Currency.DoesNotExist:
         return JsonResponse({'error': 'not found'}, status=404)
+
+
+def base_currency_api(request):
+    from parameter.models.currency import Currency
+    currency = Currency.objects.filter(is_base=True).first()
+    if currency:
+        return JsonResponse({'id': currency.pk, 'name': str(currency)})
+    return JsonResponse({'id': None, 'name': ''})
 
 
 @login_required

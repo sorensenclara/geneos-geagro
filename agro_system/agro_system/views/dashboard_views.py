@@ -45,19 +45,28 @@ def DashboardView(request):
     crop_id = request.GET.get('crop') or request.session.get('filter_crop_id')
 
     user = request.user
-    staff = None
 
-    if user.type == 'Staff':
+    if getattr(user, 'type', None) == 'Staff':
         staff = Staff.objects.filter(user=user).first()
-        country_sides = Countryside.objects.filter(producer=staff.producer)
-        crops = Crop.objects.filter(responsible=staff)
+        if staff:
+            country_sides = Countryside.objects.filter(producer=staff.producer)
+            crops = Crop.objects.filter(responsible=staff)
+        else:
+            country_sides = Countryside.objects.none()
+            crops = Crop.objects.none()
 
-    elif user.type == 'Producer':
+    elif getattr(user, 'type', None) == 'Producer':
         _p = get_producer_ref(user)
         country_sides = Countryside.objects.filter(producer=_p)
         crops = Crop.objects.filter(producer=_p)
 
-    elif user.type == 'Administration':
+    elif getattr(user, 'type', None) == 'Organization':
+        from user.models.user_producer import UserProducer
+        _org_producers = UserProducer.objects.filter(association=user)
+        country_sides = Countryside.objects.filter(producer__in=_org_producers)
+        crops = Crop.objects.filter(producer__in=_org_producers)
+
+    elif user.is_superuser or getattr(user, 'type', None) == 'Administration':
         country_sides = Countryside.objects.all()
         crops = Crop.objects.all()
 
@@ -125,11 +134,8 @@ def DashboardView(request):
         if selected_campaing:
             base_qs = base_qs.filter(campaing=selected_campaing)
 
-    elif selected_campaing:
-        base_qs = WorkOrder.objects.filter(campaing=selected_campaing)
-
-        if lots.exists():
-            base_qs = base_qs.filter(crop__lot__in=lots)
+    elif selected_campaing and crops.exists():
+        base_qs = WorkOrder.objects.filter(campaing=selected_campaing, crop__in=crops)
 
     # =========================
     # ine próximas actividades
@@ -220,33 +226,15 @@ def DashboardView(request):
                     total_cost += costo
 
 
-    # =========================
-    # Si hay órdenes, usar el cultivo real de la primera orden
-    # Esto corrige cuando selected_crop queda vacío pero work_orders sí trae datos.
-    # =========================
-    if not selected_crop and work_orders:
-        first_work_order = work_orders.first()
-
-        if first_work_order and first_work_order.crop:
-            selected_crop = first_work_order.crop
-
-            if selected_crop.lot:
-                selected_lot = selected_crop.lot
-                lot_main = selected_crop.lot
-
-            if selected_crop.countryside:
-                country_side_selected = selected_crop.countryside
-
-            # Asegurar que el listado de cultivos no quede vacío
-            crops = Crop.objects.filter(campaing=selected_campaing)
-
     alerts = Alert.objects.none()
 
     if selected_crop:
         alerts = Alert.objects.filter(crop=selected_crop).order_by('-date')
 
-    elif selected_campaing:
-        alerts = Alert.objects.filter(crop__campaing=selected_campaing).order_by('-date')
+    elif selected_campaing and crops.exists():
+        alerts = Alert.objects.filter(
+            crop__campaing=selected_campaing, crop__in=crops
+        ).order_by('-date')
 
     alerts_count = alerts.count()
 
@@ -291,10 +279,20 @@ def DashboardView(request):
     # =========================================================
     producer_ref = get_producer_ref(user)
 
-    sf = {'producer': producer_ref} if producer_ref else {}
+    if getattr(user, 'type', None) == 'Organization':
+        from user.models.user_producer import UserProducer
+        _op = UserProducer.objects.filter(association=user)
+        sf       = {'producer__in': _op}
+        sf_stock = {'silo__producer__in': _op}
+        sf_cert  = {'certificate__producer__in': _op}
+    elif producer_ref:
+        sf       = {'producer': producer_ref}
+        sf_stock = {'silo__producer': producer_ref}
+        sf_cert  = {'certificate__producer': producer_ref}
+    else:
+        sf = sf_stock = sf_cert = {}
 
     # SiloStock ya tiene quantity_tons calculado y actualizado automáticamente
-    sf_stock = {'silo__producer': producer_ref} if producer_ref else {}
     acopio_silo_stock = round(
         SiloStock.objects.filter(**sf_stock).aggregate(t=Sum('quantity_tons'))['t'] or 0, 2
     )
@@ -330,7 +328,6 @@ def DashboardView(request):
         for i, sp in enumerate(_species_set)
     ]
 
-    sf_cert = {'certificate__producer': producer_ref} if producer_ref else {}
     cert_entries = StorageMovement.objects.filter(type='entry', **sf_cert).aggregate(t=Sum('quantity_tons'))['t'] or 0
     cert_exits   = StorageMovement.objects.filter(
         type__in=['sale_exit', 'withdrawal', 'transfer'], **sf_cert
@@ -365,8 +362,7 @@ def DashboardView(request):
         silo_out_c = silo_out_c.aggregate(t=Sum('quantity_tons'))['t'] or 0
 
         cert_out_c = StorageMovement.objects.filter(
-            type='sale_exit',
-            **({'certificate__campaing': camp, 'certificate__producer': producer_ref} if producer_ref else {'certificate__campaing': camp})
+            type='sale_exit', certificate__campaing=camp, **sf_cert,
         ).aggregate(t=Sum('quantity_tons'))['t'] or 0
 
         chart_acopiado.append(round(silo_in_c + cert_in_c, 2))

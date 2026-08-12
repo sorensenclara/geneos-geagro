@@ -319,7 +319,7 @@ JAZZMIN_SETTINGS = {
             "icon": ""
         },
         {
-            "name": "Informe de Insumos",
+            "name": "Insumos por campaña",
             "url": "operation:input_report",
             "icon": "fas fa-file-alt",
             "order": 3

@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 from django.db.models import Sum
 from django.utils.translation import gettext_lazy as _
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from user.models.user_producer import UserProducer
 from sale.models.sales_receipt import SalesReceipt
 from sale.models.sale_stock_allocation import SaleStockAllocation
@@ -9,9 +9,20 @@ from storage.models.silo_movement import SiloMovement
 from storage.models.storage_movement import StorageMovement
 
 
-class SaleStockAllocationInline(admin.TabularInline):
+class SaleStockAllocationInline(ProducerAwareMixin, admin.TabularInline):
     model = SaleStockAllocation
     extra = 0
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        from storage.models.silo_stock import SiloStock
+        from storage.models.storage_certificate import StorageCertificate
+        producers = self._producers_for_user(request)
+        if producers is not None:
+            if db_field.name == 'silo_stock':
+                kwargs['queryset'] = SiloStock.objects.filter(silo__producer__in=producers)
+            elif db_field.name == 'certificate':
+                kwargs['queryset'] = StorageCertificate.objects.filter(producer__in=producers)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def has_add_permission(self, request, obj=None):
         if obj and obj.state == 'confirm':
@@ -87,7 +98,7 @@ class SalesReceiptAdmin(ProducerAwareMixin, admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado
-        userProducer = UserProducer.objects.filter(email=request.user.email).first()
+        userProducer = get_producer_for_request(request)
         if userProducer:
             obj.producer = userProducer
         super().save_model(request, obj, form, change)
@@ -108,7 +119,7 @@ class SalesReceiptAdmin(ProducerAwareMixin, admin.ModelAdmin):
             if userProducer.exists():
                 return queryset.filter(producer__in=userProducer)
         if request.user.type == 'Producer':
-            userProducer = UserProducer.objects.filter(email=request.user.email).first()
+            userProducer = get_producer_for_request(request)
             if userProducer:
                 return queryset.filter(producer=userProducer)
         return queryset.none()

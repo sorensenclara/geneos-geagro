@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from user.models.user_producer import UserProducer
 from storage.models.silo import Silo
 from storage.models.silo_stock import SiloStock
@@ -45,7 +45,7 @@ class SiloAdmin(ProducerAwareMixin, admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change:
-            user_producer = UserProducer.objects.filter(email=request.user.email).first()
+            user_producer = get_producer_for_request(request)
             if user_producer:
                 obj.producer = user_producer
         super().save_model(request, obj, form, change)
@@ -58,14 +58,23 @@ class SiloAdmin(ProducerAwareMixin, admin.ModelAdmin):
             producers = UserProducer.objects.filter(association=request.user)
             return qs.filter(producer__in=producers)
         if request.user.type == 'Producer':
-            producer = UserProducer.objects.filter(email=request.user.email).first()
+            producer = get_producer_for_request(request)
             if producer:
                 return qs.filter(producer=producer)
         return qs.none()
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'producer' and request.user.type == 'Organization':
-            kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
+        producers = self._producers_for_user(request)
+        if producers is not None:
+            if db_field.name == 'countryside':
+                from producer.models.country_side import Countryside
+                kwargs['queryset'] = Countryside.objects.filter(producer__in=producers)
+            elif db_field.name == 'lot':
+                from producer.models.lot import Lot
+                kwargs['queryset'] = Lot.objects.filter(countryside__producer__in=producers)
+        elif db_field.name == 'producer':
+            if request.user.type == 'Organization':
+                kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -88,7 +97,7 @@ class SiloStockAdmin(ProducerAwareMixin, admin.ModelAdmin):
             producers = UserProducer.objects.filter(association=request.user)
             return qs.filter(silo__producer__in=producers)
         if request.user.type == 'Producer':
-            producer = UserProducer.objects.filter(email=request.user.email).first()
+            producer = get_producer_for_request(request)
             if producer:
                 return qs.filter(silo__producer=producer)
         return qs.none()

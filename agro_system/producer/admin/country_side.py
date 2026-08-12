@@ -1,5 +1,5 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from producer.models.country_side import Countryside
 from user.models.user_producer import UserProducer
 from producer.models.staff import Staff
@@ -17,7 +17,7 @@ class CountrysideAdmin(ProducerAwareMixin, admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado
-        userProducer = UserProducer.objects.filter(email=request.user.email).first()
+        userProducer = get_producer_for_request(request)
         if userProducer:
             obj.producer = userProducer
         super().save_model(request, obj, form, change)
@@ -35,7 +35,7 @@ class CountrysideAdmin(ProducerAwareMixin, admin.ModelAdmin):
                 staff_qs = Staff.objects.filter(producer__in=user_producers)
             # si es un productor → ve solo sus staff
             elif request.user.type == 'Producer':
-                user_producer = UserProducer.objects.filter(email=request.user.email).first()
+                user_producer = get_producer_for_request(request)
                 if user_producer:
                     staff_qs = Staff.objects.filter(producer=user_producer)
             kwargs["queryset"] = staff_qs
@@ -54,7 +54,7 @@ class CountrysideAdmin(ProducerAwareMixin, admin.ModelAdmin):
             if userProducer.exists():
                 return queryset.filter(producer__in=userProducer)
         if request.user.type == 'Producer':
-            userProducer = UserProducer.objects.filter(email=request.user.email).first()
+            userProducer = get_producer_for_request(request)
             if userProducer:
                 return queryset.filter(producer=userProducer)
         return queryset.none()

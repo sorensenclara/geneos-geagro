@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import InputPendingPDFView, input_charts_view, input_cost_api, exchange_rate_api, input_catalog_view, input_catalog_excel_view
+from .views import InputPendingPDFView, input_charts_view, input_cost_api, exchange_rate_api, base_currency_api, input_catalog_view, input_catalog_excel_view
 
 app_name = 'input'
 
@@ -10,4 +10,5 @@ urlpatterns = [
     path('catalogo/excel/', input_catalog_excel_view, name='input_catalog_excel'),
     path('api/cost/', input_cost_api, name='input_cost_api'),
     path('api/exchange-rate/', exchange_rate_api, name='exchange_rate_api'),
+    path('api/base-currency/', base_currency_api, name='base_currency_api'),
 ]

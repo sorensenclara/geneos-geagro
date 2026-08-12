@@ -86,5 +86,17 @@ pip install -r requirements.txt
 
 python manage.py migrate
 
-Hay 1 migracion para crear el grupo Productor y quitarle el permiso de ver la app Parameter
 Hay 1 migracion para importar provincias y otra para ciudades de Argentina
+
+
+### Grupos Productor 
+
+python manage.py create_producer_group
+
+
+### Administrador
+
+python manage.py create_admin_group
+
+### Personal
+python manage.py create_staff_group

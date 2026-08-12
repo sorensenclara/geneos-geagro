@@ -1,5 +1,5 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from operation.models.work_order import WorkOrder
 from operation.models.input_work_order import InputWorkOrder
 from operation.admin.technical_plan import _filter_inputs
@@ -36,13 +36,14 @@ def _subtract_from_store_stock(input_obj, store, amount):
 
 
 def _refresh_value_real(work_order):
+    producer = work_order.producer
     for iwo in InputWorkOrder.objects.filter(work_order=work_order, dose_applied__isnull=True).select_related('input__currency'):
         inp = iwo.input
         if inp.cost is None:
             continue
 
         currency = inp.currency
-        rate = exchangeRate.get_rate(currency) or 1.0 if (currency and not currency.is_base) else 1.0
+        rate = exchangeRate.get_rate(currency, producer=producer) or 1.0 if (currency and not currency.is_base) else 1.0
 
         InputWorkOrder.objects.filter(pk=iwo.pk).update(
             value_real=inp.cost,
@@ -57,8 +58,19 @@ class InputWorkOrderInline(admin.StackedInline):
     extra = 0
     show_change_link = True
     verbose_name_plural = _("Inputs")
-    fields = ['input', 'dose', 'dose_applied', 'value_estimated', 'value_real', 'currency', 'exchange_rate', 'value_real_base', 'store', 'details']
-    readonly_fields = ['value_real_base']
+    fields = ['input', 'dose', 'value_estimated', 'dose_applied', 'value_real',  'currency', 'exchange_rate', 'value_real_base', 'total_real_display','store', 'details']
+    readonly_fields = ['value_real_base', 'total_real_display']
+
+    def total_real_display(self, obj):
+        if obj.value_real is None:
+            return '—'
+        dose = obj.dose_applied if obj.dose_applied is not None else obj.dose
+        if not dose:
+            return '—'
+        total = obj.value_real_base * dose
+        currency_name = str(obj.currency) if obj.currency else ''
+        return f'{total:,.2f} {currency_name}'.strip()
+    total_real_display.short_description = _('Total')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "input":
@@ -108,12 +120,39 @@ class WorkOrderAdmin(ProducerAwareMixin, admin.ModelAdmin):
     ordering = ['code']
     inlines = [InputWorkOrderInline]
     actions = [finish_order, download_pdf]
+    fieldsets = [
+        (None, {
+            'fields': [
+                'code', 'date_emission', 'date_init', 'date_fin',
+                'campaing', 'crop', 'area', 'stage', 'service',
+                'stateOT', 'type', 'staff', 'partner',
+            ],
+        }),
+        (_('Contratista'), {
+            'fields': ['contractor', 'contractor_cost', 'contractor_cost_real'],
+            'description': _('Valores en moneda base'),
+        }),
+    ]
 
     class Media:
         js = ('js/admin_input_autocost.js', 'js/admin_work_order.js')
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        producers = self._producers_for_user(request)
+        if producers is not None:
+            if db_field.name == 'crop':
+                from operation.models.crop import Crop
+                kwargs['queryset'] = Crop.objects.filter(producer__in=producers)
+            elif db_field.name == 'staff':
+                from producer.models.staff import Staff
+                kwargs['queryset'] = Staff.objects.filter(producer__in=producers)
+            elif db_field.name == 'contractor':
+                from producer.models.contractor import Contractor
+                kwargs['queryset'] = Contractor.objects.filter(producer__in=producers)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def save_model(self, request, obj, form, change):
-        userProducer = UserProducer.objects.filter(email=request.user.email).first()
+        userProducer = get_producer_for_request(request)
         if userProducer:
             obj.producer = userProducer
 
@@ -142,7 +181,7 @@ class WorkOrderAdmin(ProducerAwareMixin, admin.ModelAdmin):
             if userProducer.exists():
                 return queryset.filter(producer__in=userProducer)
         if request.user.type == 'Producer':
-            userProducer = UserProducer.objects.filter(email=request.user.email).first()
+            userProducer = get_producer_for_request(request)
             if userProducer:
                 return queryset.filter(producer=userProducer)
         return queryset.none()

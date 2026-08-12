@@ -1,3 +1,4 @@
+from user.admin.adminSite import adminSite
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -22,6 +23,11 @@ def _producer_filter(user):
         return UserProducer.objects.filter(association=user)
     if getattr(user, 'type', None) == 'Producer':
         return UserProducer.objects.filter(email=user.email)
+    if getattr(user, 'type', None) == 'Staff':
+        from producer.models.staff import Staff
+        staff = Staff.objects.filter(user=user).first()
+        if staff:
+            return UserProducer.objects.filter(pk=staff.producer_id)
     return UserProducer.objects.none()
 
 
@@ -215,7 +221,7 @@ def _build_traceability_data(request):
 @login_required
 def traceability_view(request):
     ctx = _build_traceability_data(request)
-    return render(request, 'sale/report_traceability.html', ctx)
+    return render(request, 'sale/report_traceability.html', {**adminSite.each_context(request), **ctx})
 
 
 @login_required

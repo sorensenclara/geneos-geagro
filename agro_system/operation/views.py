@@ -1,3 +1,4 @@
+from user.admin.adminSite import adminSite
 from django.shortcuts import render
 from operation.models.work_order import WorkOrder
 from operation.models.input_work_order import InputWorkOrder
@@ -20,13 +21,15 @@ from operation.models.crop import Crop
 from producer.models.contractor import Contractor
 
 
+@login_required
 def WorkOrderPDFView(request):
-
-    # Recupera los registros correspondientes a las ordenes
 
     ids = request.GET.get('ids')
     ids_list = ids.split(',') if ids else []
     orders = WorkOrder.objects.filter(id__in=ids_list)
+    producer_filter = _producer_filter(request.user)
+    if producer_filter is not None:
+        orders = orders.filter(crop__producer__in=producer_filter)
     if orders:
         # Renderiza la plantilla HTML y pasa el queryset como contexto
         context = {'orders': orders}
@@ -52,8 +55,12 @@ def WorkOrderPDFView(request):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
+@login_required
 def calendar_json(request):
+    producer_filter = _producer_filter(request.user)
     orders = WorkOrder.objects.all()
+    if producer_filter is not None:
+        orders = orders.filter(crop__producer__in=producer_filter)
     data = []
     for order in orders:
         data.append({
@@ -66,7 +73,7 @@ def calendar_json(request):
 
 @login_required
 def calendar_view(request):
-    return render(request, 'operations/calendar.html')
+    return render(request, 'operations/calendar.html', adminSite.each_context(request))
 
 
 def _producer_filter(user):
@@ -76,6 +83,11 @@ def _producer_filter(user):
         return UserProducer.objects.filter(association=user)
     if getattr(user, 'type', None) == 'Producer':
         return UserProducer.objects.filter(email=user.email)
+    if getattr(user, 'type', None) == 'Staff':
+        from producer.models.staff import Staff
+        staff = Staff.objects.filter(user=user).first()
+        if staff:
+            return UserProducer.objects.filter(pk=staff.producer_id)
     return UserProducer.objects.none()
 
 
@@ -182,17 +194,28 @@ def _build_input_report_data(request):
         if use_base:
             usages_converted = []
             for item in usage_qs.order_by('input__name', 'work_order__date_init'):
+                real_dose = item.dose_applied if item.dose_applied is not None else item.dose
                 usages_converted.append({
                     'obj': item,
-                    # value_estimated es siempre en moneda base
                     'value_estimated_base': item.value_estimated,
-                    # value_real_base ya viene calculado con la tasa histórica de la OT
+                    'total_estimated_base': (item.value_estimated or 0) * (item.dose or 0) or None,
                     'value_real_base': item.value_real_base,
+                    'total_real_base': (item.value_real_base or 0) * (real_dose or 0) or None,
                     'rate': item.exchange_rate or 1.0,
                 })
             context['usages'] = usages_converted
         else:
-            context['usages'] = list(usage_qs.order_by('input__name', 'work_order__date_init'))
+            usages_list = []
+            for item in usage_qs.order_by('input__name', 'work_order__date_init'):
+                real_dose = item.dose_applied if item.dose_applied is not None else item.dose
+                usages_list.append({
+                    'obj': item,
+                    'value_estimated': item.value_estimated,
+                    'total_estimated': (item.value_estimated or 0) * (item.dose or 0) or None,
+                    'value_real': item.value_real,
+                    'total_real': (item.value_real or 0) * (real_dose or 0) or None,
+                })
+            context['usages'] = usages_list
 
     except Campaing.DoesNotExist:
         pass
@@ -206,6 +229,7 @@ def _build_budget_data(request):
     campaing_id = request.GET.get('campaing_id')
     use_base = request.GET.get('use_base') == '1'
     base_currency = Currency.objects.filter(is_base=True).first()
+    base_symbol = (base_currency.symbol or '$') if base_currency else '$'
     producer_filter = _producer_filter(user)
     state_id = request.GET.get('state_id') or ''
 
@@ -216,6 +240,7 @@ def _build_budget_data(request):
         'selected_state_id': state_id,
         'use_base': use_base,
         'base_currency': base_currency,
+        'base_symbol': base_symbol,
         'report_rows': [],
         'months': [],
         'currency_totals': [],
@@ -258,19 +283,24 @@ def _build_budget_data(request):
             # Incluir costo de contratista por OT (en moneda base)
             wo_qs = WorkOrder.objects.filter(
                 campaing_id=campaing_id,
-                contractor_cost__isnull=False,
+            ).exclude(
+                contractor_cost__isnull=True, contractor_cost_real__isnull=True,
             ).select_related('crop')
             if producer_filter is not None:
                 wo_qs = wo_qs.filter(producer__in=producer_filter)
             if state_id:
                 wo_qs = wo_qs.filter(stateOT_id=state_id)
             for wo in wo_qs:
-                if not wo.date_init or not wo.contractor_cost:
+                if not wo.date_init:
                     continue
                 month = wo.date_init.replace(day=1)
                 months_set.add(month)
                 crop = wo.crop.name if wo.crop else '(sin cultivo)'
-                crop_map[crop][month]['real'] += wo.contractor_cost
+                if wo.contractor_cost:
+                    crop_map[crop][month]['presupuestado'] += wo.contractor_cost
+                real_cost = wo.contractor_cost_real if wo.contractor_cost_real is not None else wo.contractor_cost
+                if real_cost:
+                    crop_map[crop][month]['real'] += real_cost
         else:
             usage_items = InputWorkOrder.objects.filter(
                 work_order__campaing_id=campaing_id,
@@ -280,19 +310,25 @@ def _build_budget_data(request):
             if state_id:
                 usage_items = usage_items.filter(work_order__stateOT_id=state_id)
 
+            currency_symbols = {}  # cache: currency_name → symbol
             for item in usage_items:
                 if not item.work_order.date_init:
                     continue
                 # La moneda del real es item.currency; si no está, la del insumo
                 currency = item.currency or (item.input.currency if item.input else None)
                 currency_name = str(currency) if currency else 'Sin moneda'
+                if currency_name not in currency_symbols:
+                    currency_symbols[currency_name] = (currency.symbol or currency_name) if currency else currency_name
                 month = item.work_order.date_init.replace(day=1)
                 months_set.add(month)
                 crop = item.work_order.crop.name if item.work_order.crop else '(sin cultivo)'
                 crop_key = f"[{currency_name}] {crop}"
-                # Estimado en moneda base; real en la moneda de la OT
-                est = (item.value_estimated or 0) * (item.dose or 0)
-                real_val = item.value_real if item.value_real is not None else item.value_estimated
+                # value_estimated está en moneda base → se convierte a la moneda real dividiendo por la tasa.
+                # Así pres y real quedan en la misma moneda y el desvío es comparable.
+                # Para ítems en moneda base, exchange_rate=1 y la división no cambia nada.
+                rate = item.exchange_rate or 1.0
+                est = (item.value_estimated or 0) * (item.dose or 0) / rate
+                real_val = item.value_real if item.value_real is not None else None
                 real_dose = item.dose_applied if item.dose_applied is not None else item.dose
                 real = (real_val or 0) * (real_dose or 0)
                 crop_map[crop_key][month]['presupuestado'] += est
@@ -302,39 +338,52 @@ def _build_budget_data(request):
             base_currency_name = str(base_currency) if base_currency else 'Sin moneda'
             wo_qs = WorkOrder.objects.filter(
                 campaing_id=campaing_id,
-                contractor_cost__isnull=False,
+            ).exclude(
+                contractor_cost__isnull=True, contractor_cost_real__isnull=True,
             ).select_related('crop')
             if producer_filter is not None:
                 wo_qs = wo_qs.filter(producer__in=producer_filter)
             if state_id:
                 wo_qs = wo_qs.filter(stateOT_id=state_id)
             for wo in wo_qs:
-                if not wo.date_init or not wo.contractor_cost:
+                if not wo.date_init:
                     continue
                 month = wo.date_init.replace(day=1)
                 months_set.add(month)
                 crop = wo.crop.name if wo.crop else '(sin cultivo)'
                 crop_key = f"[{base_currency_name}] {crop}"
-                crop_map[crop_key][month]['real'] += wo.contractor_cost
+                if wo.contractor_cost:
+                    crop_map[crop_key][month]['presupuestado'] += wo.contractor_cost
+                real_cost = wo.contractor_cost_real if wo.contractor_cost_real is not None else wo.contractor_cost
+                if real_cost:
+                    crop_map[crop_key][month]['real'] += real_cost
 
         months = sorted(months_set)
         context['months'] = months
 
-        report_rows = []
-        for crop_name, month_data in sorted(crop_map.items()):
+        def _make_row(crop_name, month_data):
             total_pres = sum(v['presupuestado'] for v in month_data.values())
             total_real = sum(v['real'] for v in month_data.values())
+            if total_pres == 0 and total_real == 0:
+                return None
             desvio = total_real - total_pres
             desvio_pct = (desvio / total_pres * 100) if total_pres else None
             cells = [month_data.get(m, {'presupuestado': 0.0, 'real': 0.0}) for m in months]
-            report_rows.append({
+            max_val = max(total_pres, total_real)
+            return {
                 'crop': crop_name,
                 'cells': cells,
                 'total_pres': total_pres,
                 'total_real': total_real,
                 'desvio': desvio,
                 'desvio_pct': desvio_pct,
-            })
+                'bar_pres': round(total_pres / max_val * 100) if max_val else 0,
+                'bar_real': round(total_real / max_val * 100) if max_val else 0,
+            }
+
+        report_rows = [r for r in (
+            _make_row(cn, md) for cn, md in sorted(crop_map.items())
+        ) if r is not None]
         context['report_rows'] = report_rows
 
         if use_base:
@@ -350,36 +399,44 @@ def _build_budget_data(request):
             context['grand_desvio'] = grand_desvio
             context['grand_desvio_pct'] = (grand_desvio / context['grand_pres'] * 100) if context['grand_pres'] else None
         else:
-            currency_totals_map = {}
+            grouped = {}
             for row in report_rows:
                 crop_key = row['crop']
                 cn = crop_key[1:crop_key.index(']')] if crop_key.startswith('[') else 'Sin moneda'
-                if cn not in currency_totals_map:
-                    currency_totals_map[cn] = {
+                crop_clean = crop_key[crop_key.index(']') + 2:] if crop_key.startswith('[') else crop_key
+                if cn not in grouped:
+                    grouped[cn] = {
                         'currency': cn,
+                        'symbol': currency_symbols.get(cn, cn),
+                        'rows': [],
                         'month_cells': [{'presupuestado': 0.0, 'real': 0.0} for _ in months],
                         'total_pres': 0.0,
                         'total_real': 0.0,
                     }
-                ct = currency_totals_map[cn]
-                ct['total_pres'] += row['total_pres']
-                ct['total_real'] += row['total_real']
+                g = grouped[cn]
+                g['rows'].append({**row, 'crop': crop_clean})
+                g['total_pres'] += row['total_pres']
+                g['total_real'] += row['total_real']
                 for i, cell in enumerate(row['cells']):
-                    ct['month_cells'][i]['presupuestado'] += cell['presupuestado']
-                    ct['month_cells'][i]['real'] += cell['real']
-            currency_totals = []
-            for cn, ct in sorted(currency_totals_map.items()):
-                desvio = ct['total_real'] - ct['total_pres']
-                desvio_pct = (desvio / ct['total_pres'] * 100) if ct['total_pres'] else None
-                currency_totals.append({
-                    'currency': cn,
-                    'month_cells': ct['month_cells'],
-                    'total_pres': ct['total_pres'],
-                    'total_real': ct['total_real'],
+                    g['month_cells'][i]['presupuestado'] += cell['presupuestado']
+                    g['month_cells'][i]['real'] += cell['real']
+
+            grouped_by_currency = []
+            for cn, g in sorted(grouped.items()):
+                desvio = g['total_real'] - g['total_pres']
+                desvio_pct = (desvio / g['total_pres'] * 100) if g['total_pres'] else None
+                max_val = max(g['total_pres'], g['total_real'])
+                grouped_by_currency.append({
+                    **g,
                     'desvio': desvio,
                     'desvio_pct': desvio_pct,
+                    'bar_pres': round(g['total_pres'] / max_val * 100) if max_val else 0,
+                    'bar_real': round(g['total_real'] / max_val * 100) if max_val else 0,
                 })
-            context['currency_totals'] = currency_totals
+
+            context['grouped_by_currency'] = grouped_by_currency
+            # Mantener currency_totals para el Excel (usa misma estructura)
+            context['currency_totals'] = grouped_by_currency
 
     except Campaing.DoesNotExist:
         pass
@@ -390,7 +447,7 @@ def _build_budget_data(request):
 @login_required
 def input_report_view(request):
     context = _build_input_report_data(request)
-    return render(request, 'operations/report_inputs.html', context)
+    return render(request, 'operations/report_inputs.html', {**adminSite.each_context(request), **context})
 
 
 @login_required
@@ -490,7 +547,9 @@ def input_report_excel(request):
     ws3 = wb.create_sheet('Uso OTs')
     if use_base:
         set_header(ws3, 1, ['Insumo', 'Moneda insumo', 'OT', 'Cultivo', 'Dosis plan.',
-                             'Dosis aplic.', 'Unidad', f'Val. est. {base_label}', f'Val. real {base_label}'], HDR_FILL_B)
+                             'Dosis aplic.', 'Unidad',
+                             f'P.unit est. {base_label}', f'Total est. {base_label}',
+                             f'P.unit real {base_label}', f'Total real {base_label}'], HDR_FILL_B)
         for r, u in enumerate(ctx['usages'], 2):
             item = u['obj']
             ws3.cell(r, 1, item.input.name)
@@ -501,20 +560,27 @@ def input_report_excel(request):
             ws3.cell(r, 6, item.dose_applied or '')
             ws3.cell(r, 7, item.input.unit_measure.name if item.input.unit_measure else '')
             ws3.cell(r, 8, u['value_estimated_base'] if u['value_estimated_base'] is not None else '')
-            ws3.cell(r, 9, u['value_real_base'] if u['value_real_base'] is not None else '')
+            ws3.cell(r, 9, u['total_estimated_base'] if u['total_estimated_base'] else '')
+            ws3.cell(r, 10, u['value_real_base'] if u['value_real_base'] is not None else '')
+            ws3.cell(r, 11, u['total_real_base'] if u['total_real_base'] else '')
     else:
         set_header(ws3, 1, ['Insumo', 'Moneda', 'OT', 'Cultivo', 'Dosis plan.',
-                             'Dosis aplic.', 'Unidad', 'Val. estimado', 'Val. real'], HDR_FILL_B)
+                             'Dosis aplic.', 'Unidad',
+                             'P.unit estimado', 'Total estimado',
+                             'P.unit real', 'Total real'], HDR_FILL_B)
         for r, u in enumerate(ctx['usages'], 2):
-            ws3.cell(r, 1, u.input.name)
-            ws3.cell(r, 2, str(u.input.currency) if u.input.currency else '')
-            ws3.cell(r, 3, u.work_order.code)
-            ws3.cell(r, 4, str(u.work_order.crop) if u.work_order.crop else '')
-            ws3.cell(r, 5, u.dose)
-            ws3.cell(r, 6, u.dose_applied or '')
-            ws3.cell(r, 7, u.input.unit_measure.name if u.input.unit_measure else '')
-            ws3.cell(r, 8, u.value_estimated or '')
-            ws3.cell(r, 9, u.value_real or '')
+            item = u['obj']
+            ws3.cell(r, 1, item.input.name)
+            ws3.cell(r, 2, str(item.input.currency) if item.input.currency else '')
+            ws3.cell(r, 3, item.work_order.code)
+            ws3.cell(r, 4, str(item.work_order.crop) if item.work_order.crop else '')
+            ws3.cell(r, 5, item.dose)
+            ws3.cell(r, 6, item.dose_applied or '')
+            ws3.cell(r, 7, item.input.unit_measure.name if item.input.unit_measure else '')
+            ws3.cell(r, 8, u['value_estimated'] or '')
+            ws3.cell(r, 9, u['total_estimated'] or '')
+            ws3.cell(r, 10, u['value_real'] or '')
+            ws3.cell(r, 11, u['total_real'] or '')
     autowidth(ws3)
 
     resp = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -526,7 +592,7 @@ def input_report_excel(request):
 @login_required
 def budget_vs_real_view(request):
     context = _build_budget_data(request)
-    return render(request, 'operations/report_budget_vs_real.html', context)
+    return render(request, 'operations/report_budget_vs_real.html', {**adminSite.each_context(request), **context})
 
 
 @login_required
@@ -656,7 +722,10 @@ def _build_work_orders_data(request):
         except Campaing.DoesNotExist:
             pass
 
-        all_crops = list(Crop.objects.filter(campaing_id=campaing_id).order_by('name'))
+        crops_qs = Crop.objects.filter(campaing_id=campaing_id)
+        if producer_filter is not None:
+            crops_qs = crops_qs.filter(producer__in=producer_filter)
+        all_crops = list(crops_qs.order_by('name'))
 
         qs = WorkOrder.objects.filter(
             campaing_id=campaing_id,
@@ -706,7 +775,7 @@ def _build_work_orders_data(request):
 @login_required
 def work_orders_report_view(request):
     ctx = _build_work_orders_data(request)
-    return render(request, 'operations/report_work_orders.html', ctx)
+    return render(request, 'operations/report_work_orders.html', {**adminSite.each_context(request), **ctx})
 
 
 @login_required
@@ -728,7 +797,7 @@ def work_orders_report_excel(request):
     header_align = Alignment(horizontal='center', vertical='center', wrap_text=True)
 
     headers = ['Código', 'Inicio', 'Fin', 'Cultivo', 'Estadio', 'Servicio',
-               'Tipo', 'Estado', 'Contratista', 'Costo labor', 'Personal']
+               'Tipo', 'Estado', 'Contratista', 'Costo planeado (MB)', 'Costo real (MB)', 'Personal']
 
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
@@ -750,6 +819,7 @@ def work_orders_report_excel(request):
             str(wo.stateOT) if wo.stateOT else '',
             str(wo.contractor) if wo.contractor else '',
             round(float(wo.contractor_cost), 2) if wo.contractor_cost else '',
+            round(float(wo.contractor_cost_real), 2) if wo.contractor_cost_real else '',
             str(wo.staff) if wo.staff else '',
         ]
         for col, val in enumerate(row_data, 1):

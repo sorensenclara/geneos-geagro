@@ -1,5 +1,6 @@
 from django.contrib import admin, messages
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from django.db.models import Q
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from input.models.purchase_reception import PurchaseReception
 from input.models.purchase_reception_detail import PurchaseReceptionDetail
 from user.models.user_producer import UserProducer
@@ -61,9 +62,15 @@ def process_reception(modeladmin, request, queryset):
             )
 
 
-class DetalleRecepcionInline(admin.StackedInline):
+class DetalleRecepcionInline(ProducerAwareMixin, admin.StackedInline):
     model = PurchaseReceptionDetail
     extra = 0
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'input':
+            from operation.admin.technical_plan import _filter_inputs
+            kwargs['queryset'] = _filter_inputs(request)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def has_add_permission(self, request, obj=None):
         if obj and obj.state == 'confirm':
@@ -95,8 +102,19 @@ class PurchaseReceptionAdmin(ProducerAwareMixin, admin.ModelAdmin):
     actions = [process_reception]
     inlines = [DetalleRecepcionInline]
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        producers = self._producers_for_user(request)
+        if producers is not None:
+            if db_field.name == 'purchase_order':
+                from input.models.purchase_order import PurchaseOrder
+                kwargs['queryset'] = PurchaseOrder.objects.filter(producer__in=producers)
+            elif db_field.name == 'store':
+                from producer.models.store import Store
+                kwargs['queryset'] = Store.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def save_model(self, request, obj, form, change):
-        userProducer = UserProducer.objects.filter(email=request.user.email).first()
+        userProducer = get_producer_for_request(request)
         if userProducer:
             obj.producer = userProducer
         super().save_model(request, obj, form, change)
@@ -114,7 +132,7 @@ class PurchaseReceptionAdmin(ProducerAwareMixin, admin.ModelAdmin):
             if userProducer.exists():
                 return queryset.filter(producer__in=userProducer)
         if request.user.type == 'Producer':
-            userProducer = UserProducer.objects.filter(email=request.user.email).first()
+            userProducer = get_producer_for_request(request)
             if userProducer:
                 return queryset.filter(producer=userProducer)
         return queryset.none()

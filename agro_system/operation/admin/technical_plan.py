@@ -1,5 +1,5 @@
 from django.contrib import admin
-from user.admin.adminSite import adminSite, ProducerAwareMixin
+from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from operation.models.technical_plan_input import TechnicalPlanInput
 from operation.models.technical_plan_detail import TechnicalPlanDetail
 from operation.models.technical_plan import TechnicalPlan
@@ -39,8 +39,24 @@ class TechnicalPlanInputInline(admin.StackedInline):
             kwargs["queryset"] = TechnicalPlanDetail.objects.filter(
                 technical_plan__id=technical_plan
             )
-        if db_field.name == "input":
+        elif db_field.name == "input":
             kwargs["queryset"] = _filter_inputs(request)
+        elif db_field.name == "store":
+            from django.db.models import Q
+            from producer.models.store import Store
+            from user.models.user_producer import UserProducer
+            user = request.user
+            if user.is_superuser or getattr(user, 'type', None) == 'Administration':
+                pass
+            elif getattr(user, 'type', None) == 'Organization':
+                producers = UserProducer.objects.filter(association=user)
+                kwargs['queryset'] = Store.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
+            elif getattr(user, 'type', None) == 'Producer':
+                producer = UserProducer.objects.filter(email=user.email).first()
+                if producer:
+                    kwargs['queryset'] = Store.objects.filter(Q(producer=producer) | Q(producer__isnull=True))
+                else:
+                    kwargs['queryset'] = Store.objects.filter(producer__isnull=True)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -79,7 +95,7 @@ class TechnicalPlanAdmin(ProducerAwareMixin, admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado
-        userProducer = UserProducer.objects.filter(email=request.user.email).first()
+        userProducer = get_producer_for_request(request)
         if userProducer:
             obj.producer = userProducer
         super().save_model(request, obj, form, change)
@@ -96,7 +112,7 @@ class TechnicalPlanAdmin(ProducerAwareMixin, admin.ModelAdmin):
             if userProducer.exists():
                 return queryset.filter(Q(producer__in=userProducer) | Q(producer__isnull=True))
         if request.user.type == 'Producer':
-            userProducer = UserProducer.objects.filter(email=request.user.email).first()
+            userProducer = get_producer_for_request(request)
             if userProducer:
                 return queryset.filter(Q(producer=userProducer) | Q(producer__isnull=True))
         return queryset.none()

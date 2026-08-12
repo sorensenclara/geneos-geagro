@@ -144,44 +144,27 @@ class MiAdmin(AdminSite):
 adminSite = MiAdmin(name='miadmin')
 
 
-PRODUCER_TYPES = ('Producer', 'Staff', 'Organization')
+def get_producer_for_request(request):
+    """
+    Devuelve el UserProducer del usuario logueado.
+    Para tipo Staff, traversa Staff.producer en lugar de buscar por email.
+    Retorna None si el usuario no tiene un UserProducer asociado.
+    """
+    from user.models.user_producer import UserProducer
+    user = request.user
+    if getattr(user, 'type', None) == 'Staff':
+        from producer.models.staff import Staff
+        staff = Staff.objects.filter(user=user).first()
+        return staff.producer if staff else None
+    return UserProducer.objects.filter(email=user.email).first()
 
 
 class ProducerAwareMixin:
     """
-    Permite que usuarios Producer/Staff/Organization vean y gestionen los modelos
-    del admin sin necesitar permisos Django explícitos.
-    - Producer/Staff/Organization: puede ver, agregar y modificar.
-    El filtrado de datos por productor se delega a get_queryset() de cada ModelAdmin.
-    La organización puede eliminar, pero el productor y su staff no.
+    Mixin para admins con datos por productor.
+    Los permisos ADD/VIEW/CHANGE/DELETE se controlan mediante grupos de Django.
+    El filtrado de filas por productor se delega a get_queryset() de cada ModelAdmin.
     """
-
-    def has_module_permission(self, request):
-        if request.user.is_active and request.user.type in PRODUCER_TYPES:
-            return True
-        return super().has_module_permission(request)
-
-    def has_view_permission(self, request, obj=None):
-        if request.user.is_active and request.user.type in PRODUCER_TYPES:
-            return True
-        return super().has_view_permission(request, obj)
-
-    def has_add_permission(self, request):
-        if request.user.is_active and request.user.type in PRODUCER_TYPES:
-            return True
-        return super().has_add_permission(request)
-
-    def has_change_permission(self, request, obj=None):
-        if request.user.is_active and request.user.type in PRODUCER_TYPES:
-            return True
-        return super().has_change_permission(request, obj)
-
-    def has_delete_permission(self, request, obj=None):
-        if request.user.is_active and request.user.type == 'Organization':
-            return True
-        if request.user.is_active and request.user.type in ('Producer', 'Staff'):
-            return False
-        return super().has_delete_permission(request, obj)
 
     def get_exclude(self, request, obj=None):
         excluded = list(super().get_exclude(request, obj) or [])
@@ -189,3 +172,20 @@ class ProducerAwareMixin:
             if 'producer' not in excluded:
                 excluded.append('producer')
         return excluded
+
+    def _producers_for_user(self, request):
+        """None = sin filtro (admin/superuser). Queryset de UserProducer para el resto."""
+        from user.models.user_producer import UserProducer
+        user = request.user
+        if user.is_superuser or getattr(user, 'type', None) == 'Administration':
+            return None
+        if getattr(user, 'type', None) == 'Organization':
+            return UserProducer.objects.filter(association=user)
+        if getattr(user, 'type', None) == 'Producer':
+            return UserProducer.objects.filter(email=user.email)
+        if getattr(user, 'type', None) == 'Staff':
+            from producer.models.staff import Staff
+            staff = Staff.objects.filter(user=user).first()
+            if staff:
+                return UserProducer.objects.filter(pk=staff.producer_id)
+        return UserProducer.objects.none()

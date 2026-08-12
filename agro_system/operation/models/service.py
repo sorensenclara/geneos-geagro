@@ -10,6 +10,7 @@ class Service(models.Model):
     name = models.CharField(max_length=200, unique=True, verbose_name = _('name'))
     type = models.ForeignKey(ServiceType, verbose_name = _('type of service'), on_delete=models.CASCADE)
 
+
     def __str__(self):
         return f"{self.name}"
 

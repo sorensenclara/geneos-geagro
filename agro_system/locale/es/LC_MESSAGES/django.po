@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 09:33-0300\n"
+"POT-Creation-Date: 2026-08-11 16:26-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgstr ""
 msgid "Español"
 msgstr "Español"
 
-#: agro_system/settings/base.py:331
+#: agro_system/settings/base.py:347
 msgid "Stock Charts"
 msgstr "Gráficos de Stock"
 
@@ -64,7 +64,7 @@ msgstr "Indicador"
 #: alert/models/alert.py:12 alert/models/variable_register.py:12
 #: input/models/purchase_order.py:20 input/models/stock_movement.py:17
 #: operation/models/technical_crop_detail.py:17
-#: parameter/models/exchange_rate.py:12 sale/models/sales_receipt.py:17
+#: parameter/models/exchange_rate.py:12 sale/models/sales_receipt.py:23
 #: storage/models/silo_movement.py:26 storage/models/storage_movement.py:26
 #: storage/models/storage_service.py:16 user/models/notification.py:12
 msgid "date"
@@ -185,23 +185,23 @@ msgstr "Registros de variables"
 msgid "Stock per store"
 msgstr "Stock por almacén"
 
-#: input/admin/input.py:47
+#: input/admin/input.py:60
 msgid "Order Date"
 msgstr "Fecha de orden"
 
-#: input/admin/input.py:51
+#: input/admin/input.py:64
 msgid "Currency"
 msgstr "Moneda"
 
-#: input/admin/input.py:53
+#: input/admin/input.py:66
 msgid "Purchases"
 msgstr "Compras"
 
-#: input/admin/input.py:54 input/models/stock_movement.py:11
+#: input/admin/input.py:67 input/models/stock_movement.py:11
 msgid "Purchase"
 msgstr "Compra"
 
-#: input/admin/input.py:166
+#: input/admin/input.py:179
 #, python-format
 msgid ""
 "Automatic Reorder: A new pending order has been created for %s based on "
@@ -210,7 +210,7 @@ msgstr ""
 "Reorden automático: Se ha creado una nueva orden pendiente para %s basada en "
 "el historial."
 
-#: input/admin/input.py:183
+#: input/admin/input.py:196
 #, python-format
 msgid ""
 "Automatic Reorder: A new pending order has been created for %s using "
@@ -219,7 +219,7 @@ msgstr ""
 "Reorden automático: Se ha creado una nueva orden pendiente para %s usando "
 "valores predeterminados."
 
-#: input/admin/input.py:185
+#: input/admin/input.py:198
 #, python-format
 msgid "Automatic Reorder Failed for %s: No default provider or store found."
 msgstr ""
@@ -264,11 +264,11 @@ msgstr "La orden %s ha sido cancelada exitosamente."
 msgid "Pending purchases"
 msgstr "Imprimir compras pendientes"
 
-#: input/admin/purchase_reception.py:26
+#: input/admin/purchase_reception.py:27
 msgid "Process Reception"
 msgstr "Procesar recepción de compras"
 
-#: input/admin/purchase_reception.py:29
+#: input/admin/purchase_reception.py:30
 msgid "Only receptions that are not already confirmed can be processed."
 msgstr "Solo se pueden procesar las recepciones que aún no están confirmadas."
 
@@ -313,7 +313,7 @@ msgid "cost"
 msgstr "Precio"
 
 #: input/models/input.py:25 input/models/purchase_order.py:28
-#: parameter/models/currency.py:21 sale/models/sales_receipt.py:20
+#: parameter/models/currency.py:22 sale/models/sales_receipt.py:26
 #: storage/models/storage_service.py:21
 msgid "currency"
 msgstr "Moneda"
@@ -348,7 +348,7 @@ msgid "Minimum stock level to trigger a reorder"
 msgstr "Nivel mínimo de stock para generar un reorden automático"
 
 #: input/models/input.py:37 input/models/purchase_order.py:15
-#: input/models/purchase_reception.py:11
+#: input/models/purchase_reception.py:11 sale/models/sales_receipt.py:18
 msgid "pending"
 msgstr "Pendiente"
 
@@ -359,11 +359,12 @@ msgstr "Control de lote"
 #: input/models/input.py:39 input/models/provider.py:20
 #: input/models/purchase_order.py:31 input/models/purchase_reception.py:22
 #: input/models/stock_movement.py:22 operation/models/crop.py:37
-#: operation/models/technical_plan.py:22 operation/models/work_order.py:41
-#: producer/models/contractor.py:16 producer/models/country_side.py:25
-#: producer/models/staff.py:33 producer/models/store.py:14
-#: sale/models/sales_receipt.py:31 storage/models/silo.py:19
-#: storage/models/silo_movement.py:37 storage/models/storage_certificate.py:46
+#: operation/models/technical_plan.py:22 operation/models/work_order.py:42
+#: parameter/models/exchange_rate.py:19 producer/models/contractor.py:16
+#: producer/models/country_side.py:25 producer/models/staff.py:33
+#: producer/models/store.py:14 sale/models/sales_receipt.py:37
+#: storage/models/silo.py:19 storage/models/silo_movement.py:37
+#: storage/models/storage_certificate.py:46
 #: storage/models/storage_movement.py:36
 msgid "producer"
 msgstr "Productor"
@@ -431,7 +432,7 @@ msgid "default"
 msgstr "Predeterminado"
 
 #: input/models/provider.py:27 input/models/purchase_order.py:24
-#: sale/models/sales_receipt.py:29
+#: sale/models/sales_receipt.py:35
 msgid "provider"
 msgstr "Proveedor"
 
@@ -440,14 +441,16 @@ msgid "providers"
 msgstr "Proveedores"
 
 #: input/models/purchase_order.py:16 input/models/purchase_reception.py:12
+#: sale/models/sales_receipt.py:19
 msgid "confirm"
 msgstr "Confirmada"
 
 #: input/models/purchase_order.py:17 input/models/purchase_reception.py:13
+#: sale/models/sales_receipt.py:20
 msgid "cancel"
 msgstr "Cancelada"
 
-#: input/models/purchase_order.py:19 sale/models/sales_receipt.py:19
+#: input/models/purchase_order.py:19 sale/models/sales_receipt.py:25
 msgid "number"
 msgstr "Numero"
 
@@ -464,7 +467,7 @@ msgid "applicant"
 msgstr "Solicitante"
 
 #: input/models/purchase_order.py:29 operation/models/input_work_order.py:17
-#: parameter/models/exchange_rate.py:49
+#: parameter/models/exchange_rate.py:63
 msgid "exchange rate"
 msgstr "Tasa de cambio"
 
@@ -479,7 +482,7 @@ msgid "purchase orders"
 msgstr "Ordenes de compra"
 
 #: input/models/purchase_order_detail.py:16
-#: input/models/purchase_reception_detail.py:16 sale/models/sales_receipt.py:26
+#: input/models/purchase_reception_detail.py:16 sale/models/sales_receipt.py:32
 msgid "amount"
 msgstr "Cantidad"
 
@@ -491,7 +494,7 @@ msgstr "Cantidad pendiente"
 msgid "price unit"
 msgstr "Precio unitario"
 
-#: input/models/purchase_order_detail.py:19 sale/models/sales_receipt.py:28
+#: input/models/purchase_order_detail.py:19 sale/models/sales_receipt.py:34
 msgid "taxes"
 msgstr "Impuestos"
 
@@ -504,7 +507,7 @@ msgid "total in base currency"
 msgstr "Total en moneda base"
 
 #: input/models/purchase_order_detail.py:22 producer/models/country_side.py:22
-#: producer/models/lot.py:22 sale/models/sales_receipt.py:24
+#: producer/models/lot.py:22 sale/models/sales_receipt.py:30
 msgid "cost center"
 msgstr "Centro de costo"
 
@@ -562,7 +565,7 @@ msgid "operation"
 msgstr "Operaciones"
 
 #: input/models/stock_movement.py:54 operation/models/input_work_order.py:10
-#: operation/models/work_order.py:51
+#: operation/models/work_order.py:52
 msgid "work order"
 msgstr "Orden de trabajo"
 
@@ -592,7 +595,7 @@ msgstr "Tipos de insumos"
 msgid "types of provider"
 msgstr "Tipos de proveedores"
 
-#: input/views.py:54
+#: input/views.py:66
 msgid "Select an input"
 msgstr "Selecciona un insumo"
 
@@ -624,17 +627,29 @@ msgstr ""
 msgid "The crop '%s' has been successfully processed."
 msgstr "El cultivo '%s' ha sido procesado exitosamente."
 
-#: operation/admin/technical_plan.py:47
+#: operation/admin/technical_plan.py:63
 msgid "Duplicate Technical Plan"
 msgstr "Duplicar plan tecnico"
 
-#: operation/admin/work_order.py:59
+#: operation/admin/work_order.py:60
 msgid "Inputs"
 msgstr "Insumos"
 
-#: operation/admin/work_order.py:96
+#: operation/admin/work_order.py:73
+msgid "Total"
+msgstr "Total"
+
+#: operation/admin/work_order.py:108
 msgid "Print work orders"
 msgstr "Imprimir ordenes de trabajo"
+
+#: operation/admin/work_order.py:131
+msgid "Contratista"
+msgstr "Contratista"
+
+#: operation/admin/work_order.py:133
+msgid "Valores en moneda base"
+msgstr ""
 
 #: operation/apps.py:7 producer/models/lot.py:24
 msgid "operations"
@@ -692,7 +707,7 @@ msgid "responsible"
 msgstr "Responsable"
 
 #: operation/models/crop.py:25 producer/models/staff.py:31
-#: storage/models/storage_certificate.py:42
+#: sale/models/sales_receipt.py:38 storage/models/storage_certificate.py:42
 msgid "state"
 msgstr "Estado"
 
@@ -792,35 +807,35 @@ msgstr "Dosis aplicada"
 
 #: operation/models/input_work_order.py:14
 msgid "estimated value (base currency)"
-msgstr "Valor estimado (moneda base)"
+msgstr "Valor planeado p/unid. (moneda base)"
 
 #: operation/models/input_work_order.py:15
 msgid "real value"
-msgstr "Valor real"
+msgstr "Valor real p/unid"
 
 #: operation/models/input_work_order.py:16
 msgid "currency (real)"
-msgstr "Moneda (real)"
+msgstr "Moneda (valor real)"
 
 #: operation/models/input_work_order.py:18
 msgid "real value (base currency)"
-msgstr "Valor real (moneda base)"
+msgstr "Valor real p/unid. (moneda base)"
 
 #: operation/models/input_work_order.py:20
 msgid "details"
 msgstr "Detalles"
 
-#: operation/models/input_work_order.py:43
+#: operation/models/input_work_order.py:44
 msgid "input work order"
 msgstr "Insumo de ordenenes de trabajo"
 
-#: operation/models/input_work_order.py:44
+#: operation/models/input_work_order.py:45
 msgid "inputs work orders"
 msgstr "Insumos de ordenes de trabajo"
 
 #: operation/models/partner_crop.py:14
 #: operation/models/technical_plan_detail.py:23
-#: operation/models/work_order.py:40
+#: operation/models/work_order.py:41
 msgid "partner"
 msgstr "Socio"
 
@@ -836,12 +851,12 @@ msgstr "Socios en cultivos"
 msgid "type of service"
 msgstr "Tipo de servicios"
 
-#: operation/models/service.py:17 operation/models/technical_plan_detail.py:16
+#: operation/models/service.py:18 operation/models/technical_plan_detail.py:16
 #: operation/models/work_order.py:31
 msgid "service"
 msgstr "Servicio"
 
-#: operation/models/service.py:18
+#: operation/models/service.py:19
 msgid "services"
 msgstr "Servicos"
 
@@ -935,7 +950,7 @@ msgstr "Dosis"
 
 #: operation/models/technical_plan_input.py:20
 msgid "estimated value"
-msgstr "Valor estimado"
+msgstr "Valor estimado p/unid."
 
 #: operation/models/technical_plan_input.py:29
 msgid "technical plan input"
@@ -989,10 +1004,14 @@ msgid "staff"
 msgstr "Personal"
 
 #: operation/models/work_order.py:38
-msgid "contractor cost"
-msgstr "Costo de labor"
+msgid "contractor cost (planned, base currency)"
+msgstr "Costo contratista (planificado, moneda base)"
 
-#: operation/models/work_order.py:52
+#: operation/models/work_order.py:39
+msgid "contractor cost (real, base currency)"
+msgstr "Costo contratista (real, moneda base)"
+
+#: operation/models/work_order.py:53
 msgid "work orders"
 msgstr "Orden de trabajo"
 
@@ -1063,14 +1082,22 @@ msgid "cultivation states"
 msgstr "Estados del cultivo"
 
 #: parameter/models/currency.py:9
+msgid "symbol"
+msgstr "Símbolo"
+
+#: parameter/models/currency.py:10
+msgid "Símbolo corto para informes (ej: $ o USD)"
+msgstr ""
+
+#: parameter/models/currency.py:11
 msgid "base currency"
 msgstr "Moneda base"
 
-#: parameter/models/currency.py:10
+#: parameter/models/currency.py:12
 msgid "Only one currency can be the base currency of the system"
 msgstr "Solo una moneda puede ser la moneda base del sistema"
 
-#: parameter/models/currency.py:22
+#: parameter/models/currency.py:23
 msgid "currencies"
 msgstr "Monedas"
 
@@ -1086,7 +1113,11 @@ msgstr "Modeda destino"
 msgid "rate to base currency"
 msgstr "Tasa a moneda base"
 
-#: parameter/models/exchange_rate.py:50
+#: parameter/models/exchange_rate.py:20
+msgid "Leave empty for global rates (used as fallback for all producers)"
+msgstr "Dejar vacío para las tarifas globales (utilizadas como opción predeterminada para todos los productores)"
+
+#: parameter/models/exchange_rate.py:64
 msgid "exchange rates"
 msgstr "Tasas de cambio"
 
@@ -1295,6 +1326,26 @@ msgstr "Tipo de personal"
 msgid "types of staff"
 msgstr "Tipos de personal"
 
+#: sale/admin/sales_receipt.py:48
+msgid "Confirmar venta"
+msgstr "Confirmar venta"
+
+#: sale/admin/sales_receipt.py:51
+msgid "Solo se pueden confirmar ventas que no estén ya confirmadas."
+msgstr ""
+
+#: sale/admin/sales_receipt.py:61
+#, python-format
+msgid ""
+"La venta %(number)s no se confirmó: lo asignado (%(asignado).2f tn) no "
+"coincide con la cantidad vendida (%(cantidad).2f tn)."
+msgstr ""
+
+#: sale/admin/sales_receipt.py:88
+#, python-format
+msgid "Venta %s confirmada."
+msgstr ""
+
 #: sale/apps.py:7
 msgid "sales"
 msgstr "Ventas"
@@ -1311,7 +1362,7 @@ msgstr "Transportista"
 msgid "carrier"
 msgstr "Transportista"
 
-#: sale/models/driver.py:24 sale/models/sales_receipt.py:30
+#: sale/models/driver.py:24 sale/models/sales_receipt.py:36
 #: storage/models/silo_movement.py:35 storage/models/storage_movement.py:30
 msgid "driver"
 msgstr "Chofer"
@@ -1320,31 +1371,72 @@ msgstr "Chofer"
 msgid "drivers"
 msgstr "Choferes"
 
-#: sale/models/sales_receipt.py:18 sale/models/type_sales_receipt.py:14
-msgid "type of sales receipt"
-msgstr "Tipo de comprobantes de venta"
-
-#: sale/models/sales_receipt.py:21
-msgid "custom"
-msgstr "Cliente"
-
-#: sale/models/sales_receipt.py:22
-msgid "cuil of custom"
-msgstr "Cuil del cliente"
-
-#: sale/models/sales_receipt.py:25
-msgid "especie"
-msgstr "Especie"
-
-#: sale/models/sales_receipt.py:27
-msgid "subtotal"
-msgstr "subtotal"
-
-#: sale/models/sales_receipt.py:37
+#: sale/models/sale_stock_allocation.py:17 sale/models/sales_receipt.py:44
 msgid "sales receipt"
 msgstr "Cromprobante de ventas"
 
-#: sale/models/sales_receipt.py:38
+#: sale/models/sale_stock_allocation.py:20 storage/models/silo_movement.py:39
+#: storage/models/silo_stock.py:35
+msgid "silo stock"
+msgstr "Stock del silo"
+
+#: sale/models/sale_stock_allocation.py:23
+#: storage/models/storage_certificate.py:90
+msgid "storage certificate"
+msgstr "Certificado de depósito"
+
+#: sale/models/sale_stock_allocation.py:24 storage/models/silo_movement.py:27
+#: storage/models/silo_stock.py:17 storage/models/storage_movement.py:27
+msgid "quantity (tons)"
+msgstr "Cantidad (tn)"
+
+#: sale/models/sale_stock_allocation.py:29
+msgid ""
+"Debe indicar exactamente un silo propio o un certificado de depósito, no "
+"ambos ni ninguno."
+msgstr ""
+
+#: sale/models/sale_stock_allocation.py:45
+#, python-format
+msgid "La especie de \"%(origen)s\" no coincide con la especie de la venta."
+msgstr ""
+
+#: sale/models/sale_stock_allocation.py:60
+#, python-format
+msgid ""
+"La cantidad asignada supera el disponible en %(origen)s (%(disponible).2f "
+"tn, %(reservado).2f tn ya reservadas por otras ventas)."
+msgstr ""
+
+#: sale/models/sale_stock_allocation.py:75
+msgid "sale stock allocation"
+msgstr ""
+
+#: sale/models/sale_stock_allocation.py:76
+msgid "sale stock allocations"
+msgstr ""
+
+#: sale/models/sales_receipt.py:24 sale/models/type_sales_receipt.py:14
+msgid "type of sales receipt"
+msgstr "Tipo de comprobantes de venta"
+
+#: sale/models/sales_receipt.py:27
+msgid "custom"
+msgstr "Cliente"
+
+#: sale/models/sales_receipt.py:28
+msgid "cuil of custom"
+msgstr "Cuil del cliente"
+
+#: sale/models/sales_receipt.py:31
+msgid "especie"
+msgstr "Especie"
+
+#: sale/models/sales_receipt.py:33
+msgid "subtotal"
+msgstr "subtotal"
+
+#: sale/models/sales_receipt.py:45
 msgid "sales receipts"
 msgstr "Comprobantes de ventas"
 
@@ -1385,11 +1477,6 @@ msgstr "Salida"
 msgid "Transfer to another silo"
 msgstr "Transferencia a otro silo"
 
-#: storage/models/silo_movement.py:27 storage/models/silo_stock.py:17
-#: storage/models/storage_movement.py:27
-msgid "quantity (tons)"
-msgstr "Cantidad (tn)"
-
 #: storage/models/silo_movement.py:29
 msgid "destination silo"
 msgstr "Silo destino"
@@ -1406,15 +1493,11 @@ msgstr "Venta relacionada"
 msgid "remito number"
 msgstr "Numero de remito"
 
-#: storage/models/silo_movement.py:39 storage/models/silo_stock.py:35
-msgid "silo stock"
-msgstr "Stock del silo"
-
-#: storage/models/silo_movement.py:94
+#: storage/models/silo_movement.py:105
 msgid "silo movement"
 msgstr "Movimiento de silo"
 
-#: storage/models/silo_movement.py:95
+#: storage/models/silo_movement.py:106
 msgid "silo movements"
 msgstr "Movimientos de silo"
 
@@ -1510,15 +1593,11 @@ msgstr "Entidad del warrant"
 msgid "warrant expiry date"
 msgstr "Fecha de vencimiento del warrant"
 
-#: storage/models/storage_certificate.py:73
+#: storage/models/storage_certificate.py:84
 msgid "quantity available (tons)"
 msgstr "Cantidad disponible (tn)"
 
-#: storage/models/storage_certificate.py:79
-msgid "storage certificate"
-msgstr "Certificado de depósito"
-
-#: storage/models/storage_certificate.py:80
+#: storage/models/storage_certificate.py:91
 msgid "storage certificates"
 msgstr "Certificados de depósito"
 
@@ -1569,6 +1648,20 @@ msgstr "Servicio del acopio"
 #: storage/models/storage_service.py:29
 msgid "storage services"
 msgstr "Servicos del acopio"
+
+#: storage/services.py:36
+#, python-format
+msgid ""
+"No se puede acopiar grano de \"%(crop)s\": todavía no se cargó su rinde real "
+"(CropYields.yields_real)."
+msgstr ""
+
+#: storage/services.py:50
+#, python-format
+msgid ""
+"El acopio de \"%(crop)s\" superaría su rinde real disponible: ya acopiado "
+"%(acopiado).2f tn + %(nuevo).2f tn nuevas > %(techo).2f tn de rinde real."
+msgstr ""
 
 #: templates/account/email_confirm.html:6
 #: templates/account/email_confirm.html:12
@@ -1919,5 +2012,8 @@ msgstr "Radiación solar"
 msgid "raw data"
 msgstr "Datos"
 
-#~ msgid "rate"
-#~ msgstr "Tasa"
+msgid "contractor cost"
+msgstr "Costo de labor"
+
+msgid "rate"
+msgstr "Tasa"

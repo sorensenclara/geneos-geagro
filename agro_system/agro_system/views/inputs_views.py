@@ -15,7 +15,7 @@ from agro_system.views.filter_helpers import read_filter, get_producer_ref
 @login_required
 def InputsView(request):
 
-    campaing_id, crop_id = read_filter(request)
+    _, crop_id = read_filter(request)
 
     # ── Filtro de almacén (propio de esta vista) ───────────
     if 'store' in request.GET:
@@ -25,18 +25,24 @@ def InputsView(request):
     user = request.user
     producer_ref = get_producer_ref(user)
 
-    sf = {'producer': producer_ref} if producer_ref else {}
-
-    # ── Almacenes disponibles ──────────────────────────────
-    if producer_ref:
+    if getattr(user, 'type', None) == 'Organization':
+        from user.models.user_producer import UserProducer
+        _org_producers = UserProducer.objects.filter(association=user)
+        sf = {'producer__in': _org_producers}
+        stores = Store.objects.filter(producer__in=_org_producers).order_by('name')
+        inputs_qs = Input.objects.filter(producer__in=_org_producers, control_stock=True)
+    elif producer_ref:
+        sf = {'producer': producer_ref}
         stores = Store.objects.filter(producer=producer_ref).order_by('name')
+        inputs_qs = Input.objects.filter(producer=producer_ref, control_stock=True)
     else:
+        sf = {}
         stores = Store.objects.all().order_by('name')
+        inputs_qs = Input.objects.filter(control_stock=True)
 
     selected_store = stores.filter(id=store_id).first() if store_id else None
 
     # ── Stock por almacén (si hay filtro activo) ───────────
-    # Suma de todos los movimientos del almacén por input → stock real en ese depósito
     store_stock = {}
     if selected_store:
         rows = (
@@ -48,10 +54,6 @@ def InputsView(request):
         store_stock = {r['input_id']: r['total'] for r in rows}
 
     # ── Insumos ────────────────────────────────────────────
-    if producer_ref:
-        inputs_qs = Input.objects.filter(producer=producer_ref, control_stock=True)
-    else:
-        inputs_qs = Input.objects.filter(control_stock=True)
 
     inputs_qs = inputs_qs.select_related('type', 'unit_measure', 'currency').order_by('type__name', 'name')
 

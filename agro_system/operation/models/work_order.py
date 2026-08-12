@@ -35,7 +35,8 @@ class WorkOrder(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE, verbose_name= _('staff'))
     # Si es una labor de terceros detallar el contratista
     contractor = models.ForeignKey('producer.Contractor', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('contractor'))
-    contractor_cost = models.FloatField(null=True, blank=True, verbose_name=_('contractor cost'))
+    contractor_cost = models.FloatField(null=True, blank=True, verbose_name=_('contractor cost (planned, base currency)'))
+    contractor_cost_real = models.FloatField(null=True, blank=True, verbose_name=_('contractor cost (real, base currency)'))
     # Si es una labor de socios detallar el contratista
     partner =  models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, related_name="partner_wo", null=True, blank=True, verbose_name= _('partner'))
     producer = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, verbose_name= _('producer'))

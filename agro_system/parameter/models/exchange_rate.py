@@ -12,14 +12,22 @@ class exchangeRate(models.Model):
     date = models.DateField(verbose_name=_('date'))
     rate = models.FloatField(verbose_name=_('rate to base currency'),
                              help_text='How many units of the base currency equal 1 unit of the origin currency')
+    producer = models.ForeignKey(
+        'user.UserProducer',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name=_('producer'),
+        help_text=_('Leave empty for global rates (used as fallback for all producers)'),
+    )
 
     def __str__(self):
         return f"{self.currency_origin} → {self.currency_destination} | {self.rate}"
 
     @classmethod
-    def get_rate(cls, from_currency):
+    def get_rate(cls, from_currency, producer=None):
         """
         Devuelve la tasa más reciente de from_currency a la moneda base.
+        Si se pasa producer, busca primero su tasa específica; si no hay, usa la global (producer=null).
         Si from_currency ya es la base, devuelve 1.0.
         Si no hay tasa registrada, devuelve None.
         """
@@ -28,10 +36,16 @@ class exchangeRate(models.Model):
             return None
         if from_currency.pk == base.pk:
             return 1.0
-        record = cls.objects.filter(
+        qs = cls.objects.filter(
             currency_origin=from_currency,
             currency_destination=base,
-        ).order_by('-date').first()
+        )
+        if producer:
+            record = qs.filter(producer=producer).order_by('-date').first()
+            if record:
+                return record.rate
+            # Fallback a tasa global
+        record = qs.filter(producer__isnull=True).order_by('-date').first()
         return record.rate if record else None
 
     @classmethod

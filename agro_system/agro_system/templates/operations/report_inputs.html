@@ -342,8 +342,10 @@
           <th class="text-right">Dosis planif.</th>
           <th class="text-right">Dosis aplicada</th>
           <th>Unidad</th>
-          <th class="text-right">Valor est. en base</th>
-          <th class="text-right">Valor real en base</th>
+          <th class="text-right">P. unit. est.</th>
+          <th class="text-right">Total est.</th>
+          <th class="text-right">P. unit. real</th>
+          <th class="text-right">Total real</th>
         </tr>
       </thead>
       <tbody>
@@ -359,13 +361,19 @@
           </td>
           <td>{% if u.obj.input.unit_measure %}{{ u.obj.input.unit_measure.name }}{% else %}-{% endif %}</td>
           <td class="text-right">
-            {% if u.value_estimated_base is not None %}
-              <span class="badge-estimated">{{ u.value_estimated_base|floatformat:2 }}</span>
+            {% if u.value_estimated_base is not None %}<span class="badge-estimated">{{ u.value_estimated_base|floatformat:2 }}</span>
+            {% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td class="text-right" style="font-weight:600;">
+            {% if u.total_estimated_base %}<span class="badge-estimated">{{ u.total_estimated_base|floatformat:2 }}</span>
             {% else %}<span class="no-data">—</span>{% endif %}
           </td>
           <td class="text-right">
-            {% if u.value_real_base is not None %}
-              <span class="badge-real">{{ u.value_real_base|floatformat:2 }}</span>
+            {% if u.value_real_base is not None %}<span class="badge-real">{{ u.value_real_base|floatformat:2 }}</span>
+            {% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td class="text-right" style="font-weight:600;">
+            {% if u.total_real_base %}<span class="badge-real">{{ u.total_real_base|floatformat:2 }}</span>
             {% else %}<span class="no-data">—</span>{% endif %}
           </td>
         </tr>
@@ -491,34 +499,42 @@
           <th class="text-right">Dosis planif.</th>
           <th class="text-right">Dosis aplicada</th>
           <th>Unidad</th>
-          <th class="text-right">Valor estimado</th>
-          <th class="text-right">Valor real</th>
+          <th class="text-right">P. unit. est.</th>
+          <th class="text-right">Total est.</th>
+          <th class="text-right">P. unit. real</th>
+          <th class="text-right">Total real</th>
         </tr>
       </thead>
       <tbody>
         {% for u in usages %}
         <tr>
-          <td>{{ u.input.name }}</td>
+          <td>{{ u.obj.input.name }}</td>
           <td>
-            {% if u.input.currency %}
-              <span class="currency-tag">{{ u.input.currency }}</span>
+            {% if u.obj.input.currency %}
+              <span class="currency-tag">{{ u.obj.input.currency }}</span>
             {% else %}<span class="no-data">—</span>{% endif %}
           </td>
-          <td>{{ u.work_order.code }}</td>
-          <td>{{ u.work_order.crop }}</td>
-          <td class="text-right">{{ u.dose|floatformat:2 }}</td>
+          <td>{{ u.obj.work_order.code }}</td>
+          <td>{{ u.obj.work_order.crop }}</td>
+          <td class="text-right">{{ u.obj.dose|floatformat:2 }}</td>
           <td class="text-right">
-            {% if u.dose_applied %}{{ u.dose_applied|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+            {% if u.obj.dose_applied %}{{ u.obj.dose_applied|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
           </td>
-          <td>{% if u.input.unit_measure %}{{ u.input.unit_measure.name }}{% else %}-{% endif %}</td>
+          <td>{% if u.obj.input.unit_measure %}{{ u.obj.input.unit_measure.name }}{% else %}-{% endif %}</td>
           <td class="text-right">
-            {% if u.value_estimated %}
-              <span class="badge-estimated">{{ u.value_estimated|floatformat:2 }}</span>
+            {% if u.value_estimated %}<span class="badge-estimated">{{ u.value_estimated|floatformat:2 }}</span>
+            {% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td class="text-right" style="font-weight:600;">
+            {% if u.total_estimated %}<span class="badge-estimated">{{ u.total_estimated|floatformat:2 }}</span>
             {% else %}<span class="no-data">—</span>{% endif %}
           </td>
           <td class="text-right">
-            {% if u.value_real %}
-              <span class="badge-real">{{ u.value_real|floatformat:2 }}</span>
+            {% if u.value_real %}<span class="badge-real">{{ u.value_real|floatformat:2 }}</span>
+            {% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td class="text-right" style="font-weight:600;">
+            {% if u.total_real %}<span class="badge-real">{{ u.total_real|floatformat:2 }}</span>
             {% else %}<span class="no-data">—</span>{% endif %}
           </td>
         </tr>

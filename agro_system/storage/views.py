@@ -1,3 +1,4 @@
+from user.admin.adminSite import adminSite
 from datetime import date
 
 from django.contrib.auth.decorators import login_required
@@ -35,6 +36,11 @@ def _producer_filter(user):
         return UserProducer.objects.filter(association=user)
     if getattr(user, 'type', None) == 'Producer':
         return UserProducer.objects.filter(email=user.email)
+    if getattr(user, 'type', None) == 'Staff':
+        from producer.models.staff import Staff
+        staff = Staff.objects.filter(user=user).first()
+        if staff:
+            return UserProducer.objects.filter(pk=staff.producer_id)
     return UserProducer.objects.none()
 
 
@@ -219,7 +225,7 @@ def _build_acopio_data(request):
 @login_required
 def acopio_ledger_view(request):
     ctx = _build_acopio_data(request)
-    return render(request, 'storage/report_ledger.html', ctx)
+    return render(request, 'storage/report_ledger.html', {**adminSite.each_context(request), **ctx})
 
 
 @login_required
@@ -444,7 +450,7 @@ def _build_stock_position_data(request):
 @login_required
 def stock_position_view(request):
     ctx = _build_stock_position_data(request)
-    return render(request, 'storage/report_stock_position.html', ctx)
+    return render(request, 'storage/report_stock_position.html', {**adminSite.each_context(request), **ctx})
 
 
 @login_required
@@ -720,7 +726,7 @@ def _conciliation_empty_ctx(campaing_id, specie_id, only_with_real, show_produce
 @login_required
 def conciliation_view(request):
     ctx = _build_conciliation_data(request)
-    return render(request, 'storage/report_conciliation.html', ctx)
+    return render(request, 'storage/report_conciliation.html', {**adminSite.each_context(request), **ctx})
 
 
 @login_required
@@ -930,7 +936,7 @@ def _build_storage_cost_data(request):
 @login_required
 def storage_cost_view(request):
     ctx = _build_storage_cost_data(request)
-    return render(request, 'storage/report_storage_cost.html', ctx)
+    return render(request, 'storage/report_storage_cost.html', {**adminSite.each_context(request), **ctx})
 
 
 @login_required
@@ -1162,7 +1168,7 @@ def _build_aging_data(request):
 @login_required
 def aging_view(request):
     ctx = _build_aging_data(request)
-    return render(request, 'storage/report_aging.html', ctx)
+    return render(request, 'storage/report_aging.html', {**adminSite.each_context(request), **ctx})
 
 
 @login_required

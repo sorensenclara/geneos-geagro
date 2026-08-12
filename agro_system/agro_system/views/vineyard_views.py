@@ -10,7 +10,7 @@ from operation.models.technical_plan import TechnicalPlan
 from operation.models.work_order import WorkOrder
 from producer.models.staff import Staff
 from operation.models.crop import Crop
-from agro_system.views.filter_helpers import read_filter, get_producer_ref
+from agro_system.views.filter_helpers import read_filter, get_producer_ref, build_user_scope
 
 from storage.models.silo import Silo
 from storage.models.silo_movement import SiloMovement
@@ -49,43 +49,24 @@ def VineyardView(request):
     campaing_id, crop_id = read_filter(request)
 
     user = request.user
+    crops_base, country_sides = build_user_scope(user)
 
-    # =========================================================
-    # DEV ORIGINAL - visibilidad según tipo usuario
-    # =========================================================
-    if user.type == 'Producer':
-        _p = get_producer_ref(user)
-        country_sides = Countryside.objects.filter(producer=_p)
-        technical_plans = TechnicalPlan.objects.filter(producer=_p)
-        staff = Staff.objects.filter(producer=_p)
-        crops_base = Crop.objects.filter(producer=_p)
-
-    elif user.type == 'Staff':
-        staff_instance = Staff.objects.filter(user=user).first()
-
-        if staff_instance and staff_instance.producer:
-            producer = staff_instance.producer
-            country_sides = Countryside.objects.filter(producer=producer)
-            technical_plans = TechnicalPlan.objects.filter(producer=producer)
-            staff = Staff.objects.filter(producer=producer)
-            crops_base = Crop.objects.filter(producer=producer)
-        else:
-            country_sides = Countryside.objects.none()
-            technical_plans = TechnicalPlan.objects.none()
-            staff = Staff.objects.none()
-            crops_base = Crop.objects.none()
-
-    elif user.type == 'Administration':
-        country_sides = Countryside.objects.all()
+    # TechnicalPlan y Staff filtrados por el mismo scope
+    _p = get_producer_ref(user)
+    if user.is_superuser or getattr(user, 'type', None) == 'Administration':
         technical_plans = TechnicalPlan.objects.all()
         staff = Staff.objects.all()
-        crops_base = Crop.objects.all()
-
+    elif getattr(user, 'type', None) == 'Organization':
+        from user.models.user_producer import UserProducer
+        _producers = UserProducer.objects.filter(association=user)
+        technical_plans = TechnicalPlan.objects.filter(producer__in=_producers)
+        staff = Staff.objects.filter(producer__in=_producers)
+    elif _p:
+        technical_plans = TechnicalPlan.objects.filter(producer=_p)
+        staff = Staff.objects.filter(producer=_p)
     else:
-        country_sides = Countryside.objects.none()
         technical_plans = TechnicalPlan.objects.none()
         staff = Staff.objects.none()
-        crops_base = Crop.objects.none()
 
     # =========================================================
     # campaña seleccionada / activa
@@ -98,21 +79,11 @@ def VineyardView(request):
     else:
         selected_campaing = campaign_active or campaings.first()
 
-    if not crops_base.exists():
-        crops_base = Crop.objects.all()
-
-    if not country_sides.exists():
-        country_sides = Countryside.objects.all()
-
     lots = Lot.objects.filter(countryside__in=country_sides)
-
     crops = crops_base
 
     if selected_campaing:
         crops = crops.filter(campaing_id=selected_campaing.id)
-
-    if selected_campaing and not crops.exists():
-        crops = Crop.objects.filter(campaing_id=selected_campaing.id)
 
     # =========================================================
     #  cultivo principal / seleccionado
@@ -121,11 +92,6 @@ def VineyardView(request):
         main_crop = crops.filter(id=crop_id).first()
     else:
         main_crop = crops.filter(is_main=True).first() or crops.order_by('-id').first()
-
-    if not main_crop and selected_campaing:
-        main_crop = Crop.objects.filter(
-            campaing_id=selected_campaing.id
-        ).order_by('-id').first()
 
     # =========================================================
     # métricas reales
