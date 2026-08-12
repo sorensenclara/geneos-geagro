@@ -27,7 +27,7 @@ def topbar_filter(request):
     # Queryset de cultivos según tipo de usuario
     if user.type == 'Staff':
         staff = Staff.objects.filter(user=user).first()
-        crops_qs = Crop.objects.filter(responsible=staff) if staff else Crop.objects.none()
+        crops_qs = Crop.objects.filter(producer=staff.producer) if (staff and staff.producer) else Crop.objects.none()
     elif user.type == 'Producer':
         crops_qs = Crop.objects.filter(producer=user)
     elif user.type == 'Administration':

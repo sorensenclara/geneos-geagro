@@ -92,6 +92,8 @@ def input_charts_view(request):
     
     extra_context['all_inputs'] = all_inputs
 
+    from user.admin.adminSite import adminSite
+    extra_context.update(adminSite.each_context(request))
     return render(request, 'admin/input/charts.html', extra_context)
 
 def InputPendingPDFView(request):
@@ -239,6 +241,8 @@ def _build_catalog_data(request):
 @login_required
 def input_catalog_view(request):
     ctx = _build_catalog_data(request)
+    from user.admin.adminSite import adminSite
+    ctx.update(adminSite.each_context(request))
     return render(request, 'input/report_catalog.html', ctx)
 
 

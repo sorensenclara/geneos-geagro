@@ -55,22 +55,37 @@ class MiAdmin(AdminSite):
         campaing_id = request.GET.get("campaing")
         crop_id = request.GET.get("crop")
 
+        user = request.user
+
+        # Scope de cultivos según tipo de usuario
+        if user.is_superuser or getattr(user, 'type', None) == 'Administration':
+            crops_scope = Crop.objects.all()
+        elif getattr(user, 'type', None) == 'Organization':
+            from user.models.user_producer import UserProducer
+            _org_producers = UserProducer.objects.filter(organization=user)
+            crops_scope = Crop.objects.filter(producer__in=_org_producers)
+        elif getattr(user, 'type', None) in ('Producer', 'Staff'):
+            _producer = get_producer_for_request(request)
+            crops_scope = Crop.objects.filter(producer=_producer) if _producer else Crop.objects.none()
+        else:
+            crops_scope = Crop.objects.none()
+
         if campaing_id:
             campaing = Campaing.objects.filter(id=campaing_id).first()
         else:
             campaing = Campaing.objects.filter(active=True).first() or Campaing.objects.order_by("-date_init").first()
 
         if crop_id:
-            crop = Crop.objects.filter(id=crop_id).first()
+            crop = crops_scope.filter(id=crop_id).first()
         else:
             crop = (
-                Crop.objects.filter(campaing=campaing, is_main=True).first()
-                or Crop.objects.filter(campaing=campaing).order_by("-id").first()
+                crops_scope.filter(campaing=campaing, is_main=True).first()
+                or crops_scope.filter(campaing=campaing).order_by("-id").first()
                 if campaing else None
             )
 
         campaings = Campaing.objects.all().order_by("-date_init")
-        crops = Crop.objects.filter(campaing=campaing).order_by("-id") if campaing else Crop.objects.none()
+        crops = crops_scope.filter(campaing=campaing).order_by("-id") if campaing else Crop.objects.none()
 
         ordenes = WorkOrder.objects.filter(crop=crop).order_by("date_init") if crop else WorkOrder.objects.none()
 

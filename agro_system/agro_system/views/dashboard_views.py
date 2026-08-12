@@ -48,9 +48,9 @@ def DashboardView(request):
 
     if getattr(user, 'type', None) == 'Staff':
         staff = Staff.objects.filter(user=user).first()
-        if staff:
+        if staff and staff.producer:
             country_sides = Countryside.objects.filter(producer=staff.producer)
-            crops = Crop.objects.filter(responsible=staff)
+            crops = Crop.objects.filter(producer=staff.producer)
         else:
             country_sides = Countryside.objects.none()
             crops = Crop.objects.none()

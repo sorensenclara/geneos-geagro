@@ -115,7 +115,7 @@ def download_pdf(modeladmin, request, queryset):
 
 class WorkOrderAdmin(ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['code', 'crop', 'stage', 'date_init', 'stateOT', 'type']
-    list_filter = ['campaing', 'stage', 'stateOT', 'crop']
+    list_filter = ['campaing', 'stage', 'stateOT', 'crop', 'staff']
     search_fields = ['code', 'crop__name']
     ordering = ['code']
     inlines = [InputWorkOrderInline]
