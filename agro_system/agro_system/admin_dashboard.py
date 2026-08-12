@@ -85,11 +85,8 @@ def custom_admin_dashboard(request):
         if selected_campaing:
             base_qs = base_qs.filter(campaing=selected_campaing)
 
-    elif selected_campaing:
-        base_qs = WorkOrder.objects.filter(campaing=selected_campaing)
-
-        if lots.exists():
-            base_qs = base_qs.filter(crop__lot__in=lots)
+    elif selected_campaing and crops.exists():
+        base_qs = WorkOrder.objects.filter(campaing=selected_campaing, crop__in=crops)
 
     finished_filter = (
         Q(stateOT__name__icontains='COMPLET') |
