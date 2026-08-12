@@ -1,6 +1,8 @@
 from parameter.models.campaign import Campaing
 from operation.models.crop import Crop
 from producer.models.staff import Staff
+from user.models.user_producer import UserProducer
+from user.models.notification import Notification
 
 
 def topbar_filter(request):
@@ -28,8 +30,10 @@ def topbar_filter(request):
         crops_qs = Crop.objects.filter(responsible=staff) if staff else Crop.objects.none()
     elif user.type == 'Producer':
         crops_qs = Crop.objects.filter(producer=user)
-    elif user.type in ('Administration', 'Organization'):
+    elif user.type == 'Administration':
         crops_qs = Crop.objects.all()
+    elif user.type == 'Organization':
+        crops_qs = Crop.objects.filter(producer__in=UserProducer.objects.filter(organization=user))
     else:
         crops_qs = Crop.objects.none()
 
@@ -51,10 +55,14 @@ def topbar_filter(request):
     else:
         selected_crop = crops_qs.filter(is_main=True).first() or crops_qs.order_by('-id').first()
 
+    notifications = Notification.objects.filter(user=user).order_by('-date')[:10]
+
     return {
         'campaings': campaings,
         'crops': crops_qs,
         'selected_campaing': selected_campaing,
         'selected_crop': selected_crop,
         'campaign_active': campaign_active,
+        'topbar_notifications': notifications,
+        'topbar_notifications_count': notifications.count(),
     }

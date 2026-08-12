@@ -27,7 +27,7 @@ def InputsView(request):
 
     if getattr(user, 'type', None) == 'Organization':
         from user.models.user_producer import UserProducer
-        _org_producers = UserProducer.objects.filter(association=user)
+        _org_producers = UserProducer.objects.filter(organization=user)
         sf = {'producer__in': _org_producers}
         stores = Store.objects.filter(producer__in=_org_producers).order_by('name')
         inputs_qs = Input.objects.filter(producer__in=_org_producers, control_stock=True)

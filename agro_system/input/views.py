@@ -35,7 +35,7 @@ def input_charts_view(request):
     queryset = Input.objects.all()
     if not request.user.is_superuser and request.user.type != 'Administration':
         if request.user.type == 'Organization':
-            user_producers = UserProducer.objects.filter(association=request.user)
+            user_producers = UserProducer.objects.filter(organization=request.user)
             if user_producers.exists():
                 queryset = queryset.filter(producer__in=user_producers)
             else:
@@ -101,7 +101,7 @@ def InputPendingPDFView(request):
     if request.user.is_superuser or getattr(request.user, 'type', None) == 'Administration':
         pendings = PurchaseOrderDetail.objects.filter(pending_amount__gt=0, purchase_order__in=purchase)
     elif getattr(request.user, 'type', None) == 'Organization':
-        userProducer = UserProducer.objects.filter(association=request.user)
+        userProducer = UserProducer.objects.filter(organization=request.user)
         if userProducer.exists():
             purchase = purchase.filter(producer__in=userProducer)
             pendings = PurchaseOrderDetail.objects.filter(pending_amount__gt=0, purchase_order__in=purchase)
@@ -153,7 +153,7 @@ def _build_catalog_data(request):
     prod_filter = None
     if not user.is_superuser and getattr(user, 'type', None) != 'Administration':
         if getattr(user, 'type', None) == 'Organization':
-            prod_filter = list(UserProducer.objects.filter(association=user))
+            prod_filter = list(UserProducer.objects.filter(organization=user))
         elif getattr(user, 'type', None) == 'Producer':
             p = UserProducer.objects.filter(email=user.email).first()
             prod_filter = [p] if p else []

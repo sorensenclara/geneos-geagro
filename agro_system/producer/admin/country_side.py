@@ -31,10 +31,10 @@ class CountrysideAdmin(ProducerAwareMixin, admin.ModelAdmin):
                 staff_qs = Staff.objects.all()
             # si es una organización → ve todos los staff de sus productores
             elif request.user.type == 'Organization':
-                user_producers = UserProducer.objects.filter(association=request.user)
+                user_producers = UserProducer.objects.filter(organization=request.user)
                 staff_qs = Staff.objects.filter(producer__in=user_producers)
             # si es un productor → ve solo sus staff
-            elif request.user.type == 'Producer':
+            elif request.user.type in ('Producer', 'Staff'):
                 user_producer = get_producer_for_request(request)
                 if user_producer:
                     staff_qs = Staff.objects.filter(producer=user_producer)
@@ -50,10 +50,10 @@ class CountrysideAdmin(ProducerAwareMixin, admin.ModelAdmin):
         if request.user.type == 'Administration':
             return queryset
         if request.user.type == 'Organization':
-            userProducer = UserProducer.objects.filter(association=request.user)
+            userProducer = UserProducer.objects.filter(organization=request.user)
             if userProducer.exists():
                 return queryset.filter(producer__in=userProducer)
-        if request.user.type == 'Producer':
+        if request.user.type in ('Producer', 'Staff'):
             userProducer = get_producer_for_request(request)
             if userProducer:
                 return queryset.filter(producer=userProducer)

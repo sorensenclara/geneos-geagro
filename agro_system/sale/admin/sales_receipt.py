@@ -115,10 +115,10 @@ class SalesReceiptAdmin(ProducerAwareMixin, admin.ModelAdmin):
         if request.user.type == 'Administration':
             return queryset
         if request.user.type == 'Organization':
-            userProducer = UserProducer.objects.filter(association=request.user)
+            userProducer = UserProducer.objects.filter(organization=request.user)
             if userProducer.exists():
                 return queryset.filter(producer__in=userProducer)
-        if request.user.type == 'Producer':
+        if request.user.type in ('Producer', 'Staff'):
             userProducer = get_producer_for_request(request)
             if userProducer:
                 return queryset.filter(producer=userProducer)

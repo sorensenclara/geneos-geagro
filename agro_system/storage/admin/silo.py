@@ -55,9 +55,9 @@ class SiloAdmin(ProducerAwareMixin, admin.ModelAdmin):
         if request.user.is_superuser or request.user.type == 'Administration':
             return qs
         if request.user.type == 'Organization':
-            producers = UserProducer.objects.filter(association=request.user)
+            producers = UserProducer.objects.filter(organization=request.user)
             return qs.filter(producer__in=producers)
-        if request.user.type == 'Producer':
+        if request.user.type in ('Producer', 'Staff'):
             producer = get_producer_for_request(request)
             if producer:
                 return qs.filter(producer=producer)
@@ -74,7 +74,7 @@ class SiloAdmin(ProducerAwareMixin, admin.ModelAdmin):
                 kwargs['queryset'] = Lot.objects.filter(countryside__producer__in=producers)
         elif db_field.name == 'producer':
             if request.user.type == 'Organization':
-                kwargs['queryset'] = UserProducer.objects.filter(association=request.user)
+                kwargs['queryset'] = UserProducer.objects.filter(organization=request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -94,9 +94,9 @@ class SiloStockAdmin(ProducerAwareMixin, admin.ModelAdmin):
         if request.user.is_superuser or request.user.type == 'Administration':
             return qs
         if request.user.type == 'Organization':
-            producers = UserProducer.objects.filter(association=request.user)
+            producers = UserProducer.objects.filter(organization=request.user)
             return qs.filter(silo__producer__in=producers)
-        if request.user.type == 'Producer':
+        if request.user.type in ('Producer', 'Staff'):
             producer = get_producer_for_request(request)
             if producer:
                 return qs.filter(silo__producer=producer)

@@ -180,7 +180,7 @@ class ProducerAwareMixin:
         if user.is_superuser or getattr(user, 'type', None) == 'Administration':
             return None
         if getattr(user, 'type', None) == 'Organization':
-            return UserProducer.objects.filter(association=user)
+            return UserProducer.objects.filter(organization=user)
         if getattr(user, 'type', None) == 'Producer':
             return UserProducer.objects.filter(email=user.email)
         if getattr(user, 'type', None) == 'Staff':

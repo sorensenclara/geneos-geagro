@@ -84,7 +84,7 @@ class ExchangeRateAdmin(ProducerAwareMixin, admin.ModelAdmin):
         from user.admin.adminSite import get_producer_for_request
         from user.models.user_producer import UserProducer
         if getattr(request.user, 'type', None) == 'Organization':
-            producers = UserProducer.objects.filter(association=request.user)
+            producers = UserProducer.objects.filter(organization=request.user)
             return qs.filter(producer__in=producers)
         producer = get_producer_for_request(request)
         if producer:

@@ -38,7 +38,7 @@ def build_user_scope(user):
         return Crop.objects.none(), Countryside.objects.none()
 
     if user_type == 'Organization':
-        producers = UserProducer.objects.filter(association=user)
+        producers = UserProducer.objects.filter(organization=user)
         return (
             Crop.objects.filter(producer__in=producers),
             Countryside.objects.filter(producer__in=producers),

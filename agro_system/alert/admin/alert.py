@@ -24,9 +24,9 @@ class AlertAdmin(ProducerAwareMixin, admin.ModelAdmin):
         if request.user.is_superuser or request.user.type == 'Administration':
             return qs
         if request.user.type == 'Organization':
-            producers = UserProducer.objects.filter(association=request.user)
+            producers = UserProducer.objects.filter(organization=request.user)
             return qs.filter(crop__producer__in=producers)
-        if request.user.type == 'Producer':
+        if request.user.type in ('Producer', 'Staff'):
             producer = get_producer_for_request(request)
             if producer:
                 return qs.filter(crop__producer=producer)

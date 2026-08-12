@@ -100,3 +100,7 @@ python manage.py create_admin_group
 
 ### Personal
 python manage.py create_staff_group
+
+
+### Organizacion
+python manage.py create_organization_group

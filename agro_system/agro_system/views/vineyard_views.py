@@ -58,7 +58,7 @@ def VineyardView(request):
         staff = Staff.objects.all()
     elif getattr(user, 'type', None) == 'Organization':
         from user.models.user_producer import UserProducer
-        _producers = UserProducer.objects.filter(association=user)
+        _producers = UserProducer.objects.filter(organization=user)
         technical_plans = TechnicalPlan.objects.filter(producer__in=_producers)
         staff = Staff.objects.filter(producer__in=_producers)
     elif _p:

@@ -14,7 +14,7 @@ def _filter_inputs(request):
     if user.is_superuser or getattr(user, 'type', None) == 'Administration':
         return Input.objects.all()
     if getattr(user, 'type', None) == 'Organization':
-        producers = UserProducer.objects.filter(association=user)
+        producers = UserProducer.objects.filter(organization=user)
         return Input.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
     if getattr(user, 'type', None) == 'Producer':
         producer = UserProducer.objects.filter(email=user.email).first()
@@ -49,7 +49,7 @@ class TechnicalPlanInputInline(admin.StackedInline):
             if user.is_superuser or getattr(user, 'type', None) == 'Administration':
                 pass
             elif getattr(user, 'type', None) == 'Organization':
-                producers = UserProducer.objects.filter(association=user)
+                producers = UserProducer.objects.filter(organization=user)
                 kwargs['queryset'] = Store.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
             elif getattr(user, 'type', None) == 'Producer':
                 producer = UserProducer.objects.filter(email=user.email).first()
@@ -108,10 +108,10 @@ class TechnicalPlanAdmin(ProducerAwareMixin, admin.ModelAdmin):
         if request.user.type == 'Administration':
             return queryset
         if request.user.type == 'Organization':
-            userProducer = UserProducer.objects.filter(association=request.user)
+            userProducer = UserProducer.objects.filter(organization=request.user)
             if userProducer.exists():
                 return queryset.filter(Q(producer__in=userProducer) | Q(producer__isnull=True))
-        if request.user.type == 'Producer':
+        if request.user.type in ('Producer', 'Staff'):
             userProducer = get_producer_for_request(request)
             if userProducer:
                 return queryset.filter(Q(producer=userProducer) | Q(producer__isnull=True))

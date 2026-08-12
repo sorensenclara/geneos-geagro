@@ -62,7 +62,7 @@ def DashboardView(request):
 
     elif getattr(user, 'type', None) == 'Organization':
         from user.models.user_producer import UserProducer
-        _org_producers = UserProducer.objects.filter(association=user)
+        _org_producers = UserProducer.objects.filter(organization=user)
         country_sides = Countryside.objects.filter(producer__in=_org_producers)
         crops = Crop.objects.filter(producer__in=_org_producers)
 
@@ -281,7 +281,7 @@ def DashboardView(request):
 
     if getattr(user, 'type', None) == 'Organization':
         from user.models.user_producer import UserProducer
-        _op = UserProducer.objects.filter(association=user)
+        _op = UserProducer.objects.filter(organization=user)
         sf       = {'producer__in': _op}
         sf_stock = {'silo__producer__in': _op}
         sf_cert  = {'certificate__producer__in': _op}
