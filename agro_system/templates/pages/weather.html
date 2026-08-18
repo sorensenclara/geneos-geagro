@@ -5,290 +5,483 @@
 {% block content %}
 
 <div class="geagro-dashboard-title mb-4">
-    <h1>Clima</h1>
+  <h1>Clima agronómico</h1>
+  <div class="geagro-dashboard-context">
+    <span>CULTIVO: {% if selected_crop %}{{ selected_crop }}{% else %}Sin cultivo seleccionado{% endif %}</span>
+    {% if external_station %}
+      <i class="mdi mdi-chevron-right"></i>
+      <span><i class="mdi mdi-satellite-variant"></i> {{ external_station.name }}</span>
+    {% endif %}
+    {% if station %}
+      <i class="mdi mdi-chevron-right"></i>
+      <span><i class="mdi mdi-access-point"></i> {{ station.name }}</span>
+    {% endif %}
+  </div>
+</div>
 
-    <div class="geagro-dashboard-context">
+{% if today_summary or weather_today_rt or future_weather or weather_data %}
 
-        <span>
-            CULTIVO:
-            {% if crop_main %}
-                {{ crop_main }}
-            {% else %}
-                Sin cultivo seleccionado
-            {% endif %}
-        </span>
+<!-- {# ══════════════════════════════════════════════════════════════
+   FILA 1 — HOY + PRONÓSTICO
+   ══════════════════════════════════════════════════════════════ #} -->
+<div class="row g-3 mb-3">
 
-        {% if station %}
-        <i class="mdi mdi-chevron-right"></i>
+  {# ── HOY ── #}
+  <div class="col-xl-3 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
 
-        <span>
-            ESTACIÓN:
-            {{ station.name }}
-        </span>
+        <div class="wt-today-label">HOY · {{ today|date:"d/m/Y" }}</div>
+
+        {% if today_source_label %}
+          <div class="mb-3">
+            <span class="wt-source-badge {% if 'Open-Meteo' in today_source_label %}wt-badge-api{% endif %}">
+              {% if 'Open-Meteo' in today_source_label %}
+                <i class="mdi mdi-satellite-variant"></i>
+              {% else %}
+                <i class="mdi mdi-access-point"></i>
+              {% endif %}
+              {{ today_source_label }}
+            </span>
+          </div>
         {% endif %}
 
-    </div>
-</div>
-
-{% if weather_data %}
-
-<div class="row mb-4">
-
-    <!-- Clima actual -->
-    <div class="col-xl-8 mb-4">
-
-        <div class="card h-100">
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
-
-                    <div>
-                        <div class="text-muted mb-2">
-                            Condición actual
-                        </div>
-
-                        <h2 class="mb-1">
-                            {{ weather_data.temp|default:"-" }}°C
-                        </h2>
-
-                        <div class="text-muted">
-                            Actualizado:
-                            {{ weather_data.timestamp|date:"d/m/Y H:i" }}
-                        </div>
-                    </div>
-
-                    <div class="geagro-weather-main-icon">
-                        <i class="mdi mdi-weather-partly-cloudy"></i>
-                    </div>
-
-                </div>
-
-                <div class="row">
-
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="geagro-weather-stat">
-                            <div class="geagro-weather-stat-icon">
-                                <i class="mdi mdi-water-percent"></i>
-                            </div>
-
-                            <div class="geagro-weather-stat-value">
-                                {{ weather_data.humidity|default:"-" }}%
-                            </div>
-
-                            <div class="geagro-weather-stat-label">
-                                Humedad
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="geagro-weather-stat">
-                            <div class="geagro-weather-stat-icon">
-                                <i class="mdi mdi-weather-windy"></i>
-                            </div>
-
-                            <div class="geagro-weather-stat-value">
-                                {{ weather_data.wind_speed|default:"-" }}
-                            </div>
-
-                            <div class="geagro-weather-stat-label">
-                                km/h viento
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="geagro-weather-stat">
-                            <div class="geagro-weather-stat-icon">
-                                <i class="mdi mdi-weather-rainy"></i>
-                            </div>
-
-                            <div class="geagro-weather-stat-value">
-                                {{ weather_data.rain_total|default:"-" }}
-                            </div>
-
-                            <div class="geagro-weather-stat-label">
-                                mm lluvia
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="geagro-weather-stat">
-                            <div class="geagro-weather-stat-icon">
-                                <i class="mdi mdi-white-balance-sunny"></i>
-                            </div>
-
-                            <div class="geagro-weather-stat-value">
-                                {{ weather_data.solar_radiation|default:"-" }}
-                            </div>
-
-                            <div class="geagro-weather-stat-label">
-                                Radiación
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Estado operativo -->
-    <div class="col-xl-4 mb-4">
-
-        <div class="card h-100">
-            <div class="card-body">
-
-                <h5 class="mb-3">
-                    Condición operativa
-                </h5>
-
-                {% if weather_data.wind_speed and weather_data.wind_speed > 25 %}
-                    <div class="alert alert-danger mb-3">
-                        Viento elevado para aplicaciones.
-                    </div>
-
-                {% elif weather_data.rain_rate and weather_data.rain_rate > 0 %}
-                    <div class="alert alert-warning mb-3">
-                        Hay precipitaciones registradas.
-                    </div>
-
-                {% else %}
-                    <div class="alert alert-success mb-3">
-                        Condiciones favorables para labores.
-                    </div>
-                {% endif %}
-
-                <div class="geagro-weather-mini-row">
-                    <span>Dirección viento</span>
-                    <strong>{{ weather_data.wind_dir|default:"-" }}</strong>
-                </div>
-
-                <div class="geagro-weather-mini-row">
-                    <span>Ráfaga actual</span>
-                    <strong>{{ weather_data.wind_gust|default:"-" }}</strong>
-                </div>
-
-                <div class="geagro-weather-mini-row">
-                    <span>Ráfaga máxima</span>
-                    <strong>{{ weather_data.wind_gust_max|default:"-" }}</strong>
-                </div>
-
-                <div class="geagro-weather-mini-row">
-                    <span>Lluvia semanal</span>
-                    <strong>{{ weather_data.rain_week|default:"-" }} mm</strong>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-<!-- Tabla -->
-<div class="card">
-    <div class="card-body">
-
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-
-            <div>
-                <h5 class="mb-1">
-                    Registro climático
-                </h5>
-
-                <div class="text-muted">
-                    Datos meteorológicos recientes
-                </div>
-            </div>
-
-            {% if station %}
-            <span class="badge rounded-pill bg-light text-dark border">
-                {{ station.name }}
-            </span>
+        {% if today_summary %}
+          <div class="wt-today-temps">
+            <span class="wt-tmax-big">{{ today_summary.tmax|floatformat:0 }}°</span>
+            <span class="wt-sep">/</span>
+            <span class="wt-tmin-big">{{ today_summary.tmin|floatformat:0 }}°</span>
+          </div>
+          <div class="wt-today-meta">
+            {% if today_summary.hr_media is not None %}
+              <div class="wt-meta-row">
+                <i class="mdi mdi-water-percent"></i>
+                <span>{{ today_summary.hr_media|floatformat:0 }}% HR</span>
+              </div>
             {% endif %}
+            <div class="wt-meta-row">
+              <i class="mdi mdi-weather-pouring"></i>
+              <span>{{ today_summary.lluvia_mm|floatformat:1 }} mm lluvia</span>
+            </div>
+            {% if today_summary.eto_mm is not None %}
+              <div class="wt-meta-row">
+                <i class="mdi mdi-leaf"></i>
+                <span>{{ today_summary.eto_mm|floatformat:1 }} mm ETo</span>
+              </div>
+            {% endif %}
+          </div>
 
-        </div>
+        {% elif weather_today_rt %}
+          {# Lectura en tiempo real de la estación — aún sin resumen diario #}
+          <div class="wt-today-temps">
+            <span class="wt-tmax-big">{{ weather_today_rt.temp|floatformat:0 }}°</span>
+          </div>
+          <div class="wt-today-meta">
+            {% if weather_today_rt.humidity is not None %}
+              <div class="wt-meta-row">
+                <i class="mdi mdi-water-percent"></i>
+                <span>{{ weather_today_rt.humidity|floatformat:0 }}% HR</span>
+              </div>
+            {% endif %}
+            {% if weather_today_rt.wind_speed is not None %}
+              <div class="wt-meta-row">
+                <i class="mdi mdi-weather-windy"></i>
+                <span>{{ weather_today_rt.wind_speed|floatformat:0 }} km/h</span>
+              </div>
+            {% endif %}
+            {% if weather_today_rt.rain_total is not None %}
+              <div class="wt-meta-row">
+                <i class="mdi mdi-weather-pouring"></i>
+                <span>{{ weather_today_rt.rain_total|floatformat:1 }} mm lluvia</span>
+              </div>
+            {% endif %}
+          </div>
+          <div class="text-muted mt-2" style="font-size:.7rem;">
+            Resumen diario pendiente de consolidación.
+          </div>
 
-        <div class="geagro-responsive-table">
+        {% elif weather_data %}
+          {# Solo estación interna, sin DailySummary #}
+          <div class="wt-today-temps">
+            <span class="wt-tmax-big">{{ weather_data.temp|floatformat:0 }}°</span>
+          </div>
+          <div class="wt-today-meta">
+            {% if weather_data.humidity is not None %}
+              <div class="wt-meta-row"><i class="mdi mdi-water-percent"></i><span>{{ weather_data.humidity|floatformat:0 }}% HR</span></div>
+            {% endif %}
+            {% if weather_data.wind_speed is not None %}
+              <div class="wt-meta-row"><i class="mdi mdi-weather-windy"></i><span>{{ weather_data.wind_speed|floatformat:0 }} km/h</span></div>
+            {% endif %}
+          </div>
 
-            <table class="table align-middle mb-0">
+        {% else %}
+          <div class="text-muted small mt-3">Sin datos para hoy.</div>
+        {% endif %}
 
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Temperatura</th>
-                        <th>Humedad</th>
-                        <th>Viento</th>
-                        <th>Lluvia</th>
-                        <th>Radiación</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-
-                        <td data-label="Fecha">
-                            {{ weather_data.timestamp|date:"d/m/Y H:i" }}
-                        </td>
-
-                        <td data-label="Temperatura">
-                            {{ weather_data.temp|default:"-" }}°C
-                        </td>
-
-                        <td data-label="Humedad">
-                            {{ weather_data.humidity|default:"-" }}%
-                        </td>
-
-                        <td data-label="Viento">
-                            {{ weather_data.wind_speed|default:"-" }} km/h
-                        </td>
-
-                        <td data-label="Lluvia">
-                            {{ weather_data.rain_total|default:"-" }} mm
-                        </td>
-
-                        <td data-label="Radiación">
-                            {{ weather_data.solar_radiation|default:"-" }}
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
+      </div>
     </div>
+  </div>
+
+  {# ── PRONÓSTICO ── #}
+  <div class="col-xl-9 col-lg-8">
+    <div class="card h-100">
+      <div class="card-body">
+
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="mb-0">Pronóstico</h5>
+          {% if external_station %}
+            <span class="wt-source-badge wt-badge-api" style="font-size:.65rem;">
+              <i class="mdi mdi-satellite-variant"></i> {{ external_station.name }}
+            </span>
+          {% endif %}
+        </div>
+
+        {% if future_weather %}
+          <div class="table-responsive">
+            <table class="wt-forecast-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th><i class="mdi mdi-thermometer text-danger"></i> Máx.</th>
+                  <th><i class="mdi mdi-thermometer text-primary"></i> Mín.</th>
+                  <th><i class="mdi mdi-water-percent"></i> HR</th>
+                  <th><i class="mdi mdi-weather-windy"></i> Viento</th>
+                  <th><i class="mdi mdi-weather-tornado"></i> Ráfagas</th>
+                  <th><i class="mdi mdi-weather-pouring"></i> Lluvia</th>
+                  <th><i class="mdi mdi-leaf text-success"></i> ETo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for day in future_weather %}
+                  <tr>
+                    <td class="wt-date-cell">{{ day.datetime__date|date:"D d/m" }}</td>
+                    <td class="wt-tmax">{{ day.tmax|floatformat:0 }}°</td>
+                    <td class="wt-tmin">{{ day.tmin|floatformat:0 }}°</td>
+                    <td>
+                      {% if day.hr_media %}
+                        <span class="wt-hr">{{ day.hr_media|floatformat:0 }}%</span>
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if day.wind_max %}
+                        <span class="wt-wind">{{ day.wind_max|floatformat:0 }} km/h</span>
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if day.wind_gusts_max %}
+                        <span class="wt-wind">{{ day.wind_gusts_max|floatformat:0 }} km/h</span>
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if day.lluvia_mm %}
+                        <span class="wt-rain">{{ day.lluvia_mm|floatformat:1 }} mm</span>
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if day.eto_mm %}
+                        <span class="wt-eto">{{ day.eto_mm|floatformat:1 }} mm</span>
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-muted small py-3">
+            <i class="mdi mdi-information-outline me-1"></i>
+            Sin pronóstico disponible.
+            {% if not external_station %}Configurá una estación externa en el lote.{% endif %}
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
 </div>
+
+<!-- {# ══════════════════════════════════════════════════════════════
+   FILA 2 — DÍAS ANTERIORES (compact)
+   ══════════════════════════════════════════════════════════════ #} -->
+{% if past_summaries %}
+<div class="card mb-3">
+  <div class="card-body">
+    <h6 class="text-muted text-uppercase fw-bold mb-3" style="font-size:.7rem;letter-spacing:.06em;">Días anteriores</h6>
+    <div class="wt-past-grid">
+      {% for s in past_summaries %}
+        <div class="wt-past-cell">
+          <div class="wt-past-date">{{ s.date|date:"D d/m" }}</div>
+          <div class="wt-past-temps">
+            <span class="wt-tmax">{{ s.tmax|floatformat:0 }}°</span>
+            <span class="wt-sep-sm">/</span>
+            <span class="wt-tmin">{{ s.tmin|floatformat:0 }}°</span>
+          </div>
+          {% if s.lluvia_mm %}
+            <div class="wt-past-rain"><i class="mdi mdi-weather-pouring"></i>{{ s.lluvia_mm|floatformat:1 }} mm</div>
+          {% endif %}
+          {% if s.hr_media is not None %}
+            <div class="wt-past-hr"><i class="mdi mdi-water-percent"></i>{{ s.hr_media|floatformat:0 }}%</div>
+          {% endif %}
+          {% if s.eto_mm is not None %}
+            <div class="wt-past-eto"><i class="mdi mdi-leaf"></i>{{ s.eto_mm|floatformat:1 }} mm ETo</div>
+          {% endif %}
+          <div class="wt-past-source">
+            {% if s.fuente_predominante == 'station' %}
+              <i class="mdi mdi-access-point"></i> {{ station.name|default:"Estación" }}
+            {% else %}
+              <i class="mdi mdi-satellite-variant"></i> Open-Meteo
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- {# ══════════════════════════════════════════════════════════════
+   FILA 3 — ESTACIÓN EN TIEMPO REAL (WeatherData)
+   ══════════════════════════════════════════════════════════════ #} -->
+{% if weather_data %}
+<div class="row g-3">
+
+  {# Condición actual #}
+  <div class="col-xl-8">
+    <div class="card h-100">
+      <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+          <div>
+            <div class="text-muted mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;">Estación · Última lectura</div>
+            <h2 class="mb-1">{{ weather_data.temp|default:"-" }}°C</h2>
+            <div class="text-muted small">{{ weather_data.timestamp|date:"d/m/Y H:i" }}</div>
+          </div>
+          <i class="mdi mdi-weather-partly-cloudy" style="font-size:2.5rem;color:#6c757d;"></i>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-3 col-6">
+            <div class="geagro-weather-stat">
+              <div class="geagro-weather-stat-icon"><i class="mdi mdi-water-percent"></i></div>
+              <div class="geagro-weather-stat-value">{{ weather_data.humidity|default:"-" }}%</div>
+              <div class="geagro-weather-stat-label">Humedad</div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="geagro-weather-stat">
+              <div class="geagro-weather-stat-icon"><i class="mdi mdi-weather-windy"></i></div>
+              <div class="geagro-weather-stat-value">{{ weather_data.wind_speed|default:"-" }}</div>
+              <div class="geagro-weather-stat-label">km/h viento</div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="geagro-weather-stat">
+              <div class="geagro-weather-stat-icon"><i class="mdi mdi-weather-rainy"></i></div>
+              <div class="geagro-weather-stat-value">{{ weather_data.rain_total|default:"-" }}</div>
+              <div class="geagro-weather-stat-label">mm lluvia</div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="geagro-weather-stat">
+              <div class="geagro-weather-stat-icon"><i class="mdi mdi-white-balance-sunny"></i></div>
+              <div class="geagro-weather-stat-value">{{ weather_data.solar_radiation|default:"-" }}</div>
+              <div class="geagro-weather-stat-label">Radiación</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  {# Condición operativa #}
+  <div class="col-xl-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="mb-3">Condición operativa</h5>
+
+        {% if weather_data.wind_speed and weather_data.wind_speed > 25 %}
+          <div class="alert alert-danger mb-3">Viento elevado para aplicaciones.</div>
+        {% elif weather_data.rain_rate and weather_data.rain_rate > 0 %}
+          <div class="alert alert-warning mb-3">Hay precipitaciones registradas.</div>
+        {% else %}
+          <div class="alert alert-success mb-3">Condiciones favorables para labores.</div>
+        {% endif %}
+
+        <div class="geagro-weather-mini-row">
+          <span>Dirección viento</span><strong>{{ weather_data.wind_dir|default:"-" }}</strong>
+        </div>
+        <div class="geagro-weather-mini-row">
+          <span>Ráfaga actual</span><strong>{{ weather_data.wind_gust|default:"-" }}</strong>
+        </div>
+        <div class="geagro-weather-mini-row">
+          <span>Ráfaga máxima</span><strong>{{ weather_data.wind_gust_max|default:"-" }}</strong>
+        </div>
+        <div class="geagro-weather-mini-row">
+          <span>Lluvia semanal</span><strong>{{ weather_data.rain_week|default:"-" }} mm</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endif %}
 
 {% else %}
 
 <div class="card">
-    <div class="card-body text-center py-5">
-
-        <div class="mb-3">
-            <i class="mdi mdi-weather-cloudy-alert"
-               style="font-size:54px;color:#7A4A81;"></i>
-        </div>
-
-        <h4>
-            Sin datos meteorológicos
-        </h4>
-
-        <p class="text-muted mb-0">
-            El cultivo seleccionado aún no tiene una estación meteorológica asociada
-            o no existen registros climáticos.
-        </p>
-
+  <div class="card-body text-center py-5">
+    <div class="mb-3">
+      <i class="mdi mdi-weather-cloudy-alert" style="font-size:54px;color:#7A4A81;"></i>
     </div>
+    <h4>Sin datos meteorológicos</h4>
+    <p class="text-muted mb-0">
+      El cultivo seleccionado no tiene estaciones configuradas o no existen registros climáticos.
+    </p>
+  </div>
 </div>
 
 {% endif %}
 
 {% endblock content %}
+
+{% block extra_css %}
+<style>
+  /* ── Hoy ── */
+  .wt-today-label {
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #6c757d;
+    margin-bottom: 8px;
+  }
+  .wt-source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-size: .68rem;
+    font-weight: 600;
+    background: rgba(25,135,84,.1);
+    color: #198754;
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
+  .wt-source-badge.wt-badge-api {
+    background: rgba(13,110,253,.1);
+    color: #0d6efd;
+  }
+  .wt-today-temps {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .wt-tmax-big { font-size: 2.8rem; font-weight: 700; color: #e02424; line-height: 1; }
+  .wt-tmin-big { font-size: 1.7rem; font-weight: 400; color: #3b82f6; line-height: 1; }
+  .wt-sep      { font-size: 1.5rem; color: #ced4da; line-height: 1; }
+  .wt-today-meta { display: flex; flex-direction: column; gap: 7px; }
+  .wt-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .82rem;
+    color: #495057;
+  }
+  .wt-meta-row i { font-size: .95rem; color: #6c757d; width: 16px; text-align: center; }
+
+  /* ── Pronóstico ── */
+  .wt-forecast-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .83rem;
+  }
+  .wt-forecast-table th {
+    padding: 8px 12px;
+    text-align: left;
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #6c757d;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+  }
+  .wt-forecast-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #f0f2f5;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .wt-forecast-table tr:last-child td { border-bottom: none; }
+  .wt-forecast-table tbody tr:hover td { background: #f8f9fa; }
+  .wt-date-cell { font-weight: 500; color: #212529; min-width: 80px; }
+  .wt-tmax  { color: #e02424; font-weight: 600; }
+  .wt-tmin  { color: #3b82f6; font-weight: 600; }
+  .wt-hr    { color: #6c757d; }
+  .wt-wind  { color: #495057; }
+  .wt-rain  { color: #1e40af; }
+  .wt-eto   { color: #16a34a; }
+
+  /* ── Días anteriores ── */
+  .wt-past-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .wt-past-cell {
+    flex: 1;
+    min-width: 120px;
+    max-width: 200px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .wt-past-date {
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #6c757d;
+    margin-bottom: 6px;
+  }
+  .wt-past-temps {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    margin-bottom: 5px;
+  }
+  .wt-sep-sm { color: #ced4da; font-size: .8rem; }
+  .wt-past-rain, .wt-past-hr, .wt-past-eto {
+    font-size: .73rem;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 3px;
+  }
+  .wt-past-rain i { color: #1e40af; }
+  .wt-past-hr i   { color: #6c757d; }
+  .wt-past-eto i  { color: #16a34a; }
+  .wt-past-source {
+    font-size: .6rem;
+    color: #adb5bd;
+    margin-top: 7px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+</style>
+{% endblock extra_css %}

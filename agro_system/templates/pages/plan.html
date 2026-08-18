@@ -3,6 +3,67 @@
 {% block title %} Plan Técnico {% endblock title %}
 
 {% block content %}
+<style>
+.plan-orders-scroll {
+  max-height: 360px;
+  overflow-y: auto;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+.plan-orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+.plan-orders-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
+  padding: .5rem .75rem;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #6c757d;
+  border-bottom: 1px solid #dee2e6;
+  white-space: nowrap;
+}
+.plan-orders-table tbody td {
+  padding: .55rem .75rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+.plan-orders-table tbody tr:last-child td { border-bottom: none; }
+.plan-orders-table tbody tr:hover { background: #f8f9fa; }
+.plan-order-date { white-space: nowrap; color: #495057; }
+.plan-state-badge {
+  display: inline-block;
+  padding: .2em .65em;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.plan-state-pending { background: #fff3cd; color: #856404; }
+.plan-state-done    { background: #d1e7dd; color: #0f5132; }
+
+/* Modal */
+.plan-modal-label {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #6c757d;
+  margin-bottom: .2rem;
+}
+.plan-modal-value { font-size: .9rem; font-weight: 500; color: #212529; }
+
+/* Órdenes asignadas al usuario logueado */
+.plan-row-mine { background: #eaf4fb !important; }
+.plan-row-mine td:first-child {
+  border-left: 3px solid #0d6efd;
+  padding-left: calc(.75rem - 3px);
+}
+</style>
 
 <div class="geagro-dashboard-title mb-4">
 
@@ -164,177 +225,184 @@
 
     <!-- CUERPO -->
     <div class="row g-3">
-      <!-- Columna A -->
+      <!-- Columna A — Órdenes de trabajo -->
       <div class="col-xl-8">
-        <div class="card">
+
+        <!-- Pendientes -->
+        <div class="card mb-3">
           <div class="card-body">
-
-            <div class="d-flex align-items-start justify-content-between mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-3">
               <div>
-                <h4 class="card-title mb-1">Timeline fenológico</h4>
-                <div class="text-muted">Etapas del ciclo y actividades sugeridas</div>
+                <h4 class="card-title mb-1">Órdenes pendientes</h4>
+                <div class="text-muted small">Ordenadas por fecha de inicio · {{ pending_orders|length }} orden{{ pending_orders|length|pluralize:"es" }}</div>
               </div>
-              <i class="mdi mdi-timeline-clock-outline font-size-24 text-info"></i>
+              <a href="{% url 'work-order-create' %}{% if selected_crop %}?crop={{ selected_crop.pk }}&campaing={{ selected_campaing.pk }}{% endif %}"
+                 class="btn btn-sm btn-primary">
+                <i class="mdi mdi-plus me-1"></i>Nueva OT
+              </a>
             </div>
 
-            <div class="accordion" id="planTecnicoAccordion">
-
-              {% for item in timeline %}
-
-                <div class="accordion-item">
-
-                  <h2 class="accordion-header" id="heading{{ item.detail.id }}">
-
-                    <button class="accordion-button {% if item.status != 'active' %}collapsed{% endif %}"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapse{{ item.detail.id }}"
-                            aria-expanded="{% if item.status == 'active' %}true{% else %}false{% endif %}"
-                            aria-controls="collapse{{ item.detail.id }}">
-
-                      <div class="w-100 d-flex flex-wrap align-items-center justify-content-between gap-2">
-
-                        <div class="d-flex align-items-center gap-2">
-
-                          <span class="fw-semibold">
-                            {{ item.stage.name }}
-                          </span>
-
-                          {% if item.status == 'completed' %}
-                            <span class="badge rounded-pill bg-success">
-                              Realizada
-                            </span>
-
-                          {% elif item.status == 'active' %}
-                            <span class="badge rounded-pill bg-primary">
-                              Activa
-                            </span>
-
-                          {% else %}
-                            <span class="badge rounded-pill bg-light text-dark border">
-                              Pendiente
-                            </span>
-                          {% endif %}
-
-                          <span class="badge rounded-pill bg-light text-dark border">
-                            {{ item.service.name }}
-                          </span>
-
-                        </div>
-
-                        <div class="small text-muted">
-                          {{ item.completed_orders }}/{{ item.total_orders }} órdenes
-                        </div>
-
-                      </div>
-
-                    </button>
-
-                  </h2>
-
-                  <div id="collapse{{ item.detail.id }}"
-                      class="accordion-collapse collapse {% if item.status == 'active' %}show{% endif %}"
-                      aria-labelledby="heading{{ item.detail.id }}"
-                      data-bs-parent="#planTecnicoAccordion">
-
-                    <div class="accordion-body">
-
-                      <div class="mb-3">
-
-                        <div class="fw-semibold">
-                          Servicio técnico
-                        </div>
-
-                        <div class="text-muted">
-                          {{ item.service.description|default:"Sin descripción." }}
-                        </div>
-
-                      </div>
-
-                      <div class="mb-3">
-
-                        <div class="fw-semibold">
-                          Duración estimada
-                        </div>
-
-                        <div class="text-muted">
-                          {{ item.detail.days_estimate }} días
-                        </div>
-
-                      </div>
-
-                      <div class="fw-semibold mb-2">
-                        Órdenes de trabajo
-                      </div>
-
-                      {% if item.orders %}
-
-                        <div class="list-group">
-
-                          {% for order in item.orders %}
-
-                            <div class="list-group-item">
-
-                              <div class="d-flex justify-content-between align-items-center">
-
-                                <div>
-
-                                  <div class="fw-semibold">
-                                    {{ order.code }}
-                                  </div>
-
-                                  <div class="small text-muted">
-                                    {{ order.service }}
-                                    ·
-                                    {{ order.staff }}
-                                  </div>
-
-                                </div>
-
-                                <span class="badge rounded-pill bg-light text-dark border">
-                                  {{ order.stateOT }}
-                                </span>
-
-                              </div>
-
-                            </div>
-
-                          {% endfor %}
-
-                        </div>
-
-                      {% else %}
-
-                        <div class="text-muted">
-                          No hay órdenes registradas para esta etapa.
-                        </div>
-
-                      {% endif %}
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              {% endfor %}
-
-            </div>
-
+            {% if pending_orders %}
+              <div class="plan-orders-scroll">
+                <table class="plan-orders-table">
+                  <thead>
+                    <tr>
+                      <th>Fecha inicio</th>
+                      <th>Servicio</th>
+                      <th>Etapa</th>
+                      <th>Responsable</th>
+                      <th>Estado</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in pending_orders %}
+                      {% with o=row.order %}
+                      <tr class="{% if current_staff_id and o.staff_id == current_staff_id %}plan-row-mine{% endif %}">
+                        <td class="plan-order-date">{{ o.date_init|date:"d/m/Y" }}</td>
+                        <td class="fw-semibold">{{ o.service }}</td>
+                        <td class="text-muted small">{{ o.stage|default:"—" }}</td>
+                        <td class="text-muted small">{{ o.staff|default:"—" }}</td>
+                        <td>
+                          <span class="plan-state-badge plan-state-pending">{{ o.stateOT }}</span>
+                        </td>
+                        <td>
+                          <a href="{% url 'work-order-detail' o.pk %}"
+                             class="btn btn-sm btn-outline-primary">
+                            Ver detalle
+                          </a>
+                        </td>
+                      </tr>
+                      {% endwith %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="text-muted small py-2">
+                <i class="mdi mdi-check-circle-outline me-1 text-success"></i>
+                Sin órdenes pendientes.
+              </div>
+            {% endif %}
           </div>
         </div>
+
+        <!-- Realizadas -->
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div>
+                <h4 class="card-title mb-1">Órdenes realizadas</h4>
+                <div class="text-muted small">{{ completed_orders|length }} orden{{ completed_orders|length|pluralize:"es" }} completada{{ completed_orders|length|pluralize:"s" }}</div>
+              </div>
+              <i class="mdi mdi-check-all font-size-24 text-success"></i>
+            </div>
+
+            {% if completed_orders %}
+              <div class="plan-orders-scroll">
+                <table class="plan-orders-table">
+                  <thead>
+                    <tr>
+                      <th>Fecha inicio</th>
+                      <th>Servicio</th>
+                      <th>Etapa</th>
+                      <th>Responsable</th>
+                      <th>Estado</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in completed_orders %}
+                      {% with o=row.order %}
+                      <tr class="{% if current_staff_id and o.staff_id == current_staff_id %}plan-row-mine{% endif %}">
+                        <td class="plan-order-date">{{ o.date_init|date:"d/m/Y" }}</td>
+                        <td class="fw-semibold">{{ o.service }}</td>
+                        <td class="text-muted small">{{ o.stage|default:"—" }}</td>
+                        <td class="text-muted small">{{ o.staff|default:"—" }}</td>
+                        <td>
+                          <span class="plan-state-badge plan-state-done">{{ o.stateOT }}</span>
+                        </td>
+                        <td>
+                          <a href="{% url 'work-order-detail' o.pk %}"
+                             class="btn btn-sm btn-outline-secondary">
+                            Ver detalle
+                          </a>
+                        </td>
+                      </tr>
+                      {% endwith %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="text-muted small py-2">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Sin órdenes finalizadas aún.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
       </div>
 
       <!-- Columna B -->
       <div class="col-xl-4">
         <div class="position-sticky" style="top: 90px;">
 
+            <!-- Ventana de aplicación -->
+            {% if ventana_nivel %}
+            <div class="card mb-3
+              {% if ventana_nivel == 'verde' %}border-success{% elif ventana_nivel == 'warning' %}border-warning{% else %}border-danger{% endif %}"
+              style="border-width: 2px !important;">
+              <div class="card-body py-3">
+                <div class="d-flex align-items-center gap-3">
+
+                  <div class="flex-shrink-0">
+                    {% if ventana_nivel == 'verde' %}
+                      <i class="mdi mdi-spray-bottle font-size-28 text-success"></i>
+                    {% elif ventana_nivel == 'warning' %}
+                      <i class="mdi mdi-spray-bottle font-size-28 text-warning"></i>
+                    {% else %}
+                      <i class="mdi mdi-spray-bottle font-size-28 text-danger"></i>
+                    {% endif %}
+                  </div>
+
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold" style="font-size:.8rem; text-transform:uppercase; letter-spacing:.04em;">
+                      Ventana de aplicación
+                    </div>
+                    {% if ventana_nivel == 'verde' %}
+                      <div class="fw-bold text-success">Condiciones óptimas</div>
+                      <div class="text-muted small">Viento, Delta T y HR dentro del rango ideal.</div>
+                    {% elif ventana_nivel == 'warning' %}
+                      <div class="fw-bold text-warning">Precaución</div>
+                      <div class="text-muted small">Revisá viento o Delta T antes de comenzar.</div>
+                    {% else %}
+                      <div class="fw-bold text-danger">No aplicar</div>
+                      <div class="text-muted small">Condiciones fuera de rango. Reprogramar.</div>
+                    {% endif %}
+                  </div>
+
+                  <div class="flex-shrink-0">
+                    {% if ventana_nivel == 'verde' %}
+                      <span class="badge bg-success">Verde</span>
+                    {% elif ventana_nivel == 'warning' %}
+                      <span class="badge bg-warning text-dark">Amarillo</span>
+                    {% else %}
+                      <span class="badge bg-danger">Rojo</span>
+                    {% endif %}
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
             <div class="card mb-3">
               <div class="card-body">
                 <div class="d-flex align-items-start justify-content-between mb-2">
                   <div>
                     <h4 class="card-title mb-1">Próxima acción</h4>
-                    <div class="text-muted">Coherente con el dashboard</div>
                   </div>
                   <img src="{% static 'images/icon/technical_plan_color.svg' %}" class="dashboard-icon-img" alt="plan" />
                 </div>
@@ -356,9 +424,10 @@
                       {{ next_work_order.stateOT|default:"Pendiente" }}
                     </span>
 
-                    <button class="btn btn-sm btn-primary" type="button">
+                    <a href="{% url 'work-order-detail' next_work_order.pk %}"
+                       class="btn btn-sm btn-primary">
                       Ver detalle
-                    </button>
+                    </a>
                   </div>
 
                 {% else %}
@@ -418,12 +487,12 @@
 
 <!-- MODAL: Detalle de Actividad -->
 <div class="modal fade" id="activityDetailModal" tabindex="-1" aria-labelledby="activityDetailLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+  <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content">
 
       <div class="modal-header">
         <div>
-          <h5 class="modal-title" id="activityDetailLabel">Detalle de actividad</h5>
+          <h5 class="modal-title" id="activityDetailLabel"></h5>
           <div class="small text-muted" id="activityMeta"></div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -431,44 +500,41 @@
 
       <div class="modal-body">
 
-        <div class="mb-3">
-          <div class="fw-semibold d-flex align-items-center gap-2">
-            <i class="mdi mdi-tractor text-primary"></i>
-            Qué hacer
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <div class="plan-modal-label"><i class="mdi mdi-calendar-start text-primary"></i> Inicio</div>
+            <div id="moDateInit" class="plan-modal-value"></div>
           </div>
-          <div id="activityWhat" class="text-muted"></div>
+          <div class="col-6">
+            <div class="plan-modal-label"><i class="mdi mdi-calendar-end text-secondary"></i> Vencimiento</div>
+            <div id="moDateFin" class="plan-modal-value"></div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <div class="plan-modal-label"><i class="mdi mdi-leaf-circle-outline text-info"></i> Etapa</div>
+            <div id="moStage" class="plan-modal-value"></div>
+          </div>
+          <div class="col-6">
+            <div class="plan-modal-label"><i class="mdi mdi-account-outline"></i> Responsable</div>
+            <div id="moStaff" class="plan-modal-value"></div>
+          </div>
         </div>
 
         <div class="mb-3">
-          <div class="fw-semibold d-flex align-items-center gap-2">
-            <i class="mdi mdi-chart-line text-info"></i>
-            Por qué
-          </div>
-          <div id="activityWhy" class="text-muted"></div>
+          <div class="plan-modal-label"><i class="mdi mdi-check-decagram-outline text-success"></i> Estado</div>
+          <div id="moState" class="plan-modal-value"></div>
         </div>
 
-        <div class="mb-3">
-          <div class="fw-semibold d-flex align-items-center gap-2">
-            <i class="mdi mdi-toolbox-outline text-secondary"></i>
-            Insumos
-          </div>
-          <div id="activityInputs" class="text-muted"></div>
+        <div class="mb-3" id="moInputsRow">
+          <div class="plan-modal-label"><i class="mdi mdi-flask-outline text-warning"></i> Insumos</div>
+          <div id="moInputs" class="plan-modal-value"></div>
         </div>
 
-        <div class="mb-3">
-          <div class="fw-semibold d-flex align-items-center gap-2">
-            <i class="mdi mdi-clock-time-four-outline text-warning"></i>
-            Momento recomendado
-          </div>
-          <div id="activityWhen" class="text-muted"></div>
-        </div>
-
-        <div class="mb-0">
-          <div class="fw-semibold d-flex align-items-center gap-2">
-            <i class="mdi mdi-alert-circle-outline text-danger"></i>
-            Riesgos si no se realiza
-          </div>
-          <div id="activityRisks" class="text-muted"></div>
+        <div class="mb-0" id="moDetailRow">
+          <div class="plan-modal-label"><i class="mdi mdi-text-box-outline"></i> Detalle / Notas</div>
+          <div id="moDetail" class="plan-modal-value text-muted"></div>
         </div>
 
       </div>

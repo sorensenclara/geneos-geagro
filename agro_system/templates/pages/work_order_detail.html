@@ -1,0 +1,338 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block title %}OT {{ work_order.code }}{% endblock title %}
+
+{% block content %}
+<style>
+.wo-label {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #6c757d;
+  margin-bottom: .2rem;
+}
+.wo-value {
+  font-size: .92rem;
+  font-weight: 500;
+  color: #212529;
+}
+.wo-inputs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+.wo-inputs-table thead th {
+  padding: .45rem .75rem;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #6c757d;
+  border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
+}
+.wo-inputs-table tbody td {
+  padding: .5rem .75rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+.wo-inputs-table tbody tr:last-child td { border-bottom: none; }
+.wo-inputs-table tbody tr:hover { background: #f8f9fa; }
+.wo-new-row { background: #f0f7ff; }
+.wo-new-row td { border-bottom: 1px solid #cfe2ff !important; }
+.wo-section-header {
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #6c757d;
+  font-weight: 600;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 1rem;
+}
+</style>
+
+<div class="geagro-dashboard-title mb-4">
+  <div class="d-flex align-items-center gap-2 flex-wrap">
+    <a href="{% url 'technical-plan' %}" class="btn btn-sm btn-outline-secondary me-1">
+      <i class="mdi mdi-arrow-left"></i> Plan técnico
+    </a>
+    <h1 class="mb-0">Orden de trabajo</h1>
+    <span class="badge bg-secondary" style="font-size:.8rem; font-weight:500;">
+      {{ work_order.get_type_display }}
+    </span>
+  </div>
+  <span class="text-muted" style="font-size:.85rem; font-family: monospace;">
+    {{ work_order.code }}
+  </span>
+</div>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="new_inputs_count" id="newInputsCount" value="0">
+
+  <div class="row g-4">
+
+    <!-- ═══ Datos fijos ═══ -->
+    <div class="col-xl-7">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="wo-section-header">Datos de la orden</div>
+
+          <div class="row g-3">
+
+            <div class="col-sm-6">
+              <div class="wo-label">Servicio</div>
+              <div class="wo-value">{{ work_order.service }}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="wo-label">Tipo</div>
+              <div class="wo-value">{{ work_order.get_type_display }}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="wo-label">Fecha emisión</div>
+              <div class="wo-value">{{ work_order.date_emission|date:"d/m/Y" }}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="wo-label">Fecha inicio</div>
+              <div class="wo-value">{{ work_order.date_init|date:"d/m/Y" }}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="wo-label">Etapa fenológica</div>
+              <div class="wo-value">{{ work_order.stage|default:"—" }}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="wo-label">Área</div>
+              <div class="wo-value">{{ work_order.area|default:"—" }}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="wo-label">Campaña</div>
+              <div class="wo-value">{{ work_order.campaing|default:"—" }}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="wo-label">Cultivo</div>
+              <div class="wo-value">{{ work_order.crop|default:"—" }}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="wo-label">Personal responsable</div>
+              <div class="wo-value">{{ work_order.staff|default:"—" }}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="wo-label">Alerta de origen</div>
+              <div class="wo-value">
+                {% if work_order.alert %}
+                  <span class="text-warning">
+                    <i class="mdi mdi-alert-outline me-1"></i>{{ work_order.alert.name }}
+                  </span>
+                {% else %}
+                  <span class="text-muted">Sin alerta asociada</span>
+                {% endif %}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Campos editables ═══ -->
+    <div class="col-xl-5">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="wo-section-header">Gestión</div>
+
+          <div class="mb-3">
+            <label class="form-label wo-label" for="id_stateOT">Estado</label>
+            <select name="stateOT" id="id_stateOT" class="form-select form-select-sm">
+              {% for state in ot_states %}
+                <option value="{{ state.pk }}"
+                  {% if state.pk == work_order.stateOT_id %}selected{% endif %}>
+                  {{ state.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label wo-label" for="id_date_fin">Fecha de fin</label>
+            <input type="date" name="date_fin" id="id_date_fin"
+                   class="form-control form-control-sm"
+                   value="{{ work_order.date_fin|date:'Y-m-d' }}">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label wo-label" for="id_contractor">Contratista</label>
+            <select name="contractor" id="id_contractor" class="form-select form-select-sm">
+              <option value="">— Sin contratista —</option>
+              {% for c in contractors %}
+                <option value="{{ c.pk }}"
+                  {% if c.pk == work_order.contractor_id %}selected{% endif %}>
+                  {{ c.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label wo-label" for="id_partner">Socio</label>
+            <select name="partner" id="id_partner" class="form-select form-select-sm">
+              <option value="">— Sin socio —</option>
+              {% for c in contractors %}
+                <option value="{{ c.pk }}"
+                  {% if c.pk == work_order.partner_id %}selected{% endif %}>
+                  {{ c.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mt-4 d-grid">
+            <button type="submit" class="btn btn-success">
+              <i class="mdi mdi-content-save-outline me-1"></i>
+              Guardar cambios
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Insumos ═══ -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="wo-section-header mb-0" style="border:none; padding:0;">
+              Insumos
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="addInputBtn">
+              <i class="mdi mdi-plus"></i> Agregar insumo
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="wo-inputs-table">
+              <thead>
+                <tr>
+                  <th>Insumo</th>
+                  <th>Unidad</th>
+                  <th style="text-align:right;">Dosis planif.</th>
+                  <th style="text-align:right; min-width:110px;">Dosis real</th>
+                  <th>Detalle / Notas</th>
+                </tr>
+              </thead>
+              <tbody id="inputsTableBody">
+
+                {% for iwo in input_work_orders %}
+                <tr>
+                  <td class="fw-semibold">{{ iwo.input.name }}</td>
+                  <td class="text-muted">{{ iwo.input.unit_measure|default:"—" }}</td>
+                  <td style="text-align:right; color:#6c757d;">{{ iwo.dose }}</td>
+                  <td>
+                    <input type="number" step="any" min="0"
+                           name="iwo_{{ iwo.pk }}_dose_applied"
+                           class="form-control form-control-sm text-end"
+                           style="max-width:100px; margin-left:auto;"
+                           value="{{ iwo.dose_applied|default:'' }}"
+                           placeholder="—">
+                  </td>
+                  <td>
+                    <input type="text"
+                           name="iwo_{{ iwo.pk }}_details"
+                           class="form-control form-control-sm"
+                           value="{{ iwo.details|default:'' }}"
+                           placeholder="Sin notas">
+                  </td>
+                </tr>
+                {% empty %}
+                <tr id="emptyRow">
+                  <td colspan="5" class="text-muted text-center py-3">
+                    <i class="mdi mdi-package-variant-closed me-1"></i>
+                    Sin insumos asignados
+                  </td>
+                </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /row -->
+</form>
+
+<!-- Template para filas nuevas (no se renderiza) -->
+<template id="newInputRowTpl">
+  <tr class="wo-new-row">
+    <td>
+      <select name="new_input___IDX__" class="form-select form-select-sm" required>
+        <option value="">Elegir insumo…</option>
+        {% for inp in available_inputs %}
+        <option value="{{ inp.pk }}">{{ inp.name }}</option>
+        {% endfor %}
+      </select>
+    </td>
+    <td class="text-muted small">—</td>
+    <td class="text-muted" style="text-align:right;">—</td>
+    <td>
+      <input type="number" step="any" min="0"
+             name="new_dose___IDX__"
+             class="form-control form-control-sm text-end"
+             style="max-width:100px; margin-left:auto;"
+             placeholder="Dosis" required>
+    </td>
+    <td>
+      <div class="d-flex gap-1">
+        <input type="text"
+               name="new_details___IDX__"
+               class="form-control form-control-sm"
+               placeholder="Notas">
+        <button type="button" class="btn btn-sm btn-outline-danger remove-row-btn"
+                title="Quitar fila">
+          <i class="mdi mdi-close"></i>
+        </button>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<script>
+(function () {
+  let count = 0;
+
+  document.getElementById("addInputBtn").addEventListener("click", function () {
+    const tpl   = document.getElementById("newInputRowTpl");
+    const tbody = document.getElementById("inputsTableBody");
+    const empty = document.getElementById("emptyRow");
+    if (empty) empty.remove();
+
+    const frag = tpl.content.cloneNode(true);
+    frag.querySelectorAll("[name]").forEach(function (el) {
+      el.name = el.name.replace("__IDX__", count);
+    });
+    tbody.appendChild(frag);
+
+    document.getElementById("newInputsCount").value = ++count;
+  });
+
+  document.getElementById("inputsTableBody").addEventListener("click", function (e) {
+    const btn = e.target.closest(".remove-row-btn");
+    if (!btn) return;
+    btn.closest("tr").remove();
+  });
+}());
+</script>
+
+{% endblock content %}

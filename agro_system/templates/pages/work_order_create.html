@@ -1,0 +1,346 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block title %}Nueva orden de trabajo{% endblock title %}
+
+{% block content %}
+<style>
+.wo-label {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #6c757d;
+  margin-bottom: .25rem;
+}
+.wo-static {
+  font-size: .9rem;
+  font-weight: 500;
+  color: #212529;
+  padding: .35rem 0;
+}
+.wo-section-header {
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #6c757d;
+  font-weight: 600;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 1rem;
+}
+.wo-inputs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+.wo-inputs-table thead th {
+  padding: .45rem .75rem;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #6c757d;
+  border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
+}
+.wo-inputs-table tbody td {
+  padding: .5rem .75rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+.wo-inputs-table tbody tr:last-child td { border-bottom: none; }
+.wo-new-row { background: #f0f7ff; }
+.wo-new-row td { border-bottom: 1px solid #cfe2ff !important; }
+</style>
+
+<div class="geagro-dashboard-title mb-4">
+  <div class="d-flex align-items-center gap-2 flex-wrap">
+    <a href="{% url 'technical-plan' %}{% if selected_crop %}?crop={{ selected_crop.pk }}{% endif %}"
+       class="btn btn-sm btn-outline-secondary me-1">
+      <i class="mdi mdi-arrow-left"></i> Plan técnico
+    </a>
+    <h1 class="mb-0">Nueva orden de trabajo</h1>
+  </div>
+  {% if selected_crop %}
+    <span class="text-muted" style="font-size:.85rem;">
+      {{ selected_crop.campaing }} · {{ selected_crop.countryside }} / {{ selected_crop.lot }} · {{ selected_crop.activity }}
+    </span>
+  {% endif %}
+</div>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="new_inputs_count" id="newInputsCount" value="0">
+
+  <!-- Contexto del cultivo (ocultos, se auto-rellenan) -->
+  {% if selected_crop %}
+    <input type="hidden" name="crop_id"      value="{{ selected_crop.pk }}">
+    <input type="hidden" name="campaing_id"  value="{{ selected_crop.campaing_id }}">
+    <input type="hidden" name="area_id"      value="{{ selected_crop.area_id }}">
+    <input type="hidden" name="producer_id"  value="{{ selected_crop.producer_id }}">
+  {% endif %}
+
+  <div class="row g-4">
+
+    <!-- ═══ Datos del cultivo (solo lectura) ═══ -->
+    {% if selected_crop %}
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body py-3">
+          <div class="row g-3 align-items-center">
+            <div class="col-sm-3">
+              <div class="wo-label">Campaña</div>
+              <div class="wo-static">{{ selected_crop.campaing }}</div>
+            </div>
+            <div class="col-sm-3">
+              <div class="wo-label">Cultivo / Lote</div>
+              <div class="wo-static">{{ selected_crop.lot }} — {{ selected_crop.activity }}</div>
+            </div>
+            <div class="col-sm-3">
+              <div class="wo-label">Zona</div>
+              <div class="wo-static">{{ selected_crop.countryside }}</div>
+            </div>
+            <div class="col-sm-3">
+              <div class="wo-label">Área</div>
+              <div class="wo-static">{{ selected_crop.area }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ═══ Datos de la OT ═══ -->
+    <div class="col-xl-7">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="wo-section-header">Datos de la orden</div>
+
+          <div class="row g-3">
+
+            <div class="col-sm-6">
+              <label class="form-label wo-label" for="id_code">Código <span class="text-danger">*</span></label>
+              <input type="text" name="code" id="id_code"
+                     class="form-control form-control-sm"
+                     placeholder="Ej. OT-2025-001" required>
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label wo-label">Fecha emisión</label>
+              <div class="wo-static">{{ today|date:"d/m/Y" }}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label wo-label" for="id_date_init">Fecha inicio <span class="text-danger">*</span></label>
+              <input type="date" name="date_init" id="id_date_init"
+                     class="form-control form-control-sm" required>
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label wo-label" for="id_date_fin">Fecha fin estimada</label>
+              <input type="date" name="date_fin" id="id_date_fin"
+                     class="form-control form-control-sm">
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label wo-label" for="id_service">Servicio / Labor <span class="text-danger">*</span></label>
+              <select name="service" id="id_service" class="form-select form-select-sm" required>
+                <option value="">— Elegir —</option>
+                {% for s in services %}
+                  <option value="{{ s.pk }}">{{ s.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label wo-label" for="id_stage">Etapa fenológica <span class="text-danger">*</span></label>
+              <select name="stage" id="id_stage" class="form-select form-select-sm" required>
+                <option value="">— Elegir —</option>
+                {% for st in stages %}
+                  <option value="{{ st.pk }}">{{ st.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label wo-label" for="id_type">Tipo de orden <span class="text-danger">*</span></label>
+              <select name="type" id="id_type" class="form-select form-select-sm" required>
+                {% for val, label in wo_types %}
+                  <option value="{{ val }}" {% if val == "OW" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label wo-label" for="id_staff">Responsable (personal) <span class="text-danger">*</span></label>
+              <select name="staff" id="id_staff" class="form-select form-select-sm" required>
+                <option value="">— Elegir —</option>
+                {% for s in staff_list %}
+                  <option value="{{ s.pk }}">{{ s.surname }}, {{ s.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            {% if not selected_crop %}
+            {# Si no hay cultivo pre-seleccionado mostramos selectores manuales #}
+            <div class="col-sm-6">
+              <label class="form-label wo-label" for="id_crop">Cultivo</label>
+              <input type="text" name="crop_id" id="id_crop"
+                     class="form-control form-control-sm" placeholder="ID del cultivo">
+            </div>
+            {% endif %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Gestión ═══ -->
+    <div class="col-xl-5">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="wo-section-header">Gestión</div>
+
+          <div class="mb-3">
+            <label class="form-label wo-label" for="id_stateOT">Estado inicial</label>
+            <select name="stateOT" id="id_stateOT" class="form-select form-select-sm">
+              {% for st in ot_states %}
+                <option value="{{ st.pk }}"
+                  {% if st.is_default %}selected{% endif %}>
+                  {{ st.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label wo-label" for="id_contractor">Contratista</label>
+            <select name="contractor" id="id_contractor" class="form-select form-select-sm">
+              <option value="">— Sin contratista —</option>
+              {% for c in contractors %}
+                <option value="{{ c.pk }}">{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label wo-label" for="id_partner">Socio</label>
+            <select name="partner" id="id_partner" class="form-select form-select-sm">
+              <option value="">— Sin socio —</option>
+              {% for c in contractors %}
+                <option value="{{ c.pk }}">{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mt-4 d-grid">
+            <button type="submit" class="btn btn-success">
+              <i class="mdi mdi-plus-circle-outline me-1"></i>
+              Crear orden
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Insumos ═══ -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="wo-section-header mb-0" style="border:none; padding:0;">
+              Insumos <span class="text-muted fw-normal" style="font-size:.8rem;">(opcional)</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="addInputBtn">
+              <i class="mdi mdi-plus"></i> Agregar insumo
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="wo-inputs-table">
+              <thead>
+                <tr>
+                  <th>Insumo</th>
+                  <th style="min-width:110px; text-align:right;">Dosis planif.</th>
+                  <th>Unidad</th>
+                  <th>Notas</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="inputsTableBody">
+                <tr id="emptyRow">
+                  <td colspan="5" class="text-muted text-center py-3">
+                    <i class="mdi mdi-package-variant-closed me-1"></i>
+                    Todavía no se agregaron insumos.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /row -->
+</form>
+
+<!-- Template fila nueva insumo -->
+<template id="newInputRowTpl">
+  <tr class="wo-new-row">
+    <td>
+      <select name="new_input___IDX__" class="form-select form-select-sm" required>
+        <option value="">Elegir insumo…</option>
+        {% for inp in available_inputs %}
+        <option value="{{ inp.pk }}">{{ inp.name }}</option>
+        {% endfor %}
+      </select>
+    </td>
+    <td>
+      <input type="number" step="any" min="0"
+             name="new_dose___IDX__"
+             class="form-control form-control-sm text-end"
+             placeholder="0" required>
+    </td>
+    <td class="text-muted small">—</td>
+    <td>
+      <input type="text"
+             name="new_details___IDX__"
+             class="form-control form-control-sm"
+             placeholder="Notas">
+    </td>
+    <td>
+      <button type="button" class="btn btn-sm btn-outline-danger remove-row-btn" title="Quitar">
+        <i class="mdi mdi-close"></i>
+      </button>
+    </td>
+  </tr>
+</template>
+
+<script>
+(function () {
+  let count = 0;
+
+  document.getElementById("addInputBtn").addEventListener("click", function () {
+    const tpl   = document.getElementById("newInputRowTpl");
+    const tbody = document.getElementById("inputsTableBody");
+    const empty = document.getElementById("emptyRow");
+    if (empty) empty.remove();
+
+    const frag = tpl.content.cloneNode(true);
+    frag.querySelectorAll("[name]").forEach(function (el) {
+      el.name = el.name.replace("__IDX__", count);
+    });
+    tbody.appendChild(frag);
+    document.getElementById("newInputsCount").value = ++count;
+  });
+
+  document.getElementById("inputsTableBody").addEventListener("click", function (e) {
+    const btn = e.target.closest(".remove-row-btn");
+    if (!btn) return;
+    btn.closest("tr").remove();
+  });
+}());
+</script>
+
+{% endblock content %}

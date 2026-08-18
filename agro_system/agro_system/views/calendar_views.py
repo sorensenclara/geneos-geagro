@@ -94,11 +94,11 @@ def CalendarView(request):
     # =========================================================
     # órdenes reales del cultivo seleccionado
     # =========================================================
-    work_orders = WorkOrder.objects.none()
+    work_orders = WorkOrder.active.none()
 
     if selected_crop:
 
-        work_orders = WorkOrder.objects.filter(
+        work_orders = WorkOrder.active.filter(
             crop=selected_crop
         )
 

@@ -82,6 +82,7 @@ LOCAL_APPS = [
     'sale',
     'alert',
     'weather',
+    'crop_monitoring',
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + LOCAL_APPS + DJANGO_APPS

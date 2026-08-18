@@ -1,3 +1,4 @@
-from .variable_register import VariableRegisterAdmin
-from .indicator import Indicator
-from .alert import Alert
+from .variable_register import *
+from .indicator import *
+from .alert import *
+from .alert_profile import AlertProfileAdmin

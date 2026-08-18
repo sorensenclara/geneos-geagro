@@ -536,6 +536,54 @@ body[data-sidebar="dark"]{
 
 .geagro-alert-pill i{ color:#fff; font-size: 14px; }
 
+/* Alerta de hoy: fondo más intenso */
+.geagro-alert-pill--now{
+  background: rgba(255,255,255,.28);
+  border: 1px solid rgba(255,255,255,.4);
+}
+
+/* Alerta de pronóstico: fondo tenue y borde punteado */
+.geagro-alert-pill--forecast{
+  background: rgba(255,255,255,.10);
+  border: 1px dashed rgba(255,255,255,.35);
+  font-style: italic;
+}
+
+/* Ventana de aplicación — semáforo operativo */
+.geagro-alert-pill--verde{
+  background: rgba(16,185,129,.25);
+  border: 1px solid rgba(16,185,129,.55);
+}
+.geagro-alert-pill--warning{
+  background: rgba(245,158,11,.25);
+  border: 1px solid rgba(245,158,11,.55);
+}
+.geagro-alert-pill--rojo{
+  background: rgba(239,68,68,.28);
+  border: 1px solid rgba(239,68,68,.55);
+}
+
+/* Sección ventana: mismo estilo que forecast */
+.geagro-alertbar-ventana{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-shrink: 0;
+  border-left: 1px solid rgba(255,255,255,.20);
+  padding-left: 16px;
+}
+
+/* Sección pronóstico: separador visual izquierdo */
+.geagro-alertbar-forecast{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  border-left: 1px solid rgba(255,255,255,.20);
+  padding-left: 16px;
+}
+
 .geagro-alertbar-link{
   font-weight: 700;
   color:#fff;

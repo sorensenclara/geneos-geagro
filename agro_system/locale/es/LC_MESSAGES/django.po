@@ -8,36 +8,120 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-18 09:08-0300\n"
+"POT-Creation-Date: 2026-08-18 17:00-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
-"1 : 2;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: agro_system/settings/base.py:185
+#: agro_system/settings/base.py:186
 msgid "Español"
 msgstr "Español"
 
-#: agro_system/settings/base.py:317
+#: agro_system/settings/base.py:318
 msgid "Stock Charts"
 msgstr "Gráficos de Stock"
 
-#: alert/apps.py:7 alert/models/alert.py:22
+#: alert/admin/indicator.py:17 alert/models/indicator_variable.py:69
+msgid "indicator variable"
+msgstr "Variable del indicador"
+
+#: alert/admin/indicator.py:18 alert/models/indicator_variable.py:70
+msgid "indicator variables"
+msgstr "Variables del indicador"
+
+#: alert/admin/indicator.py:26 alert/models/indicator_band.py:55
+msgid "indicator band"
+msgstr "Banda del indicador"
+
+#: alert/admin/indicator.py:27 alert/models/indicator_band.py:56
+msgid "indicator bands"
+msgstr "Bandas del indicador"
+
+#: alert/admin/indicator.py:34 alert/models/indicator_action.py:120
+#, fuzzy
+#| msgid "indicator band"
+msgid "indicator action"
+msgstr "Banda del indicador"
+
+#: alert/admin/indicator.py:35
+msgid "indicator actions — work order templates"
+msgstr ""
+
+#: alert/admin/indicator.py:44 alert/models/indicator_recommendation.py:48
+#: alert/models/indicator_recommendation.py:72
+#, fuzzy
+#| msgid "presentation"
+msgid "recommendation"
+msgstr "Presentación"
+
+#: alert/admin/indicator.py:45
+msgid "recommendations — informative (no work order)"
+msgstr ""
+
+#: alert/admin/indicator.py:55
+msgid "Custom evaluator"
+msgstr "Evaluador personalizado"
+
+#: alert/admin/indicator.py:58
+msgid ""
+"Only set this if the generic filter + band logic cannot express the "
+"condition. When filled, the generic engine is bypassed entirely for this "
+"indicator."
+msgstr ""
+"Usalo solo si la lógica genérica de filtros + bandas no puede expresar la "
+"condición. Cuando está definido, el motor genérico se omite completamente "
+"para este indicador."
+
+#: alert/admin/indicator.py:74
+#, fuzzy
+#| msgid "actions"
+msgid "Actions"
+msgstr "Acciones"
+
+#: alert/admin/indicator.py:79
+msgid "Custom"
+msgstr "Custom"
+
+#: alert/admin/indicator.py:86 alert/models/indicator_action_input.py:22
+#: input/models/input.py:29 input/models/purchase_order_detail.py:15
+#: input/models/purchase_reception_detail.py:15
+#: operation/models/input_work_order.py:10
+#: operation/models/technical_plan_input.py:17
+msgid "input"
+msgstr "Insumo"
+
+#: alert/admin/indicator.py:87
+msgid "inputs / insumos"
+msgstr ""
+
+#: alert/admin/indicator.py:97
+#, fuzzy
+#| msgid "work order"
+msgid "Work order"
+msgstr "Orden de trabajo"
+
+#: alert/admin/indicator.py:98
+#, fuzzy
+#| msgid "forecast days"
+msgid "Forecast"
+msgstr "Días de pronóstico"
+
+#: alert/apps.py:7 alert/models/alert.py:72
 msgid "alerts"
 msgstr "Alertas"
 
-#: alert/models/alert.py:10 alert/models/indicator.py:16
+#: alert/models/alert.py:20 alert/models/indicator.py:26
 #: alert/models/variable_register.py:10 input/models/category_input.py:9
 #: input/models/input.py:12 input/models/type_input.py:10
-#: input/models/type_provider.py:10 operation/models/activity.py:11
-#: operation/models/crop.py:18 operation/models/service.py:10
-#: operation/models/service_type.py:8 operation/models/stage.py:9
-#: parameter/models/action.py:8 parameter/models/area.py:8
+#: input/models/type_provider.py:10 operation/models/crop.py:18
+#: operation/models/service.py:10 operation/models/service_type.py:8
+#: operation/models/stage.py:15 operation/models/variety.py:11
+#: parameter/models/action.py:8 parameter/models/area.py:13
 #: parameter/models/campaign.py:9 parameter/models/city.py:10
 #: parameter/models/country.py:8 parameter/models/countryside_condition.py:8
 #: parameter/models/cultivation_state.py:9 parameter/models/currency.py:8
@@ -46,113 +130,433 @@ msgstr "Alertas"
 #: parameter/models/port.py:10 parameter/models/province.py:10
 #: parameter/models/specie.py:8 parameter/models/type_var_crop_technique.py:8
 #: parameter/models/var_crop_technique.py:10 producer/models/cost_center.py:8
-#: producer/models/country_side.py:13 producer/models/lot.py:16
+#: producer/models/country_side.py:13 producer/models/lot.py:17
 #: producer/models/staff.py:20 producer/models/store.py:10
 #: producer/models/typeStaff.py:10 sale/models/driver.py:11
 #: sale/models/type_sales_receipt.py:8 user/models/notification.py:10
-#: weather/models/station_weather.py:18
+#: weather/models/station_external.py:10 weather/models/station_weather.py:18
 msgid "name"
 msgstr "Nombre"
 
-#: alert/models/alert.py:11 alert/models/indicator.py:34
+#: alert/models/alert.py:21 alert/models/alert_profile_indicator.py:30
+#: alert/models/indicator.py:80 alert/models/indicator_action.py:34
+#: alert/models/indicator_band.py:34
+#: alert/models/indicator_recommendation.py:28
+#: alert/models/indicator_variable.py:31
 msgid "indicator"
 msgstr "Indicador"
 
-#: alert/models/alert.py:12 alert/models/variable_register.py:12
-#: input/models/purchase_order.py:19
+#: alert/models/alert.py:22 alert/models/variable_register.py:12
+#: crop_monitoring/models/biofix.py:48 input/models/purchase_order.py:19
 #: operation/models/technical_crop_detail.py:17
 #: parameter/models/exchange_rate.py:12 sale/models/sales_receipt.py:17
-#: user/models/notification.py:12
+#: user/models/notification.py:12 weather/models/daily_summary.py:42
 msgid "date"
 msgstr "Fecha"
 
-#: alert/models/alert.py:13 alert/models/variable_register.py:15
+#: alert/models/alert.py:23 alert/models/variable_register.py:15
 #: operation/models/crop_yields.py:18
 #: operation/models/technical_crop_detail.py:18
 #: operation/models/technical_plan.py:15
 #: operation/models/technical_plan_input.py:19 user/models/notification.py:13
 msgid "detail"
-msgstr "detalles"
+msgstr "Detalle"
 
-#: alert/models/alert.py:14 operation/models/crop.py:46
-#: operation/models/crop_yields.py:13 operation/models/partner_crop.py:13
+#: alert/models/alert.py:32 crop_monitoring/models/biofix.py:38
+#: operation/models/crop.py:47 operation/models/crop_yields.py:13
+#: operation/models/partner_crop.py:13
 #: operation/models/technical_crop_detail.py:14
-#: operation/models/work_order.py:27
+#: operation/models/work_order.py:35
 msgid "crop"
 msgstr "Cultivo"
 
-#: alert/models/alert.py:21
+#: alert/models/alert.py:36
+msgid "BBCH stage"
+msgstr "Estadio BBCH"
+
+#: alert/models/alert.py:39 alert/models/indicator_action.py:25
+#: alert/models/indicator_band.py:20
+#: alert/models/indicator_recommendation.py:19
+#: alert/models/indicator_variable.py:44
+msgid "Warning"
+msgstr "Aviso"
+
+#: alert/models/alert.py:40 alert/models/indicator_action.py:26
+#: alert/models/indicator_band.py:21
+#: alert/models/indicator_recommendation.py:20
+#: alert/models/indicator_variable.py:45
+msgid "Alert"
+msgstr "Alerta"
+
+#: alert/models/alert.py:41 alert/models/indicator_action.py:27
+#: alert/models/indicator_band.py:22
+#: alert/models/indicator_recommendation.py:21
+#: alert/models/indicator_variable.py:46
+msgid "Critical"
+msgstr "Crítico"
+
+#: alert/models/alert.py:48 alert/models/indicator_band.py:50
+msgid "level"
+msgstr "Nivel"
+
+#: alert/models/alert.py:49
+msgid "Severity level returned by the evaluator: warning / alert / critical."
+msgstr ""
+
+#: alert/models/alert.py:54
+#, fuzzy
+#| msgid "forecast days"
+msgid "is forecast"
+msgstr "Días de pronóstico"
+
+#: alert/models/alert.py:55
+msgid ""
+"True when generated from forecast data; False when confirmed by observed "
+"data."
+msgstr ""
+
+#: alert/models/alert.py:60
+msgid "is aborted"
+msgstr ""
+
+#: alert/models/alert.py:62
+msgid ""
+"True when the forecast expired without confirmation or the forecast changed "
+"and the event is no longer predicted. Associated WOs are moved to "
+"'Cancelada'."
+msgstr ""
+
+#: alert/models/alert.py:71 operation/models/work_order.py:54
 msgid "alert"
 msgstr "Alerta"
 
-#: alert/models/indicator.py:11
+#: alert/models/alert_profile.py:18 operation/models/crop.py:21
+#: operation/models/technical_plan.py:19 parameter/models/area.py:34
+#: producer/models/lot.py:19
+msgid "area"
+msgstr "Zona"
+
+#: alert/models/alert_profile.py:24
+msgid "priority sources"
+msgstr "Fuentes prioritarias"
+
+#: alert/models/alert_profile.py:26
+msgid ""
+"Priority order of meteorological data sources for this zone. Example: "
+"[\"open_meteo_eto\", \"soil_moisture_station\", \"station\"]."
+msgstr ""
+"Orden de prioridad de fuentes de datos meteorológicos para esta zona. "
+"Ejemplo: [\"open_meteo_eto\", \"estacion_humedad_suelo\", \"estacion\"]."
+
+#: alert/models/alert_profile.py:35 alert/models/alert_profile_indicator.py:24
+msgid "alert profile"
+msgstr "Perfil de alertas"
+
+#: alert/models/alert_profile.py:36
+msgid "alert profiles"
+msgstr "Perfiles de alertas"
+
+#: alert/models/alert_profile_indicator.py:15
+msgid "On — evaluates and notifies"
+msgstr "Activo — evalúa y notifica"
+
+#: alert/models/alert_profile_indicator.py:16
+msgid "Vigilance — evaluates, records only"
+msgstr "Vigilancia — evalúa, solo registra"
+
+#: alert/models/alert_profile_indicator.py:17
+msgid "Off — not evaluated"
+msgstr "Desactivado — no evalúa"
+
+#: alert/models/alert_profile_indicator.py:36
+msgid "status"
+msgstr "Estado"
+
+#: alert/models/alert_profile_indicator.py:42
+msgid "profile indicator"
+msgstr "Indicador del perfil"
+
+#: alert/models/alert_profile_indicator.py:43
+msgid "profile indicators"
+msgstr "Indicadores del perfil"
+
+#: alert/models/indicator.py:16
 msgid "Low"
 msgstr "Bajo"
 
-#: alert/models/indicator.py:12
+#: alert/models/indicator.py:17
 msgid "Medium"
 msgstr "Medio"
 
-#: alert/models/indicator.py:13
+#: alert/models/indicator.py:18
 msgid "High"
 msgstr "Alto"
 
-#: alert/models/indicator.py:17
-msgid "variable one"
-msgstr "Primera variable"
-
-#: alert/models/indicator.py:18
-msgid "min variable one"
-msgstr "Minimo de la primera variable"
-
-#: alert/models/indicator.py:19
-msgid "max variable one"
-msgstr "Maximo de la primera variable"
-
-#: alert/models/indicator.py:20
-msgid "variable two"
-msgstr "Segunda variable"
-
-#: alert/models/indicator.py:21
-msgid "min variable two"
-msgstr "Minimo de la segunda variable"
-
 #: alert/models/indicator.py:22
-msgid "max variable two"
-msgstr "Maximo de la segunda variable"
+msgid "Revisión diaria"
+msgstr ""
 
 #: alert/models/indicator.py:23
-msgid "variable three"
-msgstr "Tercera variable"
+msgid "Revisión por registro"
+msgstr ""
 
-#: alert/models/indicator.py:24
-msgid "min variable three"
-msgstr "Minimo de tercera variable"
-
-#: alert/models/indicator.py:25
-msgid "max variable three"
-msgstr "Maximo de tercera variable"
-
-#: alert/models/indicator.py:26
+#: alert/models/indicator.py:27
 msgid "user alert"
 msgstr "Usuarios a reportar"
 
-#: alert/models/indicator.py:27
+#: alert/models/indicator.py:28
 msgid "report mails"
 msgstr "Emails a notificar"
 
-#: alert/models/indicator.py:28
+#: alert/models/indicator.py:33
 msgid "criticality level"
 msgstr "Nivel de criticidad"
 
-#: alert/models/indicator.py:35 operation/models/crop.py:38
+#: alert/models/indicator.py:38
+msgid "evaluator"
+msgstr "Evaluador"
+
+#: alert/models/indicator.py:40
+msgid ""
+"Optional Python path to a custom evaluator class (e.g. 'alert.evaluators."
+"storm_front.StormFrontEvaluator'). When set, overrides the generic filter + "
+"band logic."
+msgstr ""
+"Ruta Python a una clase evaluadora personalizada (ej: 'alert.evaluators."
+"storm_front.StormFrontEvaluator'). Cuando está definido, reemplaza la lógica "
+"genérica de filtros + bandas."
+
+#: alert/models/indicator.py:49
+msgid "review mode"
+msgstr ""
+
+#: alert/models/indicator.py:51
+msgid ""
+"Revisión diaria: se evalúa una vez por día con el resumen diario. Revisión "
+"por registro: se evalúa en cada lectura horaria u de estación; todos los "
+"filtros deben cumplirse simultáneamente en el mismo registro. No aplica a "
+"pronóstico (los pronósticos son siempre diarios)."
+msgstr ""
+
+#: alert/models/indicator.py:61
+#, fuzzy
+#| msgid "forecast days"
+msgid "max forecast days"
+msgstr "Días de pronóstico"
+
+#: alert/models/indicator.py:63
+msgid ""
+"How many days ahead this alert is emitted from forecast data. Frost → 5, "
+"hail → 2, heat → 3. Leave blank to use the global default (7)."
+msgstr ""
+
+#: alert/models/indicator.py:81 operation/models/crop.py:38
 msgid "indicators"
 msgstr "Indicadores"
 
-#: alert/models/variable_register.py:11
+#: alert/models/indicator_action.py:24
+#: alert/models/indicator_recommendation.py:18
+#, fuzzy
+#| msgid "level"
+msgid "All levels"
+msgstr "Nivel"
+
+#: alert/models/indicator_action.py:40
+#: alert/models/indicator_recommendation.py:34
+#: alert/models/indicator_variable.py:56
+#, fuzzy
+#| msgid "alert profile"
+msgid "alert level"
+msgstr "Perfil de alertas"
+
+#: alert/models/indicator_action.py:41
+msgid "Leave blank to match all levels."
+msgstr ""
+
+#: alert/models/indicator_action.py:45
+#: alert/models/indicator_recommendation.py:39
+#, fuzzy
+#| msgid "BBCH code"
+msgid "BBCH from"
+msgstr "Código BBCH"
+
+#: alert/models/indicator_action.py:46
+msgid "Minimum BBCH code (inclusive). Leave blank for no lower bound."
+msgstr ""
+
+#: alert/models/indicator_action.py:50
+#: alert/models/indicator_recommendation.py:44
+#, fuzzy
+#| msgid "BBCH code"
+msgid "BBCH to"
+msgstr "Código BBCH"
+
+#: alert/models/indicator_action.py:51
+msgid "Maximum BBCH code (inclusive). Leave blank for no upper bound."
+msgstr ""
+
+#: alert/models/indicator_action.py:56 operation/models/service.py:17
+#: operation/models/technical_plan_detail.py:17
+#: operation/models/work_order.py:39
+msgid "service"
+msgstr "Servicio"
+
+#: alert/models/indicator_action.py:62 operation/models/stage.py:46
+#: operation/models/technical_plan_detail.py:16
+#: operation/models/work_order.py:38
+msgid "stage"
+msgstr "Estadio"
+
+#: alert/models/indicator_action.py:64
+msgid ""
+"Etapa operativa de la OT. Define también el rango BBCH si no se especifica "
+"bbch_from/bbch_to. Dejar vacío para que la acción aplique a cualquier "
+"estadio."
+msgstr ""
+
+#: alert/models/indicator_action.py:70
+#, fuzzy
+#| msgid "days estimate"
+msgid "days to complete"
+msgstr "Dias estimados"
+
+#: alert/models/indicator_action.py:71
+msgid "Work order deadline in days from emission date."
+msgstr ""
+
+#: alert/models/indicator_action.py:75
+msgid "create on forecast"
+msgstr ""
+
+#: alert/models/indicator_action.py:77
+msgid ""
+"Create the work order (in Contingente state) when the alert comes from "
+"forecast data. Enable for events that require advance preparation (frost, "
+"hail)."
+msgstr ""
+
+#: alert/models/indicator_action.py:121
+#, fuzzy
+#| msgid "indicator bands"
+msgid "indicator actions"
+msgstr "Bandas del indicador"
+
+#: alert/models/indicator_action_input.py:17 parameter/models/action.py:16
+msgid "action"
+msgstr "Acción"
+
+#: alert/models/indicator_action_input.py:25
+#: operation/models/input_work_order.py:11
+msgid "planned dose"
+msgstr "Dosis planeada"
+
+#: alert/models/indicator_action_input.py:26
+msgid "Dose per application in the input's unit of measure."
+msgstr ""
+
+#: alert/models/indicator_action_input.py:33
+#, fuzzy
+#| msgid "indicator band"
+msgid "indicator action input"
+msgstr "Banda del indicador"
+
+#: alert/models/indicator_action_input.py:34
+#, fuzzy
+#| msgid "indicator bands"
+msgid "indicator action inputs"
+msgstr "Bandas del indicador"
+
+#: alert/models/indicator_band.py:26
+msgid "≥ threshold (higher is worse)"
+msgstr "≥ umbral (mayor es peor)"
+
+#: alert/models/indicator_band.py:27
+msgid "≤ threshold (lower is worse)"
+msgstr "≤ umbral (menor es peor)"
+
+#: alert/models/indicator_band.py:36
+msgid "BBCH from (numeric)"
+msgstr "BBCH desde (numérico)"
+
+#: alert/models/indicator_band.py:37
+msgid "BBCH to (numeric)"
+msgstr "BBCH hasta (numérico)"
+
+#: alert/models/indicator_band.py:41
+msgid "threshold"
+msgstr "Umbral"
+
+#: alert/models/indicator_band.py:42
+msgid "Leave blank to fire on BBCH match alone (no graduated variable)."
+msgstr "Dejar vacío para disparar solo por BBCH, sin variable graduada."
+
+#: alert/models/indicator_band.py:48
+msgid "direction"
+msgstr "Dirección"
+
+#: alert/models/indicator_band.py:51
+#: alert/models/indicator_recommendation.py:53
+#: alert/models/indicator_variable.py:65
+#: crop_monitoring/models/phenological_state.py:19 operation/models/stage.py:17
+msgid "order"
+msgstr "Orden"
+
+#: alert/models/indicator_recommendation.py:35
+msgid "Dejar vacío para aplicar a todos los niveles."
+msgstr ""
+
+#: alert/models/indicator_recommendation.py:40
+msgid "Código BBCH mínimo (inclusivo). Vacío = sin límite inferior."
+msgstr ""
+
+#: alert/models/indicator_recommendation.py:45
+msgid "Código BBCH máximo (inclusivo). Vacío = sin límite superior."
+msgstr ""
+
+#: alert/models/indicator_recommendation.py:49
+msgid "Texto que se mostrará al usuario cuando la alerta se active."
+msgstr ""
+
+#: alert/models/indicator_recommendation.py:73
+#, fuzzy
+#| msgid "presentation"
+msgid "recommendations"
+msgstr "Presentación"
+
+#: alert/models/indicator_variable.py:23
+msgid "Filter — must be in range for indicator to fire"
+msgstr "Filtro — debe estar en rango para disparar el indicador"
+
+#: alert/models/indicator_variable.py:24
+msgid "Graduated — determines severity via BBCH bands"
+msgstr "Graduada — determina severidad según bandas BBCH"
+
+#: alert/models/indicator_variable.py:36 alert/models/variable_register.py:11
 #: operation/models/technical_crop_detail.py:15
+#: weather/models/station_external.py:19
+#: weather/models/station_external_variable.py:26
 msgid "variable"
 msgstr "Variable"
+
+#: alert/models/indicator_variable.py:43
+msgid "Any level (no restriction)"
+msgstr ""
+
+#: alert/models/indicator_variable.py:49
+msgid "min value"
+msgstr "Valor mínimo"
+
+#: alert/models/indicator_variable.py:50
+msgid "max value"
+msgstr "Valor máximo"
+
+#: alert/models/indicator_variable.py:57
+msgid "Level this threshold triggers. Empty = applies to all levels."
+msgstr ""
+
+#: alert/models/indicator_variable.py:63
+msgid "role"
+msgstr "Rol"
 
 #: alert/models/variable_register.py:13
 msgid "hour"
@@ -163,10 +567,10 @@ msgstr "Hora"
 msgid "value"
 msgstr "Valor"
 
-#: alert/models/variable_register.py:16 producer/models/lot.py:33
+#: alert/models/variable_register.py:16 producer/models/lot.py:34
 #: weather/models/station_weather.py:32 weather/models/weather_data.py:12
 msgid "weather station"
-msgstr "Estación meteorologica"
+msgstr "Estación meteorológica"
 
 #: alert/models/variable_register.py:22
 msgid "variable register"
@@ -175,6 +579,101 @@ msgstr "Registro de variables"
 #: alert/models/variable_register.py:23
 msgid "variable registers"
 msgstr "Registros de variables"
+
+#: crop_monitoring/models/biofix.py:20
+msgid "Vine phenology (base 10°C)"
+msgstr "Fenología de la vid (base 10°C)"
+
+#: crop_monitoring/models/biofix.py:21
+msgid "Lobesia botrana (base 7°C)"
+msgstr "Lobesia botrana (base 7°C)"
+
+#: crop_monitoring/models/biofix.py:28
+msgid "Confirmed by producer"
+msgstr "Confirmado por el productor"
+
+#: crop_monitoring/models/biofix.py:29
+msgid "Detected by system"
+msgstr "Detectado por el sistema"
+
+#: crop_monitoring/models/biofix.py:30
+msgid "Fixed provisional date (~Sep 1)"
+msgstr "Fecha provisional fija (~1 de Sep)"
+
+#: crop_monitoring/models/biofix.py:40
+msgid "counter"
+msgstr "Contador"
+
+#: crop_monitoring/models/biofix.py:44
+msgid "base temperature"
+msgstr "Temperatura base"
+
+#: crop_monitoring/models/biofix.py:45
+msgid "10.0 para vid, 7.0 para Lobesia."
+msgstr "10.0 para vid, 7.0 para Lobesia."
+
+#: crop_monitoring/models/biofix.py:49
+msgid "Cero del contador. Brotación (vid) o primer vuelo (Lobesia)."
+msgstr "Cero del contador. Brotación (vid) o primer vuelo (Lobesia)."
+
+#: crop_monitoring/models/biofix.py:55
+msgid "origin"
+msgstr "Origen"
+
+#: crop_monitoring/models/biofix.py:57
+msgid "is confirmed"
+msgstr "Confirmado"
+
+#: crop_monitoring/models/biofix.py:61
+#: crop_monitoring/models/gdd_accumulator.py:21
+msgid "biofix"
+msgstr "Biofix"
+
+#: crop_monitoring/models/biofix.py:62
+msgid "biofixes"
+msgstr "Biofixes"
+
+#: crop_monitoring/models/gdd_accumulator.py:23
+msgid "accumulated GDD"
+msgstr "GDD acumulado"
+
+#: crop_monitoring/models/gdd_accumulator.py:24
+msgid "calculation date"
+msgstr "Fecha de cálculo"
+
+#: crop_monitoring/models/phenological_state.py:15
+msgid "BBCH code"
+msgstr "Código BBCH"
+
+#: crop_monitoring/models/phenological_state.py:16
+msgid "stage name"
+msgstr "Nombre del estadio"
+
+#: crop_monitoring/models/phenological_state.py:17
+msgid "GDD from"
+msgstr "GDD desde"
+
+#: crop_monitoring/models/phenological_state.py:18
+msgid "GDD to"
+msgstr "GDD hasta"
+
+#: crop_monitoring/models/phenological_state.py:26
+#, fuzzy
+#| msgid "operations"
+msgid "operational stage"
+msgstr "Operaciones"
+
+#: crop_monitoring/models/phenological_state.py:27
+msgid "Operational period (etapa) this phenological state belongs to."
+msgstr ""
+
+#: crop_monitoring/models/phenological_state.py:32
+msgid "phenological stage"
+msgstr "Estadio fenológico"
+
+#: crop_monitoring/models/phenological_state.py:33
+msgid "phenological stages"
+msgstr "Estadios fenológicos"
 
 #: input/admin/input.py:29
 msgid "Order Date"
@@ -307,18 +806,11 @@ msgstr "Control de lote"
 #: input/models/input.py:23 input/models/provider.py:20
 #: input/models/purchase_order.py:26 input/models/purchase_reception.py:21
 #: operation/models/crop.py:37 operation/models/technical_plan.py:22
-#: operation/models/work_order.py:40 producer/models/country_side.py:25
+#: operation/models/work_order.py:48 producer/models/country_side.py:25
 #: producer/models/staff.py:33 producer/models/store.py:14
 #: sale/models/sales_receipt.py:31
 msgid "producer"
 msgstr "Productor"
-
-#: input/models/input.py:29 input/models/purchase_order_detail.py:15
-#: input/models/purchase_reception_detail.py:15
-#: operation/models/input_work_order.py:10
-#: operation/models/technical_plan_input.py:17
-msgid "input"
-msgstr "Insumo"
 
 #: input/models/provider.py:12 user/models/user_producer.py:14
 msgid "name_company"
@@ -428,7 +920,7 @@ msgid "price total"
 msgstr "Precio total"
 
 #: input/models/purchase_order_detail.py:21 producer/models/country_side.py:22
-#: producer/models/lot.py:22 sale/models/sales_receipt.py:24
+#: producer/models/lot.py:23 sale/models/sales_receipt.py:24
 msgid "cost center"
 msgstr "Centro de costo"
 
@@ -512,55 +1004,33 @@ msgstr "Insumos"
 msgid "Print work orders"
 msgstr "Imprimir ordenes de trabajo"
 
-#: operation/apps.py:7 producer/models/lot.py:24
+#: operation/apps.py:7
 msgid "operations"
 msgstr "Operaciones"
-
-#: operation/models/activity.py:12
-msgid "description"
-msgstr "Descripción"
-
-#: operation/models/activity.py:13 parameter/models/specie.py:14
-msgid "specie"
-msgstr "Especie"
-
-#: operation/models/activity.py:14
-msgid "is agricultural"
-msgstr "Es agricola"
-
-#: operation/models/activity.py:15
-msgid "is livestock"
-msgstr "Es ganadera"
-
-#: operation/models/activity.py:22 operation/models/crop.py:23
-#: operation/models/stage.py:10
-msgid "activity"
-msgstr "Actividad"
-
-#: operation/models/activity.py:23
-msgid "activities"
-msgstr "Actividad"
 
 #: operation/models/crop.py:19
 msgid "campaing"
 msgstr "Campaña"
 
 #: operation/models/crop.py:20 producer/models/country_side.py:31
-#: producer/models/lot.py:17
+#: producer/models/lot.py:18
 msgid "countryside"
-msgstr "Campos"
+msgstr "Campo"
 
-#: operation/models/crop.py:21 operation/models/technical_plan.py:19
-#: parameter/models/area.py:14 producer/models/lot.py:18
-msgid "area"
-msgstr "Zona"
-
-#: operation/models/crop.py:22 producer/models/lot.py:40
+#: operation/models/crop.py:22 producer/models/lot.py:51
+#: weather/models/daily_summary.py:40
 msgid "lot"
 msgstr "Lote"
 
+#: operation/models/crop.py:23 operation/models/stage.py:16
+#: operation/models/technical_plan.py:18 operation/models/variety.py:21
+#, fuzzy
+#| msgid "variable"
+msgid "variety"
+msgstr "Variable"
+
 #: operation/models/crop.py:24 producer/models/country_side.py:17
-#: producer/models/lot.py:19
+#: producer/models/lot.py:20
 msgid "responsible"
 msgstr "Responsable"
 
@@ -568,7 +1038,7 @@ msgstr "Responsable"
 msgid "state"
 msgstr "Estado"
 
-#: operation/models/crop.py:26 producer/models/lot.py:21
+#: operation/models/crop.py:26 producer/models/lot.py:22
 msgid "hectares productive"
 msgstr "Hectareas productivas"
 
@@ -596,7 +1066,7 @@ msgstr "Imputar gasto"
 msgid "port"
 msgstr "Puerto"
 
-#: operation/models/crop.py:33 operation/models/work_order.py:23
+#: operation/models/crop.py:33 operation/models/work_order.py:31
 #: parameter/models/campaign.py:10
 msgid "date init"
 msgstr "Fecha de inicio"
@@ -625,7 +1095,7 @@ msgstr ""
 "Indica si este lote es el lote principal del personal. Solo un lote puede "
 "ser el lote principal de un empleado."
 
-#: operation/models/crop.py:47
+#: operation/models/crop.py:48
 msgid "crops"
 msgstr "Cultivos"
 
@@ -651,15 +1121,11 @@ msgstr "Rinde de cultivo"
 
 #: operation/models/crop_yields.py:30
 msgid "yields crops"
-msgstr "Risdes de cultivo"
+msgstr "Rindes de cultivo"
 
-#: operation/models/input_work_order.py:9 operation/models/work_order.py:50
+#: operation/models/input_work_order.py:9 operation/models/work_order.py:65
 msgid "work order"
 msgstr "Orden de trabajo"
-
-#: operation/models/input_work_order.py:11
-msgid "planned dose"
-msgstr "Dosis planeada"
 
 #: operation/models/input_work_order.py:12
 msgid "dose applied"
@@ -671,7 +1137,7 @@ msgstr "Detalles"
 
 #: operation/models/input_work_order.py:19
 msgid "input work order"
-msgstr "Insumo de ordenenes de trabajo"
+msgstr "Insumo de ordenes de trabajo"
 
 #: operation/models/input_work_order.py:20
 msgid "inputs work orders"
@@ -679,13 +1145,13 @@ msgstr "Insumos de ordenes de trabajo"
 
 #: operation/models/partner_crop.py:14
 #: operation/models/technical_plan_detail.py:24
-#: operation/models/work_order.py:39
+#: operation/models/work_order.py:47
 msgid "partner"
 msgstr "Socio"
 
 #: operation/models/partner_crop.py:24
 msgid "partner in crop"
-msgstr "Socios en cultivos"
+msgstr "Socio en cultivo"
 
 #: operation/models/partner_crop.py:25
 msgid "partners in crops"
@@ -693,35 +1159,21 @@ msgstr "Socios en cultivos"
 
 #: operation/models/service.py:11
 msgid "type of service"
-msgstr "Tipo de servicios"
-
-#: operation/models/service.py:17 operation/models/technical_plan_detail.py:17
-#: operation/models/work_order.py:31
-msgid "service"
-msgstr "Servicio"
+msgstr "Tipo de servicio"
 
 #: operation/models/service.py:18
 msgid "services"
-msgstr "Servicos"
+msgstr "Servicios"
 
 #: operation/models/service_type.py:14
 msgid "service type"
-msgstr "Tipo de servicos"
+msgstr "Tipo de servicio"
 
 #: operation/models/service_type.py:15
 msgid "service types"
-msgstr "Tipos de servicios"
+msgstr "Tipos de servicio"
 
-#: operation/models/stage.py:11
-msgid "order"
-msgstr "Orden"
-
-#: operation/models/stage.py:17 operation/models/technical_plan_detail.py:16
-#: operation/models/work_order.py:30
-msgid "stage"
-msgstr "Estadio"
-
-#: operation/models/stage.py:18
+#: operation/models/stage.py:47
 msgid "stages"
 msgstr "Estadios"
 
@@ -733,7 +1185,7 @@ msgstr "Detalle tecnico de cultivo"
 msgid "Crop technical details"
 msgstr "Detalles tecnicos de cultivo"
 
-#: operation/models/technical_plan.py:14 operation/models/work_order.py:21
+#: operation/models/technical_plan.py:14 operation/models/work_order.py:29
 msgid "code"
 msgstr "Codigo"
 
@@ -741,15 +1193,11 @@ msgstr "Codigo"
 msgid "proportion of hectares"
 msgstr "Proporción de hectareas"
 
-#: operation/models/technical_plan.py:18
-msgid "activity "
-msgstr "Actividad"
-
 #: operation/models/technical_plan.py:21
 #: operation/models/technical_plan_detail.py:20 parameter/models/campaign.py:12
 #: producer/models/staff.py:15
 msgid "active"
-msgstr "Aciva"
+msgstr "Activo"
 
 #: operation/models/technical_plan.py:28
 #: operation/models/technical_plan_detail.py:14
@@ -771,14 +1219,14 @@ msgstr "Dias estimados"
 
 #: operation/models/technical_plan_detail.py:19
 msgid "cant persons"
-msgstr "Cantidad de personas a trabajar"
+msgstr "Cantidad de personas"
 
 #: operation/models/technical_plan_detail.py:21
 msgid "subcontracted"
 msgstr "Subcontratado"
 
 #: operation/models/technical_plan_detail.py:22
-#: operation/models/work_order.py:37
+#: operation/models/work_order.py:45
 msgid "contractor"
 msgstr "Contratista"
 
@@ -804,51 +1252,73 @@ msgstr "Insumo del plan tecnico"
 msgid "technical plan inputs"
 msgstr "Insumos del plan tecnico"
 
-#: operation/models/work_order.py:16
+#: operation/models/variety.py:12
+msgid "description"
+msgstr "Descripción"
+
+#: operation/models/variety.py:13 parameter/models/specie.py:27
+msgid "specie"
+msgstr "Especie"
+
+#: operation/models/variety.py:14
+msgid "is agricultural"
+msgstr "Es agricola"
+
+#: operation/models/variety.py:15
+msgid "is livestock"
+msgstr "Es ganadera"
+
+#: operation/models/variety.py:22 producer/models/lot.py:25
+#, fuzzy
+#| msgid "cities"
+msgid "varieties"
+msgstr "Ciudades"
+
+#: operation/models/work_order.py:24
 msgid "Third-Party Work"
 msgstr "Ordenes de terceros"
 
-#: operation/models/work_order.py:17
+#: operation/models/work_order.py:25
 msgid "Own Work"
 msgstr "Ordenes propias"
 
-#: operation/models/work_order.py:18
+#: operation/models/work_order.py:26
 msgid "Partner Work"
 msgstr "Ordenes de socios"
 
-#: operation/models/work_order.py:22
+#: operation/models/work_order.py:30
 msgid "date emission"
 msgstr "Fecha de emision"
 
-#: operation/models/work_order.py:24
+#: operation/models/work_order.py:32
 msgid "date fin"
 msgstr "Fecha de fin"
 
-#: operation/models/work_order.py:26 parameter/models/campaign.py:18
+#: operation/models/work_order.py:34 parameter/models/campaign.py:18
 msgid "campaign"
 msgstr "Campaña"
 
-#: operation/models/work_order.py:28
+#: operation/models/work_order.py:36
 msgid "are"
 msgstr "Zona"
 
-#: operation/models/work_order.py:32
+#: operation/models/work_order.py:40
 msgid "state ot"
 msgstr "Estado de ordenes de trabajo"
 
-#: operation/models/work_order.py:33 parameter/models/var_crop_technique.py:11
+#: operation/models/work_order.py:41 parameter/models/var_crop_technique.py:20
 #: producer/models/staff.py:27
 msgid "type"
 msgstr "Tipo"
 
-#: operation/models/work_order.py:35 producer/models/staff.py:40
+#: operation/models/work_order.py:43 producer/models/staff.py:40
 #: producer/models/staff.py:41
 msgid "staff"
 msgstr "Personal"
 
-#: operation/models/work_order.py:51
+#: operation/models/work_order.py:66
 msgid "work orders"
-msgstr "Orden de trabajo"
+msgstr "Ordenes de trabajo"
 
 #: parameter/apps.py:7
 msgid "parameters"
@@ -862,16 +1332,32 @@ msgstr "Enviar email"
 msgid "send notification"
 msgstr "Enviar notificación"
 
-#: parameter/models/action.py:16
-msgid "action"
-msgstr "Acción"
-
 #: parameter/models/action.py:17 parameter/models/cultivation_state.py:10
 #: parameter/models/ot_state.py:10
 msgid "actions"
 msgstr "Acciones"
 
-#: parameter/models/area.py:15
+#: parameter/models/area.py:9
+msgid "Temperate humid (Cfb)"
+msgstr "Templado húmedo (Cfb)"
+
+#: parameter/models/area.py:10
+msgid "Cold arid (BWk)"
+msgstr "Árido frío (BWk)"
+
+#: parameter/models/area.py:18
+msgid "climate"
+msgstr "Clima"
+
+#: parameter/models/area.py:26
+msgid "GDD upper cutoff"
+msgstr "Techo de GDD"
+
+#: parameter/models/area.py:27
+msgid "30.0 en Mendoza (Winkler con techo). Vacío en Tandil o zonas no-vid."
+msgstr "30.0 en Mendoza (Winkler con techo). Vacío en Tandil o zonas no-vid."
+
+#: parameter/models/area.py:35
 msgid "areas"
 msgstr "Zonas"
 
@@ -926,7 +1412,7 @@ msgstr "Moneda origen"
 
 #: parameter/models/exchange_rate.py:11
 msgid "currency destination"
-msgstr "Modeda destino"
+msgstr "Moneda destino"
 
 #: parameter/models/exchange_rate.py:13
 msgid "rate"
@@ -978,7 +1464,7 @@ msgstr "Predeterminado"
 
 #: parameter/models/ot_state.py:21
 msgid "state of work order"
-msgstr "estado de la orden de trabajo"
+msgstr "Estado de la orden de trabajo"
 
 #: parameter/models/ot_state.py:22
 msgid "states of work orders"
@@ -990,9 +1476,25 @@ msgstr "Puertos"
 
 #: parameter/models/province.py:18
 msgid "provinces"
-msgstr "Provincia"
+msgstr "Provincias"
+
+#: parameter/models/specie.py:14
+msgid "GDD harvest min"
+msgstr "GDD mínimo de cosecha"
 
 #: parameter/models/specie.py:15
+msgid "Base 10°C desde brotación. Ej: Malbec 1450. Vacío para no-vid."
+msgstr "Base 10°C desde brotación. Ej: Malbec 1450. Vacío para no-vid."
+
+#: parameter/models/specie.py:19
+msgid "GDD harvest max"
+msgstr "GDD máximo de cosecha"
+
+#: parameter/models/specie.py:20
+msgid "Base 10°C desde brotación. Ej: Malbec 1700. Vacío para no-vid."
+msgstr "Base 10°C desde brotación. Ej: Malbec 1700. Vacío para no-vid."
+
+#: parameter/models/specie.py:28
 msgid "species"
 msgstr "Especies"
 
@@ -1004,20 +1506,45 @@ msgstr "Tipo de variables tecnicas de cultivo"
 msgid "types variables crop techniques"
 msgstr "Tipos de variables tecnicas de cultivo"
 
-#: parameter/models/var_crop_technique.py:12
+#: parameter/models/var_crop_technique.py:14
+#, fuzzy
+#| msgid "stage name"
+msgid "field name"
+msgstr "Nombre del estadio"
+
+#: parameter/models/var_crop_technique.py:16
+msgid ""
+"ORM field name used to read this variable from DailySummary or "
+"OpenMeteoHourly (e.g. \"wind_gusts\", \"tmin\"). Leave blank when name "
+"already matches the field."
+msgstr ""
+
+#: parameter/models/var_crop_technique.py:21
 msgid "is manual"
 msgstr "Es manual"
 
-#: parameter/models/var_crop_technique.py:12
+#: parameter/models/var_crop_technique.py:21
 msgid ""
 "Indicates if the variable is entered manually or calculated automatically"
-msgstr "Indique si la variable se carga manual o automaticamente"
+msgstr "Indica si la variable se carga manual o automáticamente"
 
-#: parameter/models/var_crop_technique.py:18
+#: parameter/models/var_crop_technique.py:22
+msgid "is climatic"
+msgstr "Es climática"
+
+#: parameter/models/var_crop_technique.py:22
+msgid ""
+"Marks this variable as a meteorological/climatic variable, available for "
+"mapping to external weather stations."
+msgstr ""
+"Marca esta variable como meteorológica/climática, disponible para el mapeo "
+"con estaciones externas."
+
+#: parameter/models/var_crop_technique.py:28
 msgid "variable crop technique"
 msgstr "Variable técnica de cultivo"
 
-#: parameter/models/var_crop_technique.py:19
+#: parameter/models/var_crop_technique.py:29
 msgid "variables crop techniques"
 msgstr "Variables técnicas de cultivo"
 
@@ -1037,7 +1564,7 @@ msgstr "Centros de costo"
 msgid "number id"
 msgstr "Numero (ID)"
 
-#: producer/models/country_side.py:16 producer/models/lot.py:20
+#: producer/models/country_side.py:16 producer/models/lot.py:21
 msgid "hectares"
 msgstr "Hectareas"
 
@@ -1049,33 +1576,37 @@ msgstr "Observación"
 msgid "countrysides"
 msgstr "Campos"
 
-#: producer/models/lot.py:23
-msgid "observatios"
+#: producer/models/lot.py:24
+msgid "observations"
 msgstr "Observaciones"
 
-#: producer/models/lot.py:25
+#: producer/models/lot.py:26
 msgid "lotRating"
 msgstr "Calificación de lote"
 
-#: producer/models/lot.py:26
-msgid "Last operation"
-msgstr "Ultima operación"
+#: producer/models/lot.py:27
+msgid "last variety"
+msgstr ""
 
-#: producer/models/lot.py:29
+#: producer/models/lot.py:30
 msgid "ubication"
 msgstr "Ubicacion"
 
-#: producer/models/lot.py:30
+#: producer/models/lot.py:31
 msgid "delimitation"
 msgstr "Delimitación"
 
-#: producer/models/lot.py:41
+#: producer/models/lot.py:35
+msgid "external station"
+msgstr "Estación externa"
+
+#: producer/models/lot.py:52
 msgid "lots"
 msgstr "Lotes"
 
 #: producer/models/staff.py:16
 msgid "inactive"
-msgstr "Aciva"
+msgstr "Inactivo"
 
 #: producer/models/staff.py:17 producer/models/staff.py:32
 msgid "discharged"
@@ -1127,7 +1658,7 @@ msgstr "Transportista"
 
 #: sale/models/carrier_provider.py:14
 msgid "Carriers"
-msgstr "Transportista"
+msgstr "Transportistas"
 
 #: sale/models/driver.py:17
 msgid "carrier"
@@ -1159,11 +1690,11 @@ msgstr "Especie"
 
 #: sale/models/sales_receipt.py:27
 msgid "subtotal"
-msgstr "subtotal"
+msgstr "Subtotal"
 
 #: sale/models/sales_receipt.py:37
 msgid "sales receipt"
-msgstr "Cromprobante de ventas"
+msgstr "Comprobante de ventas"
 
 #: sale/models/sales_receipt.py:38
 msgid "sales receipts"
@@ -1189,7 +1720,7 @@ msgstr ""
 
 #: templates/account/email_confirm.html:22
 msgid "Confirm"
-msgstr "Confirmada"
+msgstr "Confirmar"
 
 #: templates/account/email_confirm.html:29
 #, python-format
@@ -1302,11 +1833,11 @@ msgstr "Disponibilidad de insumos (Actual vs Proyectada)"
 
 #: templates/admin/input/charts.html:47
 msgid "Stock Evolution Over Time"
-msgstr "Evolución de las acciones a lo largo del tiempo"
+msgstr "Evolución del stock a lo largo del tiempo"
 
 #: templates/admin/input/charts.html:51
 msgid "Select Input"
-msgstr "Seleccionar entrada"
+msgstr "Seleccionar insumo"
 
 #: templates/admin/input/charts.html:53
 msgid "All"
@@ -1330,7 +1861,7 @@ msgstr "Stock de seguridad"
 
 #: templates/admin/input/charts.html:145
 msgid "Quantity"
-msgstr "Cntidad"
+msgstr "Cantidad"
 
 #: templates/admin/login.html:25
 #, python-format
@@ -1343,11 +1874,11 @@ msgstr ""
 
 #: templates/admin/login.html:75
 msgid "Forgotten your password or username?"
-msgstr "Olvidaste tu contraseña o nombre de usuario"
+msgstr "¿Olvidaste tu contraseña o nombre de usuario?"
 
 #: templates/admin/login.html:83
 msgid "Log in"
-msgstr "Iniciar sesion"
+msgstr "Iniciar sesión"
 
 #: user/apps.py:7
 msgid "users"
@@ -1403,7 +1934,7 @@ msgstr "Organización"
 
 #: user/models/user_producer.py:20
 msgid "prefix"
-msgstr "prefijo"
+msgstr "Prefijo"
 
 #: user/models/user_producer.py:21
 msgid "sequence"
@@ -1421,6 +1952,183 @@ msgstr "Productores"
 #: weather/models/weather_data.py:50
 msgid "weather data"
 msgstr "Datos climatológicos"
+
+#: weather/models/daily_summary.py:45
+msgid "min temperature (°C)"
+msgstr "Temperatura mínima (°C)"
+
+#: weather/models/daily_summary.py:46
+msgid "max temperature (°C)"
+msgstr "Temperatura máxima (°C)"
+
+#: weather/models/daily_summary.py:49
+msgid "avg humidity (%)"
+msgstr "Humedad relativa promedio (%)"
+
+#: weather/models/daily_summary.py:50
+msgid "rainfall (mm)"
+msgstr "Precipitación (mm)"
+
+#: weather/models/daily_summary.py:51
+msgid "ETo (mm)"
+msgstr "ETo (mm)"
+
+#: weather/models/daily_summary.py:54
+#, fuzzy
+#| msgid "wind speed (km/h)"
+msgid "max wind speed (km/h)"
+msgstr "Velocidad del viento (km/h)"
+
+#: weather/models/daily_summary.py:55
+#, fuzzy
+#| msgid "wind gusts (km/h)"
+msgid "max wind gusts (km/h)"
+msgstr "Ráfagas (km/h)"
+
+#: weather/models/daily_summary.py:59
+msgid "hours HR ≥ 90%"
+msgstr "Horas con HR ≥ 90%"
+
+#: weather/models/daily_summary.py:61
+msgid "hours T 21–30 °C (oidio)"
+msgstr "Horas con T 21–30 °C (oídio)"
+
+#: weather/models/daily_summary.py:67
+msgid "source"
+msgstr "Fuente"
+
+#: weather/models/daily_summary.py:73
+msgid "daily summary"
+msgstr "Resumen diario"
+
+#: weather/models/daily_summary.py:74
+msgid "daily summaries"
+msgstr "Resúmenes diarios"
+
+#: weather/models/open_meteo_hourly.py:19
+#: weather/models/station_external_variable.py:19
+msgid "station"
+msgstr "Estación"
+
+#: weather/models/open_meteo_hourly.py:21
+msgid "datetime"
+msgstr "Fecha y hora"
+
+#: weather/models/open_meteo_hourly.py:24
+msgid "temperature (°C)"
+msgstr "Temperatura (°C)"
+
+#: weather/models/open_meteo_hourly.py:25
+msgid "relative humidity (%)"
+msgstr "Humedad relativa (%)"
+
+#: weather/models/open_meteo_hourly.py:26
+msgid "wind speed (km/h)"
+msgstr "Velocidad del viento (km/h)"
+
+#: weather/models/open_meteo_hourly.py:27
+msgid "wind direction (°)"
+msgstr "Dirección del viento (°)"
+
+#: weather/models/open_meteo_hourly.py:28
+msgid "wind gusts (km/h)"
+msgstr "Ráfagas (km/h)"
+
+#: weather/models/open_meteo_hourly.py:29
+msgid "precipitation (mm)"
+msgstr "Precipitación (mm)"
+
+#: weather/models/open_meteo_hourly.py:30
+msgid "CAPE (J/kg)"
+msgstr "CAPE (J/kg)"
+
+#: weather/models/open_meteo_hourly.py:31
+msgid "ETo FAO-56 (mm)"
+msgstr "ETo FAO-56 (mm)"
+
+#: weather/models/open_meteo_hourly.py:36
+msgid "delta T (°C/h)"
+msgstr "Delta T (°C/h)"
+
+#: weather/models/open_meteo_hourly.py:37
+msgid "Temperature change vs previous hour. Negative = drop."
+msgstr "Cambio de temperatura respecto a la hora anterior. Negativo = caída."
+
+#: weather/models/open_meteo_hourly.py:41
+msgid "wind direction change (°/h)"
+msgstr "Cambio de dirección del viento (°/h)"
+
+#: weather/models/open_meteo_hourly.py:42
+msgid "Angular wind direction change vs previous hour (0–180°)."
+msgstr ""
+"Cambio angular de dirección del viento respecto a la hora anterior (0–180°)."
+
+#: weather/models/open_meteo_hourly.py:46
+msgid "extra data"
+msgstr "Datos adicionales"
+
+#: weather/models/open_meteo_hourly.py:51
+#: weather/models/open_meteo_hourly.py:52
+msgid "Open-Meteo hourly data"
+msgstr "Datos horarios de Open-Meteo"
+
+#: weather/models/station_external.py:11 weather/models/station_weather.py:20
+msgid "latitude"
+msgstr "Latitud"
+
+#: weather/models/station_external.py:12 weather/models/station_weather.py:21
+msgid "longitude"
+msgstr "Longitud"
+
+#: weather/models/station_external.py:14
+msgid "forecast days"
+msgstr "Días de pronóstico"
+
+#: weather/models/station_external.py:17
+msgid ""
+"Number of days to forecast (Per default, only 7 days are returned. Up to 16 "
+"days of forecast are possible)"
+msgstr "Número de días a pronosticar (por defecto 7 días, hasta 16 posibles)"
+
+#: weather/models/station_external.py:19
+msgid ""
+"Variable to be retrieved from the external station (e.g., temperature, "
+"humidity, etc.)"
+msgstr ""
+"Variable a obtener de la estación externa (ej: temperatura, humedad, etc.)"
+
+#: weather/models/station_external.py:20
+msgid "url"
+msgstr "URL"
+
+#: weather/models/station_external.py:20
+msgid "URL of the external station API endpoint"
+msgstr "URL del endpoint de la API de la estación externa"
+
+#: weather/models/station_external.py:26
+msgid "weather station external"
+msgstr "Estación meteorológica externa"
+
+#: weather/models/station_external.py:27
+msgid "weather stations external"
+msgstr "Estaciones meteorológicas externas"
+
+#: weather/models/station_external_variable.py:30
+msgid "source field"
+msgstr "Campo fuente"
+
+#: weather/models/station_external_variable.py:31
+msgid "Nombre exacto del campo en la respuesta de la API (ej: temperature_2m)."
+msgstr ""
+"Nombre exacto del campo en la respuesta de la API (ej: temperature_2m)."
+
+#: weather/models/station_external_variable.py:36
+msgid "station variable mapping"
+msgstr "Mapeo de variable de estación"
+
+#: weather/models/station_external_variable.py:37
+msgid "station variable mappings"
+msgstr "Mapeos de variables de estación"
 
 #: weather/models/station_weather.py:10
 msgid "1 minute"
@@ -1450,21 +2158,13 @@ msgstr "2 horas"
 msgid "passkey"
 msgstr "Passkey"
 
-#: weather/models/station_weather.py:20
-msgid "latitude"
-msgstr "Latitud"
-
-#: weather/models/station_weather.py:21
-msgid "longitude"
-msgstr "Longitud"
-
 #: weather/models/station_weather.py:25
 msgid "save interval (minutes)"
 msgstr "Intervalo de registro de datos"
 
 #: weather/models/station_weather.py:33
 msgid "weather stations"
-msgstr "Estaciones meteorologicas"
+msgstr "Estaciones meteorológicas"
 
 #: weather/models/weather_data.py:11
 msgid "timestamp"
@@ -1496,7 +2196,7 @@ msgstr "Dirección del viento"
 
 #: weather/models/weather_data.py:31
 msgid "rain rate"
-msgstr "Intencidad de lluvia"
+msgstr "Intensidad de lluvia"
 
 #: weather/models/weather_data.py:32
 msgid "rain total"
@@ -1520,6 +2220,43 @@ msgstr "Radiación solar"
 
 #: weather/models/weather_data.py:42
 msgid "raw data"
-msgstr "Datos"
+msgstr "Datos crudos"
 
+#~ msgid "activity"
+#~ msgstr "Actividad"
 
+#~ msgid "activities"
+#~ msgstr "Actividades"
+
+#~ msgid "activity "
+#~ msgstr "Actividad"
+
+#~ msgid "Last operation"
+#~ msgstr "Ultima operación"
+
+#~ msgid "variable one"
+#~ msgstr "Primera variable"
+
+#~ msgid "max variable one"
+#~ msgstr "Maximo de la primera variable"
+
+#~ msgid "variable two"
+#~ msgstr "Segunda variable"
+
+#~ msgid "min variable two"
+#~ msgstr "Minimo de la segunda variable"
+
+#~ msgid "max variable two"
+#~ msgstr "Maximo de la segunda variable"
+
+#~ msgid "variable three"
+#~ msgstr "Tercera variable"
+
+#~ msgid "min variable three"
+#~ msgstr "Minimo de tercera variable"
+
+#~ msgid "max variable three"
+#~ msgstr "Maximo de tercera variable"
+
+#~ msgid "observatios"
+#~ msgstr "Observaciones"

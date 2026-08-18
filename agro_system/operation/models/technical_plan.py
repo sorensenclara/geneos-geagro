@@ -1,7 +1,7 @@
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .activity import Activity
+from .variety import Variety
 from parameter.models.area import Area
 
 
@@ -15,7 +15,7 @@ class TechnicalPlan(models.Model):
     detail = models.TextField(null=True, blank=True,  verbose_name= _('detail'))
     # Referencia para los cálculos proporcionales
     hectares = models.FloatField(verbose_name= _('proportion of hectares'), default=10)
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE,verbose_name= _('activity '))
+    activity = models.ForeignKey(Variety, on_delete=models.CASCADE, verbose_name=_('variety'))
     area = models.ForeignKey(Area, on_delete=models.CASCADE, verbose_name= _('area'))
     # Permite filtrar planes específicos de las empresas que no se comparten.
     active = models.BooleanField(default=True, verbose_name= _('active') )

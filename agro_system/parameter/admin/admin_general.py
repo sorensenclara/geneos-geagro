@@ -12,8 +12,6 @@ from parameter.models.cultivation_state import CiltivationState
 from parameter.models.ot_state import OTState
 from parameter.models.port import Port
 from parameter.models.var_crop_technique import VarCropTechnique
-from parameter.models.specie import Specie
-from parameter.models.area import Area
 from parameter.models.measure_unit import MaensureUnit
 from parameter.models.currency import Currency
 from parameter.models.exchange_rate import exchangeRate
@@ -31,9 +29,14 @@ adminSite.register(Action)
 adminSite.register(CiltivationState)
 adminSite.register(OTState)
 adminSite.register(Port)
-adminSite.register(VarCropTechnique)
-adminSite.register(Specie)
-adminSite.register(Area)
+class VarCropTechniqueAdmin(admin.ModelAdmin):
+    list_display  = ("name", "type", "is_manual", "is_climatic")
+    list_filter   = ("is_climatic", "is_manual", "type")
+    search_fields = ("name",)
+
+adminSite.register(VarCropTechnique, VarCropTechniqueAdmin)
+
+
 adminSite.register(MaensureUnit)
 adminSite.register(Currency)
 adminSite.register(exchangeRate)

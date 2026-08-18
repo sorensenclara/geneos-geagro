@@ -16,6 +16,7 @@ from parameter.models.campaign import Campaing
 from producer.models.staff import Staff
 
 from alert.models.alert import Alert
+from alert.models.indicator import Indicator
 
 
 @login_required
@@ -92,68 +93,82 @@ def TechnicalPlanView(request):
         ).order_by('-id').first()
 
 
-    work_orders = WorkOrder.objects.none()
+    _completed_q = (
+        Q(stateOT__name__icontains='COMPLET') |
+        Q(stateOT__name__icontains='FINALIZ') |
+        Q(stateOT__name__icontains='REALIZ')
+    )
+
+    work_orders = WorkOrder.active.none()
 
     if selected_crop:
-        work_orders = WorkOrder.objects.filter(crop=selected_crop)
-
+        work_orders = WorkOrder.active.filter(crop=selected_crop)
         if selected_campaing:
             work_orders = work_orders.filter(campaing_id=selected_campaing.id)
 
+    def _inputs_str(order):
+        parts = []
+        for iwo in InputWorkOrder.objects.filter(work_order=order).select_related("input__unit_measure"):
+            unit = str(iwo.input.unit_measure) if iwo.input.unit_measure_id else ""
+            parts.append(f"{iwo.input.name} — {iwo.dose} {unit}".strip())
+        return " | ".join(parts) if parts else "Sin insumos"
 
-    orders = []
+    def _order_row(order):
+        return {
+            "order": order,
+            "inputs_str": _inputs_str(order),
+        }
 
-    for order in work_orders:
-        input_work_orders = InputWorkOrder.objects.filter(work_order=order)
+    pending_orders  = [_order_row(o) for o in work_orders.exclude(_completed_q).order_by("date_init")]
+    completed_orders = [_order_row(o) for o in work_orders.filter(_completed_q).order_by("-date_init")]
 
-        orders.append({
-            'work_order': order,
-            'input_work_orders': input_work_orders,
-        })
-
+    # ID del registro Staff del usuario logueado (para highlight de "mis órdenes")
+    current_staff_id = None
+    if user.type == 'Staff':
+        _my_staff = Staff.objects.filter(user=user).first()
+        if _my_staff:
+            current_staff_id = _my_staff.pk
 
     today = date.today()
 
     next_work_order = work_orders.filter(
         date_init__gte=today
-    ).order_by('date_init').first()
+    ).exclude(_completed_q).order_by('date_init').first()
 
     if not next_work_order:
-        next_work_order = work_orders.exclude(
-            Q(stateOT__name__icontains='COMPLET') |
-            Q(stateOT__name__icontains='FINALIZ') |
-            Q(stateOT__name__icontains='REALIZ')
-        ).order_by('date_init').first()
+        next_work_order = work_orders.exclude(_completed_q).order_by('date_init').first()
 
 
     work_orders_total = work_orders.count()
-
-    work_orders_completed = work_orders.filter(
-        Q(stateOT__name__icontains='COMPLET') |
-        Q(stateOT__name__icontains='FINALIZ') |
-        Q(stateOT__name__icontains='REALIZ')
-    ).count()
-
+    work_orders_completed = work_orders.filter(_completed_q).count()
     work_orders_pending = work_orders_total - work_orders_completed
-
-    if work_orders_total > 0:
-        work_orders_completed_percent = round(
-            (work_orders_completed / work_orders_total) * 100
-        )
-    else:
-        work_orders_completed_percent = 0
+    work_orders_completed_percent = (
+        round((work_orders_completed / work_orders_total) * 100) if work_orders_total else 0
+    )
 
 
-    alerts = Alert.objects.none()
+    alerts = Alert.active.none()
 
     if selected_crop:
-        alerts = Alert.objects.filter(
+        alerts = Alert.active.filter(
             crop=selected_crop
         ).order_by('-date')
 
     alerts_count = alerts.count()
 
     next_alert = alerts.first()
+
+    # Ventana de aplicación: muestra verde si no hay alerta activa del indicador
+    ventana_nivel = None
+    if selected_crop:
+        ventana_ind = Indicator.objects.filter(name="ventana_aplicacion").first()
+        if ventana_ind:
+            ventana_alert = Alert.active.filter(
+                crop=selected_crop,
+                indicator=ventana_ind,
+            ).order_by("-date").first()
+            ventana_nivel = ventana_alert.level if ventana_alert else "verde"
+
     why_now_title = "Según planificación técnica"
     why_now_text = "Esta acción está programada dentro del plan técnico del cultivo."
 
@@ -224,7 +239,8 @@ def TechnicalPlanView(request):
             })
 
     data = {
-        'data_work_orders': orders,
+        'pending_orders':   pending_orders,
+        'completed_orders': completed_orders,
         'work_orders': work_orders,
 
         'country_sides': country_sides,
@@ -254,6 +270,9 @@ def TechnicalPlanView(request):
         'next_alert': next_alert,
         'why_now_title': why_now_title,
         'why_now_text': why_now_text,
+
+        'current_staff_id': current_staff_id,
+        'ventana_nivel': ventana_nivel,
     }
 
     return render(request, 'pages/plan.html', data)

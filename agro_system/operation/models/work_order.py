@@ -10,7 +10,15 @@ from producer.models.staff import Staff
 
 
 
+class ActiveWorkOrderManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().exclude(stateOT__name="Cancelada")
+
+
 class WorkOrder(models.Model):
+
+    objects = models.Manager()
+    active  = ActiveWorkOrderManager()
 
     types = [
         ('TPW', _('Third-Party Work')),
@@ -38,7 +46,14 @@ class WorkOrder(models.Model):
     # Si es una labor de socios detallar el contratista
     partner =  models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, related_name="partner_wo", null=True, blank=True, verbose_name= _('partner'))
     producer = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, verbose_name= _('producer'))
-    
+    alert = models.ForeignKey(
+        'alert.Alert',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='work_orders',
+        verbose_name=_('alert'),
+    )
+
     @property
     def init_order(self):
         return datetime.combine(self.date_init,  time(9, 0))

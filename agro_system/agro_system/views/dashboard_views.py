@@ -1,6 +1,10 @@
+import logging
+
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 from producer.models.lot import Lot
 from producer.models.country_side import Countryside
@@ -16,7 +20,45 @@ from weather.models.weather_data import WeatherData
 from weather.models.station_weather import WeatherStation
 
 from alert.models.alert import Alert
+from alert.models.alert_profile_indicator import AlertProfileIndicator
+from alert.models.indicator import Indicator
 from operation.models.input_work_order import InputWorkOrder
+
+from crop_monitoring.models.phenological_state import PhenologicalState
+from crop_monitoring.models.biofix import Biofix
+
+# Alertas relevantes por etapa BBCH — informa el panel del dashboard
+_ALERTS_BY_BBCH = {
+    "07-09": ["helada", "zonda", "ventana_aplicacion"],
+    "11-15": ["helada", "zonda", "ventana_aplicacion"],
+    "53-55": ["helada", "mildiu_primario", "lobesia", "ventana_aplicacion"],
+    "57":    ["helada", "mildiu_primario", "lobesia", "ventana_aplicacion"],
+    "60":    ["helada", "golpe_calor", "lobesia", "mildiu_primario", "ventana_aplicacion"],
+    "65":    ["helada", "golpe_calor", "lobesia", "botrytis", "mildiu_primario", "ventana_aplicacion"],
+    "69":    ["golpe_calor", "lobesia", "botrytis", "ventana_aplicacion"],
+    "71-73": ["estres_hidrico", "lobesia", "botrytis", "ventana_aplicacion"],
+    "75":    ["estres_hidrico", "lobesia", "botrytis", "ventana_aplicacion"],
+    "77-79": ["estres_hidrico", "lobesia", "botrytis", "ventana_aplicacion"],
+    "81":    ["estres_hidrico", "golpe_calor", "lobesia", "gdd_cosecha", "ventana_aplicacion"],
+    "83":    ["estres_hidrico", "golpe_calor", "lobesia", "gdd_cosecha", "ventana_aplicacion"],
+    "85":    ["estres_hidrico", "gdd_cosecha", "botrytis"],
+    "89":    ["estres_hidrico", "gdd_cosecha", "botrytis"],
+}
+
+_ALERT_LABELS = {
+    "helada":             "Helada",
+    "zonda":              "Zonda",
+    "ventana_aplicacion": "Ventana de aplicación",
+    "mildiu_primario":    "Mildiu primario",
+    "mildiu_secundario":  "Mildiu secundario",
+    "lobesia":            "Lobesia botrana",
+    "golpe_calor":        "Golpe de calor",
+    "botrytis":           "Botrytis",
+    "estres_hidrico":     "Estrés hídrico",
+    "granizo":            "Granizo",
+    "oidio":              "Oídio",
+    "gdd_cosecha":        "Ventana de cosecha",
+}
 
 # Panel principal
 @login_required
@@ -39,7 +81,7 @@ def DashboardView(request):
         country_sides = Countryside.objects.filter(producer=user)
         crops = Crop.objects.filter(producer=user)
 
-    elif user.type == 'Administration':
+    elif user.type == 'Administration' or user.is_superuser:
         country_sides = Countryside.objects.all()
         crops = Crop.objects.all()
 
@@ -102,22 +144,21 @@ def DashboardView(request):
     base_qs = WorkOrder.objects.none()
 
     if selected_crop:
-        base_qs = WorkOrder.objects.filter(crop=selected_crop)
+        base_qs = WorkOrder.active.filter(crop=selected_crop)
 
         if selected_campaing:
             base_qs = base_qs.filter(campaing=selected_campaing)
 
     elif selected_campaing:
-        base_qs = WorkOrder.objects.filter(campaing=selected_campaing)
+        base_qs = WorkOrder.active.filter(campaing=selected_campaing)
 
         if lots.exists():
             base_qs = base_qs.filter(crop__lot__in=lots)
 
     # =========================
-    # ine próximas actividades
-    # Solo muestra 3 órdenes en la card central
+    # Próximas actividades — pendientes (incluyendo vencidas no finalizadas)
     # =========================
-    work_orders = base_qs.order_by('date_init')[:3]
+    work_orders = base_qs.exclude(stateOT__name__iexact="Finalizada").order_by('date_init')[:3]
 
 
     # =========================
@@ -155,23 +196,12 @@ def DashboardView(request):
         if campaign_days_remaining < 0:
             campaign_days_remaining = 0
 
-    # Próxima acción:
-    # 1. Pendiente desde hoy en adelante
+    # Próxima acción: solo desde hoy en adelante, sin fallback al pasado
     next_work_order = base_qs.filter(
         date_init__gte=today
     ).exclude(
         stateOT__name__iexact="Finalizada"
     ).order_by('date_init').first()
-
-    # 2. Si no hay, cualquier pendiente
-    if not next_work_order:
-        next_work_order = base_qs.exclude(
-            stateOT__name__iexact="Finalizada"
-        ).order_by('date_init').first()
-
-    # 3. Si no hay, última finalizada
-    if not next_work_order:
-        next_work_order = base_qs.order_by('-date_init').first()
 
 
     insumos_faltantes = []
@@ -222,15 +252,119 @@ def DashboardView(request):
             # Asegurar que el listado de cultivos no quede vacío
             crops = Crop.objects.filter(campaing=selected_campaing)
 
-    alerts = Alert.objects.none()
+    alerts = Alert.active.none()
 
     if selected_crop:
-        alerts = Alert.objects.filter(crop=selected_crop).order_by('-date')
-
+        alerts = Alert.active.filter(crop=selected_crop).order_by('-date')
     elif selected_campaing:
-        alerts = Alert.objects.filter(crop__campaing=selected_campaing).order_by('-date')
+        alerts = Alert.active.filter(crop__campaing=selected_campaing).order_by('-date')
+    alerts_today    = alerts.filter(date=today, is_forecast=False)
+    alerts_forecast = alerts.filter(date__gt=today, is_forecast=True).order_by('date')
+    alerts_count    = alerts_today.count()
 
-    alerts_count = alerts.count()
+    # Ventana de aplicación: verde si no hay alerta activa del indicador
+    ventana_nivel = None
+    if selected_crop:
+        _ventana_ind = Indicator.objects.filter(name="ventana_aplicacion").first()
+        if _ventana_ind:
+            _ventana_alert = Alert.active.filter(
+                crop=selected_crop,
+                indicator=_ventana_ind,
+            ).order_by("-date").first()
+            ventana_nivel = _ventana_alert.level if _ventana_alert else "verde"
+
+    # ── Fenología ────────────────────────────────────────────────
+    vine_gdd               = None
+    current_stage          = None
+    next_stage             = None
+    phenological_timeline  = []
+    gdd_stage_percent      = 0
+    current_stage_alerts   = []
+    next_stage_alerts      = []
+
+    if selected_crop:
+        biofix_vine = Biofix.objects.filter(crop=selected_crop, counter=Biofix.COUNTER_VINE).first()
+        if biofix_vine is None:
+            logger.warning("Dashboard: sin biofix vine para crop %s", selected_crop.pk)
+        else:
+            try:
+                vine_gdd = float(biofix_vine.accumulator.accumulated_gdd)
+            except Exception as e:
+                logger.warning("Dashboard: sin acumulador para biofix %s → %s", biofix_vine.pk, e)
+
+        if vine_gdd is not None:
+            try:
+                current_stage = PhenologicalState.current_stage(vine_gdd)
+                next_stage    = PhenologicalState.next_stage(vine_gdd)
+
+                current_order = current_stage.order if current_stage else 0
+                for stage in PhenologicalState.objects.all():
+                    if stage.order < current_order:
+                        status = "past"
+                    elif stage.order == current_order:
+                        status = "current"
+                    else:
+                        status = "future"
+                    phenological_timeline.append({"stage": stage, "status": status})
+
+                if current_stage:
+                    stage_range = current_stage.gdd_to - current_stage.gdd_from
+                    if stage_range > 0:
+                        gdd_stage_percent = min(100, int(
+                            (vine_gdd - current_stage.gdd_from) / stage_range * 100
+                        ))
+
+                # Alertas del área (via AlertProfileIndicator) + indicadores propios del cultivo
+                area_alerts = {}
+                lot = selected_crop.lot
+                if lot and lot.area:
+                    try:
+                        profile = lot.area.alert_profile
+                        area_alerts = {
+                            pi.indicator.name: pi.status
+                            for pi in AlertProfileIndicator.objects.filter(
+                                profile=profile, status__in=("on", "vigilance")
+                            ).select_related("indicator")
+                        }
+                    except Exception:
+                        pass
+                # Crop-level indicators override/add with status "on"
+                for ind in selected_crop.indicators.all():
+                    area_alerts[ind.name] = "on"
+
+                def _alerts_for_bbch(bbch):
+                    return [
+                        {"key": k, "label": _ALERT_LABELS.get(k, k), "level": area_alerts.get(k)}
+                        for k in _ALERTS_BY_BBCH.get(bbch, [])
+                        if area_alerts.get(k) in ("on", "vigilance")
+                    ]
+
+                if current_stage:
+                    current_stage_alerts = _alerts_for_bbch(current_stage.bbch)
+
+                if next_stage:
+                    current_keys = {a["key"] for a in current_stage_alerts}
+                    next_stage_alerts = [
+                        a for a in _alerts_for_bbch(next_stage.bbch)
+                        if a["key"] not in current_keys
+                    ]
+
+            except Exception as e:
+                logger.exception("Dashboard: error en fenología para crop %s", selected_crop.pk)
+
+    # BBCH numérico para filtrar recomendaciones
+    bbch_code = None
+    if current_stage and current_stage.bbch:
+        try:
+            bbch_code = int(current_stage.bbch.split("-")[0])
+        except (ValueError, AttributeError):
+            pass
+
+    # Alertas de hoy + sus recomendaciones que aplican al nivel y BBCH actual
+    alerts_with_recs = []
+    for alert in alerts_today.select_related("indicator").prefetch_related("indicator__recommendations"):
+        recs = [r for r in alert.indicator.recommendations.all() if r.matches(alert.level, bbch_code)]
+        alerts_with_recs.append({"alert": alert, "recommendations": recs})
 
     lot_hectares_total = 0
     crop_hectares_planted = 0
@@ -285,7 +419,10 @@ def DashboardView(request):
         'work_orders': work_orders,
 
         'alerts': alerts,
+        'alerts_today': alerts_today,
+        'alerts_forecast': alerts_forecast,
         'alerts_count': alerts_count,
+        'alerts_with_recs': alerts_with_recs,
 
         'selected_countryside': country_side_selected,
         'selected_lot': selected_lot,
@@ -314,6 +451,17 @@ def DashboardView(request):
         'work_orders_pending': work_orders_pending,
         'work_orders_completed_percent': work_orders_completed_percent,
         'campaign_days_remaining': campaign_days_remaining,
+
+        # Fenología
+        'vine_gdd':              vine_gdd,
+        'current_stage':         current_stage,
+        'next_stage':            next_stage,
+        'phenological_timeline': phenological_timeline,
+        'gdd_stage_percent':     gdd_stage_percent,
+        'current_stage_alerts':  current_stage_alerts,
+        'next_stage_alerts':     next_stage_alerts,
+
+        'ventana_nivel': ventana_nivel,
     }
 
     return render(request, 'pages/dashboard.html', data)

@@ -1,49 +1,40 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  function scrollToActiveStageInstant() {
-    const active = document.querySelector(".accordion-collapse.show");
-    if (!active) return;
-
-    const yOffset = -110;
-    const y = active.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
-    window.scrollTo(0, y);
-  }
-
-  function openActivityById(activityId) {
-    const el = document.getElementById(activityId);
-    if (!el) return;
-
-    document.getElementById("activityDetailLabel").innerText = el.dataset.title || "Actividad";
-
-    document.getElementById("activityMeta").innerText =
-      (el.dataset.cat ? el.dataset.cat + " · " : "") +
-      (el.dataset.priority ? "Prioridad " + el.dataset.priority : "");
-
-    document.getElementById("activityWhat").innerText = el.dataset.what || "";
-    document.getElementById("activityWhy").innerText = el.dataset.why || "";
-    document.getElementById("activityInputs").innerText = el.dataset.inputs || "";
-    document.getElementById("activityWhen").innerText = el.dataset.when || "";
-    document.getElementById("activityRisks").innerText = el.dataset.risks || "";
-
-    const modalEl = document.getElementById("activityDetailModal");
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    modal.show();
-  }
-
   document.addEventListener("click", function (e) {
-    const target = e.target.closest("[data-open-activity]");
-    if (!target) return;
+    const btn = e.target.closest(".plan-detail-btn");
+    if (!btn) return;
 
-    e.preventDefault();
+    const d = btn.dataset;
 
-    const actId = target.dataset.openActivity;
+    document.getElementById("activityDetailLabel").textContent = d.service || "Orden de trabajo";
+    document.getElementById("activityMeta").textContent        = d.code   || "";
+    document.getElementById("moDateInit").textContent          = d.dateInit || "—";
+    document.getElementById("moDateFin").textContent           = d.dateFin  || "—";
+    document.getElementById("moStage").textContent             = d.stage   || "—";
+    document.getElementById("moStaff").textContent             = d.staff   || "—";
+    document.getElementById("moState").textContent             = d.state   || "—";
 
-    if (target.dataset.scroll === "1") {
-      scrollToActiveStageInstant();
+    const inputsRow = document.getElementById("moInputsRow");
+    const inputsEl  = document.getElementById("moInputs");
+    if (d.inputs && d.inputs.trim()) {
+      inputsEl.textContent = d.inputs;
+      inputsRow.style.display = "";
+    } else {
+      inputsRow.style.display = "none";
     }
 
-    openActivityById(actId);
+    const detailRow = document.getElementById("moDetailRow");
+    const detailEl  = document.getElementById("moDetail");
+    if (d.detail && d.detail.trim()) {
+      detailEl.textContent = d.detail;
+      detailRow.style.display = "";
+    } else {
+      detailRow.style.display = "none";
+    }
+
+    bootstrap.Modal.getOrCreateInstance(
+      document.getElementById("activityDetailModal")
+    ).show();
   });
 
 });

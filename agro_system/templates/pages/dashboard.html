@@ -32,22 +32,67 @@
   <div class="geagro-alertbar mb-4">
     <div class="geagro-alertbar-inner">
 
+      <!-- Alertas de hoy -->
       <div class="geagro-alertbar-left">
         <span class="geagro-alertbar-title">
           <i class="mdi mdi-bell-outline"></i>
-          Alertas
+          Hoy
         </span>
-
         <span class="geagro-alertbar-count">{{ alerts_count|default:"0" }}</span>
-
         <div class="geagro-alertbar-list">
-          {% for alert in alerts|slice:":3" %}
-            <span class="geagro-alert-pill">
-              <i class="mdi mdi-alert-outline"></i> {{ alert.name }}
+          {% for alert in alerts_today|slice:":3" %}
+            <span class="geagro-alert-pill geagro-alert-pill--now">
+              <i class="mdi mdi-alert-circle-outline"></i>
+              {{ alert.indicator.name }} — {{ alert.detail }}
             </span>
           {% empty %}
             <span class="geagro-alert-pill">
-              <i class="mdi mdi-check-circle-outline"></i> Sin alertas activas
+              <i class="mdi mdi-check-circle-outline"></i> Sin alertas hoy
+            </span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Ventana de aplicación -->
+      {% if ventana_nivel %}
+      <div class="geagro-alertbar-ventana">
+        <span class="geagro-alertbar-title">
+          <i class="mdi mdi-spray-bottle"></i>
+          Aplicación
+        </span>
+        <div class="geagro-alertbar-list">
+          {% if ventana_nivel == 'verde' %}
+            <span class="geagro-alert-pill geagro-alert-pill--verde">
+              <i class="mdi mdi-check-circle-outline"></i> Condiciones óptimas
+            </span>
+          {% elif ventana_nivel == 'warning' %}
+            <span class="geagro-alert-pill geagro-alert-pill--warning">
+              <i class="mdi mdi-alert-outline"></i> Precaución — revisá antes de aplicar
+            </span>
+          {% else %}
+            <span class="geagro-alert-pill geagro-alert-pill--rojo">
+              <i class="mdi mdi-close-circle-outline"></i> No aplicar ahora
+            </span>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Alertas de pronóstico -->
+      <div class="geagro-alertbar-forecast">
+        <span class="geagro-alertbar-title">
+          <i class="mdi mdi-clock-outline"></i>
+          Próximas
+        </span>
+        <div class="geagro-alertbar-list">
+          {% for alert in alerts_forecast|slice:":4" %}
+            <span class="geagro-alert-pill geagro-alert-pill--forecast">
+              <i class="mdi mdi-weather-cloudy-clock"></i>
+              {{ alert.date|date:"d/m" }} — {{ alert.indicator.name }}
+            </span>
+          {% empty %}
+            <span class="geagro-alert-pill">
+              <i class="mdi mdi-calendar-check-outline"></i> Sin alertas próximas
             </span>
           {% endfor %}
         </div>
@@ -63,34 +108,51 @@
 
       <!-- 1. RIESGO SANITARIO -->
       <div class="col-xl-3 col-md-6 geagro-kpi">
-        <div class="card h-100 geagro-card-risk {% if alerts_count %}risk-high{% else %}risk-low{% endif %}">
-          <div class="card-body">
+        <div class="card h-100 geagro-card-risk {% if alerts_with_recs %}risk-high{% else %}risk-low{% endif %}">
+          <div class="card-body d-flex flex-column">
 
             <div class="geagro-card-header">
               <h5 class="card-title">Riesgo sanitario</h5>
               <i class="mdi mdi-shield-alert-outline geagro-card-icon"></i>
             </div>
 
-            {% if alerts_count %}
-              <div class="risk-value">Alto</div>
-              <div class="geagro-kpi-meta">
-                {% for alert in alerts|slice:":1" %}
-                  {{ alert.name }}<br>
-                  {{ alert.date|date:"d/m/Y" }}
+            {% if alerts_with_recs %}
+              <div class="risk-level-summary">
+                <span class="risk-value-sm">Alto</span>
+                <span class="risk-count-pill">{{ alerts_with_recs|length }} alerta{{ alerts_with_recs|length|pluralize:"s" }}</span>
+              </div>
+              <div class="risk-alert-scroll">
+                {% for item in alerts_with_recs %}
+                  <div class="risk-alert-item risk-item-{{ item.alert.level }}">
+                    <div class="risk-alert-header">
+                      <span class="risk-alert-name">{{ item.alert.indicator.name }}</span>
+                      <span class="risk-level-chip risk-chip-{{ item.alert.level }}">
+                        {% if item.alert.level == "warning" %}Advertencia
+                        {% elif item.alert.level == "alert" %}Alerta
+                        {% elif item.alert.level == "critical" %}Crítico
+                        {% else %}{{ item.alert.level }}{% endif %}
+                      </span>
+                    </div>
+                    {% if item.recommendations %}
+                      <ul class="risk-rec-list">
+                        {% for rec in item.recommendations %}
+                          <li><i class="mdi mdi-lightbulb-on-outline"></i>{{ rec.text }}</li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                  </div>
                 {% endfor %}
               </div>
             {% else %}
               <div class="risk-value">Bajo</div>
-              <div class="geagro-kpi-meta">
-                Sin alertas sanitarias o climáticas activas.
-              </div>
+              <div class="geagro-kpi-meta">Sin alertas activas.</div>
             {% endif %}
 
-            <div class="geagro-card-footer">
-              {% if alerts_count %}
-                <span class="geagro-badge geagro-badge-danger">Atención</span>
+            <div class="geagro-card-footer mt-auto">
+              {% if alerts_with_recs %}
+                <span class="risk-badge">Atención</span>
               {% else %}
-                <span class="geagro-badge geagro-badge-success">Controlado</span>
+                <span class="risk-badge">Controlado</span>
               {% endif %}
               <a href="{% url 'alert' %}" class="small">Ver análisis</a>
             </div>
@@ -477,9 +539,471 @@
 
   </div>
 
+  <!-- FRANJA FENOLÓGICA -->
+  <div class="row g-3 mt-1">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="d-flex align-items-start justify-content-between mb-3">
+            <div>
+              <h4 class="card-title mb-1">Estado fenológico del cultivo</h4>
+              <div class="text-muted">
+                {% if selected_crop %}{{ selected_crop.activity }}{% endif %}
+                {% if vine_gdd %} · <strong>{{ vine_gdd|floatformat:0 }} GDD acumulados</strong>{% endif %}
+              </div>
+            </div>
+            <i class="mdi mdi-sprout font-size-24 text-success"></i>
+          </div>
+
+          {% if phenological_timeline %}
+
+            <!-- Timeline horizontal de etapas -->
+            <div class="pheno-timeline-wrap mb-3">
+              <div class="pheno-timeline">
+                {% for item in phenological_timeline %}
+                  <div class="pheno-step {{ item.status }}">
+                    <div class="pheno-dot"></div>
+                    <div class="pheno-label">
+                      <span class="pheno-bbch">BBCH {{ item.stage.bbch }}</span>
+                      <span class="pheno-name">{{ item.stage.stage_name }}</span>
+                    </div>
+                  </div>
+                  {% if not forloop.last %}
+                    <div class="pheno-connector {{ item.status }}"></div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Barra de progreso dentro de la etapa actual -->
+            {% if current_stage %}
+            <div class="mb-4">
+              <div class="d-flex justify-content-between small mb-1">
+                <span>Progreso en <strong class="text-success">BBCH {{ current_stage.bbch }} — {{ current_stage.stage_name }}</strong></span>
+                <span class="text-success fw-bold">{{ gdd_stage_percent }}%</span>
+              </div>
+              <div class="progress" style="height:6px;">
+                <div class="progress-bar bg-success" style="width:{{ gdd_stage_percent }}%;"></div>
+              </div>
+              <div class="d-flex justify-content-between text-muted small mt-1">
+                <span>{{ current_stage.gdd_from }} GDD</span>
+                <span>{{ vine_gdd|floatformat:0 }} GDD actuales</span>
+                <span>{{ current_stage.gdd_to }} GDD</span>
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Alertas: etapa actual | próxima etapa -->
+            <div class="row g-3">
+
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 border h-100">
+                  <div class="d-flex align-items-center mb-2 gap-2">
+                    <i class="mdi mdi-bell-ring-outline text-warning"></i>
+                    <strong>Alertas activas en esta etapa</strong>
+                  </div>
+                  {% if current_stage_alerts %}
+                    <div class="d-flex flex-wrap gap-2">
+                      {% for alert in current_stage_alerts %}
+                        <span class="badge {% if alert.level == 'on' %}bg-warning text-dark{% else %}bg-secondary{% endif %} d-flex align-items-center gap-1">
+                          {{ alert.label }}
+                          {% if alert.level == 'vigilance' %}<small class="opacity-75">(vigilancia)</small>{% endif %}
+                        </span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <span class="text-muted small">Ninguna configurada para esta etapa en el área.</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 border h-100" style="border-style:dashed !important;">
+                  <div class="d-flex align-items-center mb-2 gap-2">
+                    <i class="mdi mdi-bell-plus-outline text-info"></i>
+                    <strong>Se activan en la próxima etapa</strong>
+                    {% if next_stage %}<span class="text-muted small">(BBCH {{ next_stage.bbch }})</span>{% endif %}
+                  </div>
+                  {% if next_stage_alerts %}
+                    <div class="d-flex flex-wrap gap-2">
+                      {% for alert in next_stage_alerts %}
+                        <span class="badge {% if alert.level == 'on' %}bg-info text-dark{% else %}bg-secondary{% endif %} d-flex align-items-center gap-1">
+                          {{ alert.label }}
+                          {% if alert.level == 'vigilance' %}<small class="opacity-75">(vigilancia)</small>{% endif %}
+                        </span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <span class="text-muted small">Sin alertas nuevas al pasar a la siguiente etapa.</span>
+                  {% endif %}
+                </div>
+              </div>
+
+            </div>
+
+          {% else %}
+            <div class="text-muted text-center py-4">
+              <i class="mdi mdi-information-outline me-1"></i>
+              Sin biofix cargado para este cultivo. Ingresá la fecha de brotación para activar el motor fenológico.
+            </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- DEV: botón temporal para disparar ingesta Open-Meteo -->
+  <div class="row g-3 mt-1">
+    <div class="col-12">
+      <div class="card border-warning">
+        <div class="card-body d-flex align-items-center gap-3 py-2">
+          <span class="badge bg-warning text-dark">DEV</span>
+          <span class="text-muted small">Ingesta manual de datos Open-Meteo</span>
+          <a href="{% url 'fetch_open_meteo' %}" class="btn btn-sm btn-outline-warning ms-auto">
+            <i class="mdi mdi-cloud-download-outline me-1"></i>Fetch Open-Meteo
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 {% endblock content %}
+
+{% block extra_css %}
+<style>
+  /* ── Clima agronómico ── */
+  .wt-today-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px;
+    height: 100%;
+  }
+  .wt-today-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #6c757d;
+    margin-bottom: 8px;
+  }
+  .wt-source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    background: rgba(25,135,84,.1);
+    color: #198754;
+    padding: 2px 9px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  .wt-source-badge.wt-badge-api {
+    background: rgba(13,110,253,.1);
+    color: #0d6efd;
+  }
+  .wt-today-temps {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  .wt-tmax-big {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #e02424;
+    line-height: 1;
+  }
+  .wt-tmin-big {
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: #3b82f6;
+    line-height: 1;
+  }
+  .wt-sep {
+    font-size: 1.4rem;
+    color: #ced4da;
+    line-height: 1;
+  }
+  .wt-today-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .wt-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #495057;
+  }
+  .wt-meta-row i { font-size: 0.95rem; color: #6c757d; width: 16px; text-align: center; }
+
+  /* Forecast table */
+  .wt-forecast-wrap { height: 100%; }
+  .wt-section-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #6c757d;
+    margin-bottom: 8px;
+  }
+  .wt-forecast-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+  .wt-forecast-table th {
+    padding: 7px 10px;
+    text-align: left;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #6c757d;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+  }
+  .wt-forecast-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #f0f2f5;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .wt-forecast-table tr:last-child td { border-bottom: none; }
+  .wt-forecast-table tr:hover td { background: #f8f9fa; }
+  .wt-date-cell { color: #212529; font-weight: 500; }
+  .wt-tmax { color: #e02424; font-weight: 600; }
+  .wt-tmin { color: #3b82f6; font-weight: 600; }
+  .wt-rain { color: #1e40af; }
+  .wt-eto  { color: #16a34a; }
+
+  /* Past days */
+  .wt-past-section {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #dee2e6;
+  }
+  .wt-past-grid {
+    display: flex;
+    gap: 10px;
+  }
+  .wt-past-cell {
+    flex: 1;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px 12px;
+    min-width: 0;
+    border: 1px solid #e9ecef;
+  }
+  .wt-past-date {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 5px;
+  }
+  .wt-past-temps {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    margin-bottom: 4px;
+  }
+  .wt-sep-sm { color: #ced4da; font-size: 0.8rem; }
+  .wt-past-rain, .wt-past-hr {
+    font-size: 0.72rem;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 2px;
+  }
+  .wt-past-rain i { color: #1e40af; }
+  .wt-past-hr i { color: #6c757d; }
+  .wt-past-source {
+    font-size: 0.6rem;
+    color: #adb5bd;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* ── Riesgo sanitario — alertas + recomendaciones ── */
+  .risk-level-summary {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    margin: 4px 0 8px;
+  }
+  .risk-value-sm {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--risk-high);
+  }
+  .geagro-card-risk.risk-low .risk-value-sm { color: var(--risk-low); }
+  .risk-count-pill {
+    font-size: 0.67rem;
+    font-weight: 600;
+    background: rgba(224,36,36,.12);
+    color: var(--risk-high);
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .risk-alert-scroll {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: #dee2e6 transparent;
+    padding-right: 2px;
+  }
+  .risk-alert-item {
+    border-left: 3px solid #adb5bd;
+    padding: 5px 7px;
+    border-radius: 0 6px 6px 0;
+    background: #f8f9fa;
+  }
+  .risk-item-warning  { border-left-color: #d97706; background: #fffbeb; }
+  .risk-item-alert    { border-left-color: #e02424; background: #fff5f5; }
+  .risk-item-critical { border-left-color: #7c3aed; background: #f5f3ff; }
+  .risk-alert-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .risk-alert-name {
+    font-size: 0.77rem;
+    font-weight: 600;
+    color: #212529;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .risk-level-chip {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 999px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .risk-chip-warning  { background: #fef3c7; color: #92400e; }
+  .risk-chip-alert    { background: rgba(224,36,36,.14); color: #9b1c1c; }
+  .risk-chip-critical { background: rgba(124,58,237,.14); color: #5b21b6; }
+  .risk-rec-list {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .risk-rec-list li {
+    font-size: 0.68rem;
+    color: #6c757d;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    line-height: 1.35;
+  }
+  .risk-rec-list li i {
+    color: #d97706;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ── Timeline fenológica ── */
+  .pheno-timeline-wrap {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  .pheno-timeline {
+    display: flex;
+    align-items: flex-start;
+    min-width: max-content;
+    padding: 1rem 0.5rem 0.25rem;
+  }
+  .pheno-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 84px;
+    flex-shrink: 0;
+  }
+  .pheno-connector {
+    flex-shrink: 0;
+    width: 20px;
+    height: 2px;
+    margin-top: 11px;
+    background: #dee2e6;
+  }
+  .pheno-connector.past    { background: #6c757d; }
+  .pheno-connector.current { background: #198754; }
+
+  .pheno-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+    background: #fff;
+    flex-shrink: 0;
+    transition: box-shadow .2s;
+  }
+  .pheno-step.past    .pheno-dot { background: #6c757d; border-color: #6c757d; }
+  .pheno-step.current .pheno-dot {
+    background: #198754;
+    border-color: #198754;
+    width: 28px;
+    height: 28px;
+    box-shadow: 0 0 0 5px rgba(25,135,84,.18);
+  }
+  .pheno-step.future .pheno-dot { border-style: dashed; border-color: #adb5bd; }
+
+  .pheno-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 6px;
+    gap: 2px;
+  }
+  .pheno-bbch {
+    font-size: 0.64rem;
+    font-weight: 700;
+    color: #495057;
+    white-space: nowrap;
+  }
+  .pheno-step.current .pheno-bbch { color: #198754; }
+  .pheno-step.past    .pheno-bbch { color: #6c757d; }
+  .pheno-step.future  .pheno-bbch { color: #adb5bd; }
+
+  .pheno-name {
+    font-size: 0.6rem;
+    color: #6c757d;
+    line-height: 1.2;
+    max-width: 76px;
+    text-align: center;
+  }
+  .pheno-step.current .pheno-name { color: #198754; font-weight: 600; }
+  .pheno-step.future  .pheno-name { color: #adb5bd; }
+</style>
+{% endblock extra_css %}
 
 {% block extra_javascript %}
   <script src="{% static 'libs/morris.js/morris.min.js' %}"></script>

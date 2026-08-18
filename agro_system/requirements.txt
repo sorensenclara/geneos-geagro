@@ -48,7 +48,7 @@ pyhanko-certvalidator==0.28.0
 PyJWT==2.10.1
 pypdf==6.0.0
 python-bidi==0.6.6
-python-environ==0.4.54
+django-environ==0.11.2
 python-monkey-business==1.1.0
 PyYAML==6.0.2
 reportlab==4.4.3

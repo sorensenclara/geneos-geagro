@@ -25,7 +25,7 @@ from django.views.generic import RedirectView
 from operation.views import calendar_json, calendar_view
 from django.contrib.auth.decorators import login_required
 from .views.user_views import MyPasswordChangeView, MyPasswordSetView
-from weather.views import weather_ingest
+from weather.views.station_weather import weather_ingest
 
 
 urlpatterns = [

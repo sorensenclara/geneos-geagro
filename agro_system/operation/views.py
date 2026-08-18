@@ -41,7 +41,7 @@ def WorkOrderPDFView(request):
 
 
 def calendar_json(request):
-    orders = WorkOrder.objects.all()
+    orders = WorkOrder.active.all()
     data = []
     for order in orders:
         data.append({

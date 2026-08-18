@@ -2,9 +2,9 @@ from django.shortcuts import render
 # views.py
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import WeatherData
+from weather.models.weather_data import WeatherData
 from datetime import datetime, timezone as dt_timezone, timedelta
-from .models.station_weather import WeatherStation
+from weather.models.station_weather import WeatherStation
 
 
 def to_float(val):

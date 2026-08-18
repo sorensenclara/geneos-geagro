@@ -87,10 +87,10 @@ def AlertView(request):
             campaing_id=selected_campaing.id
         ).order_by('-id').first()
 
-    alerts = Alert.objects.none()
+    alerts = Alert.active.none()
 
     if selected_crop:
-        alerts = Alert.objects.filter(
+        alerts = Alert.active.filter(
             crop=selected_crop
         ).order_by('-date')
 

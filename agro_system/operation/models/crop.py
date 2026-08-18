@@ -3,7 +3,7 @@ from producer.models.country_side import Countryside
 from parameter.models.area import Area
 from django.utils.translation import gettext_lazy as _
 from producer.models.staff import Staff
-from operation.models.activity import Activity
+from operation.models.variety import Variety
 from parameter.models.campaign import Campaing
 from producer.models.lot import Lot
 from parameter.models.cultivation_state import CiltivationState
@@ -20,7 +20,7 @@ class Crop(models.Model):
     countryside = models.ForeignKey(Countryside, models.CASCADE,verbose_name = _('countryside'))
     area = models.ForeignKey(Area, models.CASCADE,verbose_name = _('area'))
     lot = models.ForeignKey(Lot, models.CASCADE,verbose_name = _('lot'))
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, verbose_name = _('activity'))
+    activity = models.ForeignKey(Variety, on_delete=models.CASCADE, verbose_name=_('variety'))
     responsible = models.ForeignKey(Staff, models.CASCADE,verbose_name = _('responsible'))
     state = models.ForeignKey(CiltivationState, models.CASCADE, verbose_name = _('state'))
     hectares_productive = models.FloatField(default=0, verbose_name = _('hectares productive'))
@@ -37,6 +37,7 @@ class Crop(models.Model):
     producer = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, verbose_name = _('producer'))
     indicators = models.ManyToManyField('alert.Indicator', verbose_name = _('indicators'), null=True, blank=True)
     is_main = models.BooleanField(default=False, verbose_name = _('is main crop'), help_text=_('Indicates if this crop is the main crop of the staff. Only one crop can be the main crop for a staff.'))
+
 
 
     def __str__(self):
