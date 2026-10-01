@@ -96,6 +96,23 @@ class SalesReceiptAdmin(ProducerAwareMixin, admin.ModelAdmin):
     inlines = [SaleStockAllocationInline]
     actions = [confirmar_venta]
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        producers = self._producers_for_user(request)
+        if producers is not None:
+            from django.db.models import Q
+            if db_field.name == 'cost_center':
+                from producer.models.cost_center import CostCenter
+                kwargs['queryset'] = CostCenter.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
+            elif db_field.name == 'provider':
+                from input.models.provider import Provider
+                kwargs['queryset'] = Provider.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
+            elif db_field.name == 'driver':
+                # El chofer pertenece a un transportista: se ven los de transportistas propios o compartidos
+                from sale.models.driver import Driver
+                kwargs['queryset'] = Driver.objects.filter(
+                    Q(provider__producer__in=producers) | Q(provider__producer__isnull=True))
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def save_model(self, request, obj, form, change):
         # Asigna por defecto el usuario productor logueado
         userProducer = get_producer_for_request(request)

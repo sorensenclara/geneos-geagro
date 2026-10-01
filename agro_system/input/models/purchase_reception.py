@@ -18,10 +18,12 @@ class PurchaseReception(models.Model):
     delivery_date = models.DateField(null=True, blank=True, verbose_name = _('delivery date'))
     reference = models.CharField(max_length=100, null=True, blank=True, verbose_name = _('reference'))
     state = models.CharField('Estado', max_length=7, choices=states, default='pending')
-    store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name = _('store'))
+    store = models.ForeignKey(Store, on_delete=models.CASCADE, blank=True, verbose_name = _('store'))
     producer = models.ForeignKey('user.UserProducer', on_delete=models.RESTRICT, verbose_name= _('producer'))
 
     def save(self, *args, **kwargs):
+        if not self.store_id:
+            self.store = Store.get_default(self.producer if self.producer_id else None)
         is_new = self.pk is None
         super().save(*args, **kwargs)
         if is_new and not self.code:

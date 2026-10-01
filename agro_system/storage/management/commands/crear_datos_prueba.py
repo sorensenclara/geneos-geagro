@@ -46,7 +46,7 @@ class Command(BaseCommand):
         self.lot_rating, _ = LotRating.objects.get_or_create(name='Alta')
         self.gender, _ = Gender.objects.get_or_create(name='Masculino')
         self.type_staff, _ = TypeStaff.objects.get_or_create(name='Administración')
-        self.cost_center, _ = CostCenter.objects.get_or_create(name='Centro Prueba Acopio')
+        self.cost_center, _ = CostCenter.objects.get_or_create(name='Centro Prueba Acopio', producer=None)
         Currency.objects.get_or_create(name='Peso Argentino')
         Port.objects.get_or_create(name='Rosario', defaults={'city': self.city})
 
@@ -70,7 +70,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('  ✓'))
 
     # ------------------------------------------------------------------ #
-    # Parámetros de cultivo: specie, activity, state, campaign            #
+    # Parámetros de cultivo: specie, variety, state, campaign            #
     # ------------------------------------------------------------------ #
     def _parametros_cultivo(self):
         self.stdout.write('→ Especies, actividades, estados, campaña...')
@@ -78,18 +78,18 @@ class Command(BaseCommand):
         from parameter.models.specie import Specie
         from parameter.models.campaign import Campaing
         from parameter.models.cultivation_state import CiltivationState
-        from operation.models.activity import Activity
+        from operation.models.variety import Variety
 
         soja, _ = Specie.objects.get_or_create(name='Soja')
         trigo, _ = Specie.objects.get_or_create(name='Trigo')
         maiz, _ = Specie.objects.get_or_create(name='Maíz')
         Specie.objects.get_or_create(name='Girasol')
 
-        self.act_soja, _ = Activity.objects.get_or_create(
+        self.variety_soja, _ = Variety.objects.get_or_create(
             name='Cosecha Soja', defaults={'specie': soja, 'is_agricultural': True})
-        Activity.objects.get_or_create(
+        Variety.objects.get_or_create(
             name='Cosecha Trigo', defaults={'specie': trigo, 'is_agricultural': True})
-        Activity.objects.get_or_create(
+        Variety.objects.get_or_create(
             name='Cosecha Maíz', defaults={'specie': maiz, 'is_agricultural': True})
 
         for estado in ['Planificado', 'Sembrado', 'En desarrollo', 'Cancelado']:
@@ -180,7 +180,7 @@ class Command(BaseCommand):
             ))
             raise SystemExit(1)
 
-        self.lot.activity.add(self.act_soja)
+        self.lot.variety.add(self.variety_soja)
 
         self.stdout.write(f'  Usando: staff={self.responsible}, campo={self.countryside}, lote={self.lot}')
         self.stdout.write(self.style.SUCCESS('  ✓'))
@@ -195,7 +195,7 @@ class Command(BaseCommand):
         from parameter.models.specie import Specie
 
         soja = Specie.objects.get(name='Soja')
-        act = self.act_soja
+        variety = self.variety_soja
 
         crop, created = Crop.objects.get_or_create(
             name='Soja 2024/2025 - La Esperanza L1 (PRUEBA)',
@@ -204,7 +204,7 @@ class Command(BaseCommand):
                 'countryside': self.countryside,
                 'area': self.area,
                 'lot': self.lot,
-                'activity': act,
+                'variety': variety,
                 'responsible': self.responsible,
                 'state': self.estado_cosechado,
                 'hectares_productive': 148,

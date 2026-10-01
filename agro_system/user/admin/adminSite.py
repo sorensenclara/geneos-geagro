@@ -112,7 +112,7 @@ class MiAdmin(AdminSite):
             "campaing": campaing.name if campaing else "-",
             "crop": str(crop) if crop else "-",
             "campo_lote": f"{crop.countryside} / {crop.lot}" if crop else "-",
-            "actividad": crop.activity if crop else "-",
+            "variedad": crop.variety if crop else "-",
             "estado": crop.state if crop else "-",
             "hectareas_productivas": crop.hectares_productive if crop else 0,
             "hectareas_plantadas": crop.hectares_planted if crop else 0,
@@ -172,6 +172,69 @@ def get_producer_for_request(request):
         staff = Staff.objects.filter(user=user).first()
         return staff.producer if staff else None
     return UserProducer.objects.filter(email=user.email).first()
+
+
+class DefaultStoreAdminMixin:
+    """
+    Si el campo 'store' queda vacío, lo completa con el almacén por defecto del productor.
+    Si no hay almacén por defecto, el campo pasa a ser obligatorio.
+    """
+
+    def get_form(self, request, obj=None, **kwargs):
+        from django import forms
+        from producer.models.store import Store
+        form_class = super().get_form(request, obj, **kwargs)
+        request_producer = get_producer_for_request(request)
+
+        class DefaultStoreForm(form_class):
+            def clean(self):
+                cleaned_data = super().clean()
+                if 'store' in self.fields and not cleaned_data.get('store'):
+                    producer = (request_producer or cleaned_data.get('producer')
+                                or (self.instance.producer if self.instance.producer_id else None))
+                    default_store = Store.get_default(producer)
+                    if default_store:
+                        cleaned_data['store'] = default_store
+                    else:
+                        self.add_error('store', forms.Field.default_error_messages['required'])
+                return cleaned_data
+
+        return DefaultStoreForm
+
+
+class UniqueNamePerProducerAdminMixin:
+    """
+    Valida que el nombre sea único por productor. El campo 'producer' suele estar
+    oculto en el form (lo asigna save_model), así que Django no puede validar el
+    UniqueConstraint (name, producer) y terminaría en IntegrityError.
+    """
+
+    def get_form(self, request, obj=None, **kwargs):
+        from django.core.exceptions import ValidationError
+        form_class = super().get_form(request, obj, **kwargs)
+        request_producer = get_producer_for_request(request)
+
+        class UniqueNamePerProducerForm(form_class):
+            def clean(self):
+                cleaned_data = super().clean()
+                name = cleaned_data.get('name')
+                if name:
+                    if 'producer' in self.fields:
+                        producer = cleaned_data.get('producer')
+                    elif self.instance.pk:
+                        producer = self.instance.producer
+                    else:
+                        producer = request_producer
+                    model = self._meta.model
+                    duplicated = model.objects.filter(name=name, producer=producer).exclude(pk=self.instance.pk)
+                    if duplicated.exists():
+                        self.add_error('name', ValidationError(
+                            _('A %(model)s with this name already exists.'),
+                            params={'model': model._meta.verbose_name},
+                        ))
+                return cleaned_data
+
+        return UniqueNamePerProducerForm
 
 
 class ProducerAwareMixin:

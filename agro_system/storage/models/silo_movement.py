@@ -73,7 +73,7 @@ class SiloMovement(models.Model):
             silo=silo,
             crop=crop,
             defaults={
-                'specie': crop.activity.specie,
+                'specie': crop.variety.specie,
                 'campaing': crop.campaing,
                 'quantity_tons': 0,
                 'active': True,

@@ -103,6 +103,11 @@ MIDDLEWARE = [
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
+# Django usa 'same-origin' por defecto, que no manda Referer a otros dominios.
+# Los tiles de OpenStreetMap exigen Referer (si no, responden 403 "Access blocked").
+# Con esta política a otros dominios solo se envía el origen, nunca la ruta.
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
 ROOT_URLCONF = 'agro_system.urls'
 
 TEMPLATES = [
@@ -423,6 +428,7 @@ JAZZMIN_SETTINGS = {
         "operation": "icon-operaciones",
         "parameter": "icon-parametros",
         "sale": "icon-ventas",
+        "storage": "icon-acopio",
 
         # Alertas / clima
         "alert": "icon-alertas",

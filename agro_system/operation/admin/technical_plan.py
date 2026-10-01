@@ -23,10 +23,18 @@ def _filter_inputs(request):
     return Input.objects.filter(producer__isnull=True)
 
 
-class TechnicalPlanDetailInline(admin.StackedInline):
+class TechnicalPlanDetailInline(ProducerAwareMixin, admin.StackedInline):
     model = TechnicalPlanDetail
     extra = 0
     show_change_link = True
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'contractor':
+            producers = self._producers_for_user(request)
+            if producers is not None:
+                from producer.models.contractor import Contractor
+                kwargs['queryset'] = Contractor.objects.filter(producer__in=producers)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class TechnicalPlanInputInline(admin.StackedInline):
@@ -51,8 +59,9 @@ class TechnicalPlanInputInline(admin.StackedInline):
             elif getattr(user, 'type', None) == 'Organization':
                 producers = UserProducer.objects.filter(organization=user)
                 kwargs['queryset'] = Store.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
-            elif getattr(user, 'type', None) == 'Producer':
-                producer = UserProducer.objects.filter(email=user.email).first()
+            else:
+                # Producer y Staff: almacenes de su productor y los compartidos
+                producer = get_producer_for_request(request)
                 if producer:
                     kwargs['queryset'] = Store.objects.filter(Q(producer=producer) | Q(producer__isnull=True))
                 else:
@@ -79,9 +88,9 @@ def duplicate_plan(modeladmin, request, queryset):
             input.save()
 
 class TechnicalPlanAdmin(ProducerAwareMixin, admin.ModelAdmin):
-    list_display = ['code','activity','area','producer']
-    list_filter = ['active', 'activity','area']
-    search_fields = ['codce','activity','producer']
+    list_display = ['code','variety','area','producer']
+    list_filter = ['active', 'variety','area']
+    search_fields = ['codce','variety','producer']
     ordering = ['code']
     actions = [duplicate_plan]
 

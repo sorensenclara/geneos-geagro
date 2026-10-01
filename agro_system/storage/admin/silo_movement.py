@@ -99,6 +99,15 @@ class SiloMovementAdmin(ProducerAwareMixin, admin.ModelAdmin):
             elif db_field.name == 'crop':
                 from operation.models.crop import Crop
                 kwargs['queryset'] = Crop.objects.filter(producer__in=producers)
+            elif db_field.name == 'driver':
+                # El chofer pertenece a un transportista: se ven los de transportistas propios o compartidos
+                from django.db.models import Q
+                from sale.models.driver import Driver
+                kwargs['queryset'] = Driver.objects.filter(
+                    Q(provider__producer__in=producers) | Q(provider__producer__isnull=True))
+            elif db_field.name == 'related_sale':
+                from sale.models.sales_receipt import SalesReceipt
+                kwargs['queryset'] = SalesReceipt.objects.filter(producer__in=producers)
         elif db_field.name == 'producer':
             if request.user.type == 'Organization':
                 kwargs['queryset'] = UserProducer.objects.filter(organization=request.user)

@@ -142,7 +142,7 @@ def _build_traceability_data(request):
 
     # ── Orphan exits — movements not linked to any sale ──────────
     orphan_silo_qs = SiloMovement.objects.select_related(
-        'silo', 'crop', 'crop__campaing', 'crop__activity__specie', 'producer',
+        'silo', 'crop', 'crop__campaing', 'crop__variety__specie', 'producer',
     ).filter(type=SiloMovement.EXIT, related_sale__isnull=True)
 
     orphan_stor_qs = StorageMovement.objects.select_related(
@@ -157,7 +157,7 @@ def _build_traceability_data(request):
         orphan_silo_qs = orphan_silo_qs.filter(crop__campaing_id=campaing_id)
         orphan_stor_qs = orphan_stor_qs.filter(certificate__campaing_id=campaing_id)
     if specie_id:
-        orphan_silo_qs = orphan_silo_qs.filter(crop__activity__specie_id=specie_id)
+        orphan_silo_qs = orphan_silo_qs.filter(crop__variety__specie_id=specie_id)
         orphan_stor_qs = orphan_stor_qs.filter(certificate__specie_id=specie_id)
     if date_from:
         orphan_silo_qs = orphan_silo_qs.filter(date__gte=date_from)
@@ -169,7 +169,7 @@ def _build_traceability_data(request):
     orphan_rows = []
     for m in orphan_silo_qs.order_by('-date'):
         try:
-            specie_str   = str(m.crop.activity.specie) if (m.crop and m.crop.activity) else '—'
+            specie_str   = str(m.crop.variety.specie) if (m.crop and m.crop.variety) else '—'
             campaing_str = str(m.crop.campaing) if m.crop else '—'
         except Exception:
             specie_str = campaing_str = '—'

@@ -390,8 +390,8 @@ def DashboardView(request):
         species_filter['crop__producer'] = producer_ref
 
     active_species = Specie.objects.filter(
-        activity__crop__campaing__in=recent_campaigns,
-        **({'activity__crop__producer': producer_ref} if producer_ref else {})
+        variety__crop__campaing__in=recent_campaigns,
+        **({'variety__crop__producer': producer_ref} if producer_ref else {})
     ).distinct()
 
     chart_species = []
@@ -409,7 +409,7 @@ def DashboardView(request):
         real_per_camp = []
 
         for camp in recent_campaigns:
-            f = {'crop__campaing': camp, 'crop__activity__specie': specie}
+            f = {'crop__campaing': camp, 'crop__variety__specie': specie}
             if producer_ref:
                 f['crop__producer'] = producer_ref
 

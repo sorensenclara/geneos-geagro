@@ -140,7 +140,7 @@ def TechnicalPlanView(request):
 
     if selected_crop:
         technical_plan = TechnicalPlan.objects.filter(
-            activity=selected_crop.activity,
+            variety=selected_crop.variety,
             area=selected_crop.area,
             active=True
         ).first()

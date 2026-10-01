@@ -1,4 +1,4 @@
-from .activity import Activity
+from .variety import Variety
 from .crop import Crop
 from .crop_yields import CropYields
 from .input_work_order import InputWorkOrder

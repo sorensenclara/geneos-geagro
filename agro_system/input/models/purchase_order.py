@@ -23,7 +23,7 @@ class PurchaseOrder(models.Model):
     applicant = models.ForeignKey(Staff, null=True, blank=True, on_delete=models.CASCADE, verbose_name = _('applicant'))
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE, verbose_name = _('provider'))
     state = models.CharField('Estado', max_length=7, choices=states, default='pending')
-    store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name=_('store'))
+    store = models.ForeignKey(Store, on_delete=models.CASCADE, blank=True, verbose_name=_('store'))
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT, null=True, blank=True,
                                  verbose_name=_('currency'))
     exchange_rate = models.FloatField(null=True, blank=True, verbose_name=_('exchange rate'),
@@ -32,6 +32,8 @@ class PurchaseOrder(models.Model):
 
 
     def save(self, *args, **kwargs):
+        if not self.store_id:
+            self.store = Store.get_default(self.producer if self.producer_id else None)
         # Detectar si la tasa de cambio fue modificada antes de guardar
         rate_changed = False
         if self.pk:

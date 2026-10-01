@@ -6,9 +6,9 @@ from user.models.notification import Notification
 
 class NotificationAdmin(admin.ModelAdmin):
 
-    list_display = ('name', 'user', 'date', 'detail')
+    list_display = ('name', 'user', 'date', 'read', 'detail')
     search_fields = ('name', 'user__username')
-    list_filter = ('user', 'date')
+    list_filter = ('read', 'user', 'date')
     ordering = ('-date',)
 
 adminSite.register(Notification, NotificationAdmin)

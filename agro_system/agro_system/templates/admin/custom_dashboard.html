@@ -60,7 +60,7 @@
 
       {% if current_or_next_order %}
         <h2 class="geagro-labor-title">
-          {{ current_or_next_order.service }}
+          {{ current_or_next_order.service|default:"Orden de trabajo" }}
         </h2>
 
         <p class="geagro-muted mb-2">
@@ -74,7 +74,7 @@
 
         <div class="geagro-kpi-row">
           <span>Estadio</span>
-          <strong>{{ current_or_next_order.stage }}</strong>
+          <strong>{{ current_or_next_order.stage|default:"-" }}</strong>
         </div>
 
         <div class="geagro-kpi-row">
@@ -118,7 +118,7 @@
               <td>{{ order.date_init|date:"d/m" }}</td>
               <td>
                 <a href="/admin/operation/workorder/{{ order.id }}/change/">
-                  {{ order.service }}
+                  {{ order.service|default:order.code }}
                 </a>
               </td>
               <td>{{ order.stateOT }}</td>
@@ -369,11 +369,11 @@
                       </td>
 
                       <td>
-                        {{ item.work_order.service }}
+                        {{ item.work_order.service|default:"—" }}
                       </td>
 
                       <td>
-                        {{ item.dose }}
+                        {{ item.dose }} {{ item.effective_unit|default:"" }}
                       </td>
 
                       <td>
@@ -600,7 +600,7 @@
 
                           <td>{{ item.input.name }}</td>
 
-                          <td>{{ item.work_order.service }}</td>
+                          <td>{{ item.work_order.service|default:"—" }}</td>
 
                           <td>
 

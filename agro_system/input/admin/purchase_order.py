@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
+from user.admin.adminSite import adminSite, ProducerAwareMixin, DefaultStoreAdminMixin, get_producer_for_request
 from input.models.purchase_order import PurchaseOrder
 from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.purchase_reception import PurchaseReception
@@ -91,8 +91,14 @@ class PurchaseOrderDetailInline(ProducerAwareMixin, admin.StackedInline):
         if db_field.name == 'input':
             from operation.admin.technical_plan import _filter_inputs
             kwargs['queryset'] = _filter_inputs(request)
+        elif db_field.name == 'costo_center':
+            producers = self._producers_for_user(request)
+            if producers is not None:
+                from django.db.models import Q
+                from producer.models.cost_center import CostCenter
+                kwargs['queryset'] = CostCenter.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-    
+
     def has_add_permission(self, request, obj=None):
         if obj and obj.state == 'confirm':
             return False
@@ -115,7 +121,7 @@ class PurchaseOrderDetailInline(ProducerAwareMixin, admin.StackedInline):
             return [field.name for field in self.model._meta.fields]
         return super().get_readonly_fields(request, obj)
     
-class PurchaseOrderAdmin(ProducerAwareMixin, admin.ModelAdmin):
+class PurchaseOrderAdmin(DefaultStoreAdminMixin, ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['code', 'date', 'provider', 'store', 'currency', 'state']
     list_filter = ['state', 'provider', 'currency']
     search_fields = ['number']

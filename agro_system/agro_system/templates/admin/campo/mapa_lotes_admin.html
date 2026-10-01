@@ -21,7 +21,7 @@
 }
 </style>
 
-<h2>Mapa de Lotes - {{ campo.nombre }}</h2>
+<h2>Mapa de Lotes - {{ campo.name }}</h2>
 <div id="map" style="height: 600px;"></div>
 <script>
     function flipCoords(geojson) {
@@ -41,14 +41,16 @@
     //lotes = flipCoords(lotes);
 
     var map = L.map('map');
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
+    // Política de uso de OSM: atribución obligatoria (el Referer lo resuelve SECURE_REFERRER_POLICY)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
     var geojsonLayer = L.geoJSON(lotes, {
         style: { color: 'green', fillOpacity: 0.3 },
         onEachFeature: function (feature, layer) {
-            layer.bindPopup(feature.properties.nombre);
+            layer.bindPopup(feature.properties.name);
         }
     }).addTo(map);
 

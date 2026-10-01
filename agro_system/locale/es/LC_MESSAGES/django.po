@@ -34,7 +34,7 @@ msgstr "Alertas"
 #: alert/models/alert.py:10 alert/models/indicator.py:16
 #: alert/models/variable_register.py:10 input/models/category_input.py:9
 #: input/models/input.py:20 input/models/type_input.py:10
-#: input/models/type_provider.py:10 operation/models/activity.py:11
+#: input/models/type_provider.py:10 operation/models/variety.py:11
 #: operation/models/crop.py:18 operation/models/service.py:10
 #: operation/models/service_type.py:8 operation/models/stage.py:9
 #: parameter/models/action.py:8 parameter/models/area.py:8
@@ -651,35 +651,35 @@ msgstr "Contratista"
 msgid "Valores en moneda base"
 msgstr ""
 
-#: operation/apps.py:7 producer/models/lot.py:24
+#: operation/apps.py:7
 msgid "operations"
 msgstr "Operaciones"
 
-#: operation/models/activity.py:12
+#: operation/models/variety.py:12
 msgid "description"
 msgstr "Descripción"
 
-#: operation/models/activity.py:13 parameter/models/specie.py:14
+#: operation/models/variety.py:13 parameter/models/specie.py:14
 #: storage/models/silo_stock.py:14 storage/models/storage_certificate.py:34
 msgid "specie"
 msgstr "Especie"
 
-#: operation/models/activity.py:14
+#: operation/models/variety.py:14
 msgid "is agricultural"
 msgstr "Es agricola"
 
-#: operation/models/activity.py:15
+#: operation/models/variety.py:15
 msgid "is livestock"
 msgstr "Es ganadera"
 
-#: operation/models/activity.py:22 operation/models/crop.py:23
-#: operation/models/stage.py:10
-msgid "activity"
-msgstr "Actividad"
+#: operation/models/variety.py:22 operation/models/crop.py:23
+#: operation/models/stage.py:10 operation/models/technical_plan.py:18
+msgid "variety"
+msgstr "Variedad"
 
-#: operation/models/activity.py:23
-msgid "activities"
-msgstr "Actividades"
+#: operation/models/variety.py:23 producer/models/lot.py:24
+msgid "varieties"
+msgstr "Variedades"
 
 #: operation/models/crop.py:19 storage/models/silo_stock.py:15
 #: storage/models/storage_certificate.py:33
@@ -854,7 +854,7 @@ msgstr "Tipo de servicios"
 #: operation/models/service.py:18 operation/models/technical_plan_detail.py:16
 #: operation/models/work_order.py:31
 msgid "service"
-msgstr "Servicio"
+msgstr "Servicio/Labor"
 
 #: operation/models/service.py:19
 msgid "services"
@@ -893,10 +893,6 @@ msgstr "Detalles tecnicos de cultivo"
 msgid "proportion of hectares"
 msgstr "Proporción de hectareas"
 
-#: operation/models/technical_plan.py:18
-msgid "activity "
-msgstr "Actividad"
-
 #: operation/models/technical_plan.py:21
 #: operation/models/technical_plan_detail.py:19 parameter/models/campaign.py:12
 #: producer/models/staff.py:15 storage/models/silo.py:18
@@ -932,7 +928,7 @@ msgstr "Subcontratado"
 #: operation/models/technical_plan_detail.py:21
 #: operation/models/work_order.py:37 producer/models/contractor.py:22
 msgid "contractor"
-msgstr "Contratista"
+msgstr "Contratista/proveedor"
 
 #: operation/models/technical_plan_detail.py:22
 msgid "with partner"
@@ -1267,8 +1263,8 @@ msgid "lotRating"
 msgstr "Calificación de lote"
 
 #: producer/models/lot.py:26
-msgid "Last operation"
-msgstr "Ultima operación"
+msgid "last variety"
+msgstr "Última variedad"
 
 #: producer/models/lot.py:29
 msgid "ubication"
@@ -2017,3 +2013,60 @@ msgstr "Costo de labor"
 
 msgid "rate"
 msgstr "Tasa"
+
+#: user/admin/adminSite.py
+#, python-format
+msgid "A %(model)s with this name already exists."
+msgstr "Ya existe un %(model)s con este nombre."
+
+#: operation/admin/work_order.py
+msgid "General"
+msgstr "General"
+
+#: operation/admin/work_order.py
+msgid "Additional fields"
+msgstr "Campos adicionales"
+
+#: operation/admin/work_order.py
+msgid "If left empty, they are filled in automatically."
+msgstr "Si se dejan vacíos se completan automáticamente."
+
+#: operation/admin/work_order.py
+msgid "Contractor costs are in base currency."
+msgstr "Los costos de contratista están en moneda base."
+
+#: operation/models/work_order.py
+msgid "There is no active campaign. Select one."
+msgstr "No hay una campaña activa. Seleccioná una."
+
+#: operation/models/work_order.py
+msgid "There is no default work order state. Select one."
+msgstr "No hay un estado de orden por defecto. Seleccioná uno."
+
+#: operation/models/work_order.py
+msgid "If left empty, it is numbered automatically (0001, 0002...)."
+msgstr "Si se deja vacío, se numera automáticamente (0001, 0002...)."
+
+#: operation/models/work_order.py
+msgid "surface (ha)"
+msgstr "Superficie"
+
+#: operation/models/input_work_order.py
+msgid "technical dose (planned)"
+msgstr "Dosis técnica (planeada)"
+
+#: operation/models/input_work_order.py
+msgid "real dose"
+msgstr "Dosis real"
+
+#: operation/models/input_work_order.py
+msgid "total quantity"
+msgstr "Cantidad total"
+
+#: user/models/notification.py
+msgid "read"
+msgstr "Leída"
+
+#: user/models/notification.py
+msgid "read at"
+msgstr "Leída el"

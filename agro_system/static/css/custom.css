@@ -1478,3 +1478,21 @@ body :not(.fa):not(.fas):not(.far):not(.fab) {
   border-color:#c6a400;
   color:#fff;
 }
+
+/* Notificaciones: no leídas resaltadas (campana y página de notificaciones) */
+.geagro-notif-unread{
+  background: rgba(30, 125, 59, 0.07);
+}
+.geagro-notif-unread h6,
+.geagro-notif-unread .geagro-notif-title{
+  font-weight: 700;
+}
+.geagro-notif-dot{
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--geagro-green-500);
+  margin-right: 6px;
+  vertical-align: middle;
+}

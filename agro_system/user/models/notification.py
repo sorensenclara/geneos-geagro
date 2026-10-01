@@ -11,6 +11,8 @@ class Notification(models.Model):
     user = models.ForeignKey(UserExtend, on_delete=models.CASCADE, verbose_name = _('user'))
     date = models.DateField(verbose_name = _('date'))
     detail = models.TextField(verbose_name = _('detail'))
+    read = models.BooleanField(default=False, verbose_name = _('read'))
+    read_at = models.DateTimeField(null=True, blank=True, verbose_name = _('read at'))
 
     def __str__(self):
         return f"{self.user} - {self.date}"
@@ -18,4 +20,5 @@ class Notification(models.Model):
     class Meta:
         verbose_name = _('notification')
         verbose_name_plural = _('notifications')
+        ordering = ['-date', '-id']
 

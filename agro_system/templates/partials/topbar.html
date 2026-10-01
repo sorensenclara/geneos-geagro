@@ -56,7 +56,7 @@
               <option value="">Todos</option>
               {% for c in crops %}
                 <option value="{{ c.id }}" {% if selected_crop and c.id == selected_crop.id %}selected{% endif %}>
-                  {{ c.activity|default:c.name|default:c }}
+                  {{ c.variety|default:c.name|default:c }}
                 </option>
               {% endfor %}
             </select>
@@ -88,21 +88,25 @@
         <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="mdi mdi-bell-outline"></i>
-          {% if topbar_notifications_count %}
-            <span class="badge text-bg-primary rounded-pill">{{ topbar_notifications_count }}</span>
-          {% endif %}
+          {# El número lo actualiza notifications.js al marcar como leídas (sin recargar) #}
+          <span class="badge text-bg-primary rounded-pill js-notif-badge{% if not topbar_notifications_count %} d-none{% endif %}">{{ topbar_notifications_count }}</span>
         </button>
 
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
-          aria-labelledby="page-header-notifications-dropdown">
+          aria-labelledby="page-header-notifications-dropdown"
+          data-notif-csrf="{{ csrf_token }}"
+          data-notif-read-url="{% url 'notification_mark_read' 0 %}"
+          data-notif-read-all-url="{% url 'notification_mark_all_read' %}">
 
           <div class="p-3">
-            <h5 class="m-0">Notificaciones{% if topbar_notifications_count %} ({{ topbar_notifications_count }}){% endif %}</h5>
+            <h5 class="m-0">Notificaciones<span class="js-notif-header-count">{% if topbar_notifications_count %} ({{ topbar_notifications_count }}){% endif %}</span></h5>
           </div>
 
           <div data-simplebar style="max-height: 230px;">
             {% for notif in topbar_notifications %}
-              <div class="text-reset notification-item px-3 py-2 border-bottom">
+              <a href="{% url 'notifications' %}"
+                 class="text-reset notification-item d-block px-3 py-2 border-bottom{% if not notif.read %} geagro-notif-unread js-notif-unread{% endif %}"
+                 data-notif-id="{{ notif.pk }}">
                 <div class="d-flex">
                   <div class="flex-shrink-0 me-3">
                     <div class="avatar-xs">
@@ -112,19 +116,31 @@
                     </div>
                   </div>
                   <div class="flex-grow-1">
-                    <h6 class="mb-1">{{ notif.name }}</h6>
+                    <h6 class="mb-1">
+                      {% if not notif.read %}<span class="geagro-notif-dot js-notif-dot"></span>{% endif %}
+                      {{ notif.name }}
+                    </h6>
                     <div class="text-muted">
-                      <p class="mb-0">{{ notif.date }}</p>
+                      <p class="mb-0">{{ notif.date|date:"d/m/Y" }}</p>
                     </div>
                   </div>
                 </div>
-              </div>
+              </a>
             {% empty %}
               <div class="text-center text-muted py-3">
                 <i class="mdi mdi-bell-off-outline d-block mb-1" style="font-size:1.5rem;"></i>
                 Sin notificaciones
               </div>
             {% endfor %}
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center p-2 border-top">
+            <button type="button" class="btn btn-sm btn-link text-decoration-none js-notif-read-all{% if not topbar_notifications_count %} d-none{% endif %}">
+              Marcar todas como leídas
+            </button>
+            <a href="{% url 'notifications' %}" class="btn btn-sm btn-link text-decoration-none ms-auto">
+              Ver todas <i class="mdi mdi-arrow-right"></i>
+            </a>
           </div>
         </div>
       </div>

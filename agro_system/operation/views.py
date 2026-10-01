@@ -187,7 +187,7 @@ def _build_input_report_data(request):
 
         usage_qs = InputWorkOrder.objects.filter(
             work_order__campaing_id=campaing_id,
-        ).select_related('input', 'input__unit_measure', 'input__currency', 'work_order', 'work_order__stage', 'work_order__crop')
+        ).select_related('input', 'input__unit_measure', 'unit_measure', 'input__currency', 'work_order', 'work_order__stage', 'work_order__crop')
         if producer_filter is not None:
             usage_qs = usage_qs.filter(work_order__producer__in=producer_filter)
 
@@ -450,6 +450,20 @@ def input_report_view(request):
     return render(request, 'operations/report_inputs.html', {**adminSite.each_context(request), **context})
 
 
+def _write_usage_common(ws, r, item):
+    """Columnas 1-9 de la hoja 'Uso OTs' (iguales en moneda base y original)."""
+    unit = item.effective_unit
+    ws.cell(r, 1, item.input.name)
+    ws.cell(r, 2, str(item.input.currency) if item.input.currency else '')
+    ws.cell(r, 3, item.work_order.code)
+    ws.cell(r, 4, str(item.work_order.crop) if item.work_order.crop else '')
+    ws.cell(r, 5, item.work_order.surface if item.work_order.surface is not None else '')
+    ws.cell(r, 6, unit.name if unit else '')
+    ws.cell(r, 7, item.dose)
+    ws.cell(r, 8, item.dose_applied or '')
+    ws.cell(r, 9, item.total_quantity if item.total_quantity is not None else '')
+
+
 @login_required
 def input_report_excel(request):
     import openpyxl
@@ -546,41 +560,29 @@ def input_report_excel(request):
     # ── Hoja 3: Uso OTs ───────────────────────────────────────
     ws3 = wb.create_sheet('Uso OTs')
     if use_base:
-        set_header(ws3, 1, ['Insumo', 'Moneda insumo', 'OT', 'Cultivo', 'Dosis plan.',
-                             'Dosis aplic.', 'Unidad',
+        set_header(ws3, 1, ['Insumo', 'Moneda insumo', 'OT', 'Cultivo', 'Superficie (ha)', 'Unidad',
+                             'Dosis técnica', 'Dosis real', 'Cantidad total',
                              f'P.unit est. {base_label}', f'Total est. {base_label}',
                              f'P.unit real {base_label}', f'Total real {base_label}'], HDR_FILL_B)
         for r, u in enumerate(ctx['usages'], 2):
             item = u['obj']
-            ws3.cell(r, 1, item.input.name)
-            ws3.cell(r, 2, str(item.input.currency) if item.input.currency else '')
-            ws3.cell(r, 3, item.work_order.code)
-            ws3.cell(r, 4, str(item.work_order.crop) if item.work_order.crop else '')
-            ws3.cell(r, 5, item.dose)
-            ws3.cell(r, 6, item.dose_applied or '')
-            ws3.cell(r, 7, item.input.unit_measure.name if item.input.unit_measure else '')
-            ws3.cell(r, 8, u['value_estimated_base'] if u['value_estimated_base'] is not None else '')
-            ws3.cell(r, 9, u['total_estimated_base'] if u['total_estimated_base'] else '')
-            ws3.cell(r, 10, u['value_real_base'] if u['value_real_base'] is not None else '')
-            ws3.cell(r, 11, u['total_real_base'] if u['total_real_base'] else '')
+            _write_usage_common(ws3, r, item)
+            ws3.cell(r, 10, u['value_estimated_base'] if u['value_estimated_base'] is not None else '')
+            ws3.cell(r, 11, u['total_estimated_base'] if u['total_estimated_base'] else '')
+            ws3.cell(r, 12, u['value_real_base'] if u['value_real_base'] is not None else '')
+            ws3.cell(r, 13, u['total_real_base'] if u['total_real_base'] else '')
     else:
-        set_header(ws3, 1, ['Insumo', 'Moneda', 'OT', 'Cultivo', 'Dosis plan.',
-                             'Dosis aplic.', 'Unidad',
+        set_header(ws3, 1, ['Insumo', 'Moneda', 'OT', 'Cultivo', 'Superficie (ha)', 'Unidad',
+                             'Dosis técnica', 'Dosis real', 'Cantidad total',
                              'P.unit estimado', 'Total estimado',
                              'P.unit real', 'Total real'], HDR_FILL_B)
         for r, u in enumerate(ctx['usages'], 2):
             item = u['obj']
-            ws3.cell(r, 1, item.input.name)
-            ws3.cell(r, 2, str(item.input.currency) if item.input.currency else '')
-            ws3.cell(r, 3, item.work_order.code)
-            ws3.cell(r, 4, str(item.work_order.crop) if item.work_order.crop else '')
-            ws3.cell(r, 5, item.dose)
-            ws3.cell(r, 6, item.dose_applied or '')
-            ws3.cell(r, 7, item.input.unit_measure.name if item.input.unit_measure else '')
-            ws3.cell(r, 8, u['value_estimated'] or '')
-            ws3.cell(r, 9, u['total_estimated'] or '')
-            ws3.cell(r, 10, u['value_real'] or '')
-            ws3.cell(r, 11, u['total_real'] or '')
+            _write_usage_common(ws3, r, item)
+            ws3.cell(r, 10, u['value_estimated'] or '')
+            ws3.cell(r, 11, u['total_estimated'] or '')
+            ws3.cell(r, 12, u['value_real'] or '')
+            ws3.cell(r, 13, u['total_real'] or '')
     autowidth(ws3)
 
     resp = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -752,6 +754,16 @@ def _build_work_orders_data(request):
 
         orders = list(qs)
 
+    # Totales para comparar planeado vs real (la diferencia suma solo órdenes con ambos costos)
+    diffs = [wo.contractor_cost_diff for wo in orders if wo.contractor_cost_diff is not None]
+    totals = {
+        'surface': round(sum(wo.surface for wo in orders if wo.surface is not None), 2),
+        'cost_planned': round(sum(wo.contractor_cost for wo in orders if wo.contractor_cost is not None), 2),
+        'cost_real': round(sum(wo.contractor_cost_real for wo in orders if wo.contractor_cost_real is not None), 2),
+        'cost_diff': round(sum(diffs), 2) if diffs else None,
+        'compared': len(diffs),
+    }
+
     return {
         'campaigns': Campaing.objects.all().order_by('-date_init'),
         'all_states': OTState.objects.all().order_by('name'),
@@ -769,6 +781,7 @@ def _build_work_orders_data(request):
         'selected_date_from': date_from,
         'selected_date_to': date_to,
         'orders': orders,
+        'totals': totals,
     }
 
 
@@ -796,8 +809,9 @@ def work_orders_report_excel(request):
     header_font = Font(color='FFFFFF', bold=True, size=9)
     header_align = Alignment(horizontal='center', vertical='center', wrap_text=True)
 
-    headers = ['Código', 'Inicio', 'Fin', 'Cultivo', 'Estadio', 'Servicio',
-               'Tipo', 'Estado', 'Contratista', 'Costo planeado (MB)', 'Costo real (MB)', 'Personal']
+    headers = ['Código', 'Inicio', 'Fin', 'Cultivo', 'Superficie (ha)', 'Estadio', 'Servicio',
+               'Tipo', 'Estado', 'Contratista', 'Costo planeado (MB)', 'Costo real (MB)', 'Diferencia (MB)',
+               'Personal']
 
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
@@ -813,17 +827,37 @@ def work_orders_report_excel(request):
             wo.date_init.strftime('%d/%m/%Y') if wo.date_init else '',
             wo.date_fin.strftime('%d/%m/%Y') if wo.date_fin else '',
             str(wo.crop) if wo.crop else '',
+            round(float(wo.surface), 2) if wo.surface is not None else '',
             str(wo.stage) if wo.stage else '',
             str(wo.service) if wo.service else '',
             TYPE_LABELS.get(wo.type, wo.type) if wo.type else '',
             str(wo.stateOT) if wo.stateOT else '',
             str(wo.contractor) if wo.contractor else '',
-            round(float(wo.contractor_cost), 2) if wo.contractor_cost else '',
-            round(float(wo.contractor_cost_real), 2) if wo.contractor_cost_real else '',
+            round(float(wo.contractor_cost), 2) if wo.contractor_cost is not None else '',
+            round(float(wo.contractor_cost_real), 2) if wo.contractor_cost_real is not None else '',
+            wo.contractor_cost_diff if wo.contractor_cost_diff is not None else '',
             str(wo.staff) if wo.staff else '',
         ]
         for col, val in enumerate(row_data, 1):
             ws.cell(row=row_idx, column=col, value=val)
+
+    # Fila de totales (mismos totales que el informe en pantalla)
+    if orders:
+        totals = ctx['totals']
+        total_row = len(orders) + 2
+        total_values = {
+            1: 'Totales',
+            5: totals['surface'],
+            11: totals['cost_planned'],
+            12: totals['cost_real'],
+            13: totals['cost_diff'] if totals['cost_diff'] is not None else '',
+        }
+        for col, val in total_values.items():
+            ws.cell(row=total_row, column=col, value=val).font = Font(bold=True)
+        ws.cell(row=total_row + 2, column=1, value=(
+            'Diferencia = costo real - costo planeado. La diferencia total compara solo las '
+            f"{totals['compared']} órdenes con ambos costos; los totales planeado y real suman todas."
+        )).font = Font(italic=True, size=9)
 
     for col in range(1, len(headers) + 1):
         max_len = max(

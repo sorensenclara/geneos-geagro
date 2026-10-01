@@ -48,7 +48,7 @@ def process_plan(modeladmin, request, queryset):
         messages.success(request, _("The crop '%s' has been successfully processed.") % obj.name)
 
     
-        plan  = TechnicalPlan.objects.filter(activity=obj.activity).filter(area=obj.area)
+        plan  = TechnicalPlan.objects.filter(variety=obj.variety).filter(area=obj.area)
         detail_plan = TechnicalPlanDetail.objects.filter(technical_plan=plan.first())
 
         days = 0
@@ -118,10 +118,10 @@ def process_plan(modeladmin, request, queryset):
 
 class CropAdmin(ProducerAwareMixin, admin.ModelAdmin):
     
-    list_display = ['name','campaing', 'countryside', 'lot', 'activity']
-    list_filter = ['campaing', 'activity', 'countryside']
+    list_display = ['name','campaing', 'countryside', 'lot', 'variety']
+    list_filter = ['campaing', 'variety', 'countryside']
     search_fields = ['name']
-    ordering = ['campaing', 'activity', 'name']
+    ordering = ['campaing', 'variety', 'name']
     inlines = [TechnicalCropDetailInline, CropYieldsInline, PartnerCropInline]
 
     actions = [process_plan]

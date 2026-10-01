@@ -1,7 +1,7 @@
 from django.contrib import admin
 from producer.models.store import Store
 from user.models.user_producer import UserProducer
-from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
+from user.admin.adminSite import adminSite, ProducerAwareMixin, UniqueNamePerProducerAdminMixin, get_producer_for_request
 from django.utils.translation import gettext_lazy as _
 from input.models.input_stock import InputStock
 
@@ -25,7 +25,7 @@ class StoreInputStockInline(admin.TabularInline):
         return False
 
 
-class StoreAdmin(ProducerAwareMixin, admin.ModelAdmin):
+class StoreAdmin(UniqueNamePerProducerAdminMixin, ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['name', 'address', 'city', 'default']
     inlines = [StoreInputStockInline,]
     

@@ -339,9 +339,11 @@
           <th>Moneda insumo</th>
           <th>Orden de trabajo</th>
           <th>Cultivo</th>
-          <th class="text-right">Dosis planif.</th>
-          <th class="text-right">Dosis aplicada</th>
+          <th class="text-right">Superficie (ha)</th>
           <th>Unidad</th>
+          <th class="text-right">Dosis técnica</th>
+          <th class="text-right">Dosis real</th>
+          <th class="text-right">Cantidad total</th>
           <th class="text-right">P. unit. est.</th>
           <th class="text-right">Total est.</th>
           <th class="text-right">P. unit. real</th>
@@ -355,11 +357,17 @@
           <td>{% if u.obj.input.currency %}{{ u.obj.input.currency }}{% else %}<span class="no-data">—</span>{% endif %}</td>
           <td>{{ u.obj.work_order.code }}</td>
           <td>{{ u.obj.work_order.crop }}</td>
+          <td class="text-right">
+            {% if u.obj.work_order.surface is not None %}{{ u.obj.work_order.surface|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td>{% if u.obj.effective_unit %}{{ u.obj.effective_unit.name }}{% else %}-{% endif %}</td>
           <td class="text-right">{{ u.obj.dose|floatformat:2 }}</td>
           <td class="text-right">
             {% if u.obj.dose_applied %}{{ u.obj.dose_applied|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
           </td>
-          <td>{% if u.obj.input.unit_measure %}{{ u.obj.input.unit_measure.name }}{% else %}-{% endif %}</td>
+          <td class="text-right">
+            {% if u.obj.total_quantity is not None %}{{ u.obj.total_quantity|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+          </td>
           <td class="text-right">
             {% if u.value_estimated_base is not None %}<span class="badge-estimated">{{ u.value_estimated_base|floatformat:2 }}</span>
             {% else %}<span class="no-data">—</span>{% endif %}
@@ -496,9 +504,11 @@
           <th>Moneda</th>
           <th>Orden de trabajo</th>
           <th>Cultivo</th>
-          <th class="text-right">Dosis planif.</th>
-          <th class="text-right">Dosis aplicada</th>
+          <th class="text-right">Superficie (ha)</th>
           <th>Unidad</th>
+          <th class="text-right">Dosis técnica</th>
+          <th class="text-right">Dosis real</th>
+          <th class="text-right">Cantidad total</th>
           <th class="text-right">P. unit. est.</th>
           <th class="text-right">Total est.</th>
           <th class="text-right">P. unit. real</th>
@@ -516,11 +526,17 @@
           </td>
           <td>{{ u.obj.work_order.code }}</td>
           <td>{{ u.obj.work_order.crop }}</td>
+          <td class="text-right">
+            {% if u.obj.work_order.surface is not None %}{{ u.obj.work_order.surface|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+          </td>
+          <td>{% if u.obj.effective_unit %}{{ u.obj.effective_unit.name }}{% else %}-{% endif %}</td>
           <td class="text-right">{{ u.obj.dose|floatformat:2 }}</td>
           <td class="text-right">
             {% if u.obj.dose_applied %}{{ u.obj.dose_applied|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
           </td>
-          <td>{% if u.obj.input.unit_measure %}{{ u.obj.input.unit_measure.name }}{% else %}-{% endif %}</td>
+          <td class="text-right">
+            {% if u.obj.total_quantity is not None %}{{ u.obj.total_quantity|floatformat:2 }}{% else %}<span class="no-data">—</span>{% endif %}
+          </td>
           <td class="text-right">
             {% if u.value_estimated %}<span class="badge-estimated">{{ u.value_estimated|floatformat:2 }}</span>
             {% else %}<span class="no-data">—</span>{% endif %}

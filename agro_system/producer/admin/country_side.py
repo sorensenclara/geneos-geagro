@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Q
 from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
 from producer.models.country_side import Countryside
 from user.models.user_producer import UserProducer
@@ -6,12 +7,15 @@ from producer.models.staff import Staff
 from django.utils.html import format_html
 from django.urls import path
 from django.template.response import TemplateResponse
+from django.shortcuts import get_object_or_404
 from django.core.serializers import serialize
 from producer.models.lot import Lot
+from producer.models.store import Store
+from producer.models.cost_center import CostCenter
 
 # Register your models here.
 class CountrysideAdmin(ProducerAwareMixin, admin.ModelAdmin):
-    list_display = ['name', 'condition', 'hectares', 'responsible', 'city', 'cost_center']
+    list_display = ['name', 'condition', 'hectares', 'responsible', 'city', 'cost_center', 'ver_mapa']
     list_filter = ['condition','responsible','city']
     search_fields = ['name']
 
@@ -22,6 +26,19 @@ class CountrysideAdmin(ProducerAwareMixin, admin.ModelAdmin):
             obj.producer = userProducer
         super().save_model(request, obj, form, change)
         
+    def get_changeform_initial_data(self, request):
+        # Al crear un campo se preseleccionan el almacén y el centro de costo por defecto
+        # (el usuario puede dejarlos vacíos)
+        initial = super().get_changeform_initial_data(request)
+        producer = get_producer_for_request(request)
+        default_store = Store.get_default(producer)
+        default_cost_center = CostCenter.get_default(producer)
+        if default_store and 'store' not in initial:
+            initial['store'] = default_store.pk
+        if default_cost_center and 'cost_center' not in initial:
+            initial['cost_center'] = default_cost_center.pk
+        return initial
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
 
         if db_field.name == "responsible":
@@ -39,7 +56,14 @@ class CountrysideAdmin(ProducerAwareMixin, admin.ModelAdmin):
                 if user_producer:
                     staff_qs = Staff.objects.filter(producer=user_producer)
             kwargs["queryset"] = staff_qs
-            
+
+        # Almacenes y centros de costo: los del productor y los compartidos (sin productor)
+        elif db_field.name in ("store", "cost_center"):
+            producers = self._producers_for_user(request)
+            if producers is not None:
+                model = Store if db_field.name == "store" else CostCenter
+                kwargs["queryset"] = model.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
+
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
@@ -73,9 +97,10 @@ class CountrysideAdmin(ProducerAwareMixin, admin.ModelAdmin):
     ver_mapa.short_description = "Mapa"
 
     def mapa_admin_view(self, request, campo_id):
-        campo = Countryside.objects.get(pk=campo_id)
-        lotes = Lot.objects.filter(campo=campo).exclude(delimitacion__isnull=True)
-        lotes_geojson = serialize('geojson', lotes, geometry_field='delimitacion', fields=('name',))
+        # get_queryset filtra por productor: solo se ve el mapa de campos propios
+        campo = get_object_or_404(self.get_queryset(request), pk=campo_id)
+        lotes = Lot.objects.filter(countryside=campo).exclude(delimitation__isnull=True)
+        lotes_geojson = serialize('geojson', lotes, geometry_field='delimitation', fields=('name',))
         context = dict(
             self.admin_site.each_context(request),
             campo=campo,

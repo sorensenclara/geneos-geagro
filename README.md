@@ -104,3 +104,11 @@ python manage.py create_staff_group
 
 ### Organizacion
 python manage.py create_organization_group
+
+### IMPORTAR INSUMOS
+# PARA INSUMOS COMPARTIDOS (SIN PRODUCTOR)
+python manage.py importar_insumos 
+
+# PARA INSUMOS POR PRODUCTOR
+ejemplo: id del productor 2
+python manage.py importar_insumos 2

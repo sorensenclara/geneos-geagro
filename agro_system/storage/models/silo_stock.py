@@ -24,7 +24,7 @@ class SiloStock(models.Model):
 
     def save(self, *args, **kwargs):
         if self.crop_id:
-            self.specie = self.crop.activity.specie
+            self.specie = self.crop.variety.specie
             self.campaing = self.crop.campaing
         super().save(*args, **kwargs)
 

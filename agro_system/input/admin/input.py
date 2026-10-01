@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from producer.models.store import Store
 from input.models.provider import Provider
 from user.models.user_producer import UserProducer
-from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
+from user.admin.adminSite import adminSite, ProducerAwareMixin, UniqueNamePerProducerAdminMixin, get_producer_for_request
 from input.models.purchase_order import PurchaseOrder
 from input.models.purchase_order_detail import PurchaseOrderDetail
 from input.models.input import Input
@@ -110,7 +110,7 @@ class InputResource(resources.ModelResource):
         else:
             raise ValueError("No se pudo asignar el productor al insumo. Usuario no tiene un productor asociado.")
 
-class InputAdmin(ProducerAwareMixin, ImportExportModelAdmin):
+class InputAdmin(UniqueNamePerProducerAdminMixin, ProducerAwareMixin, ImportExportModelAdmin):
     search_fields = ['name']
     inlines = [InputStockInline, PurchaseInline]
     list_display = ['name', 'type', 'cost', 'currency', 'cost_update_mode', 'stock', 'min_stock', 'pending', 'producer']

@@ -243,6 +243,7 @@
             <td class="td_datos"><b>CAMPAÑA</b></td>
             <td class="td_datos"><b>FECHA</b></td>
             <td class="td_datos"><b>CULTIVO</b></td>
+            <td class="td_datos"><b>SUPERFICIE (HA)</b></td>
             <td class="td_datos"><b>SERVICIO</b></td>
             <td class="td_datos"><b>ESTADO</b></td>
         </tr>
@@ -251,7 +252,8 @@
             <td class="td_datos">{{order.campaing}}</td>
             <td class="td_datos">{{order.date_init}}</td>
             <td class="td_datos">{{order.crop}}</td>
-            <td class="td_datos">{{order.service}}</td>
+            <td class="td_datos">{% if order.surface is not None %}{{ order.surface|floatformat:2 }}{% else %}—{% endif %}</td>
+            <td class="td_datos">{{order.service|default:"—"}}</td>
             <td class="td_datos">{{order.stateOT}}</td>
         </tr>
         {% endfor %}

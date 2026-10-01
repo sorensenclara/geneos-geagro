@@ -20,7 +20,7 @@ class CropYields(models.Model):
 
     @property
     def especie(self):
-        return self.crop.activity.specie    
+        return self.crop.variety.specie    
 
     def __str__(self):
         return f"{self.date_estimate} - {self.yields_estimate}"    

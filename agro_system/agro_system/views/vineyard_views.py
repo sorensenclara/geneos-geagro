@@ -22,15 +22,15 @@ from operation.models.crop_yields import CropYields
 def _build_crops_yield_detail(crops_qs):
     """Devuelve lista de dicts con rinde estimado/real por cultivo para mostrar en detalle."""
     result = []
-    for crop in crops_qs.select_related('activity', 'lot', 'activity__specie'):
+    for crop in crops_qs.select_related('variety', 'lot', 'variety__specie'):
         cy = CropYields.objects.filter(crop=crop).first()
         est  = cy.yields_estimate if cy else None
         real = cy.yields_real if cy else None
         pct  = round((real / est * 100)) if est and real else None
         result.append({
             'crop':     crop,
-            'specie':   crop.activity.specie.name if crop.activity and crop.activity.specie else '—',
-            'activity': str(crop.activity) if crop.activity else '—',
+            'specie':   crop.variety.specie.name if crop.variety and crop.variety.specie else '—',
+            'variety': str(crop.variety) if crop.variety else '—',
             'lot':      str(crop.lot) if crop.lot else '—',
             'ha':       crop.hectares_planted or 0,
             'est':      est,

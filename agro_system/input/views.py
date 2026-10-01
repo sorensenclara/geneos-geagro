@@ -40,7 +40,7 @@ def input_charts_view(request):
                 queryset = queryset.filter(producer__in=user_producers)
             else:
                 queryset = queryset.none()
-        elif request.user.type == 'Producer':
+        elif request.user.type in ('Producer', 'Staff'):
             user_producer = get_producer_for_request(request)
             if user_producer:
                 queryset = queryset.filter(producer=user_producer)
@@ -156,8 +156,8 @@ def _build_catalog_data(request):
     if not user.is_superuser and getattr(user, 'type', None) != 'Administration':
         if getattr(user, 'type', None) == 'Organization':
             prod_filter = list(UserProducer.objects.filter(organization=user))
-        elif getattr(user, 'type', None) == 'Producer':
-            p = UserProducer.objects.filter(email=user.email).first()
+        elif getattr(user, 'type', None) in ('Producer', 'Staff'):
+            p = get_producer_for_request(request)
             prod_filter = [p] if p else []
         else:
             prod_filter = []
@@ -384,6 +384,7 @@ def input_cost_api(request):
             'cost': inp.cost,
             'currency': str(inp.currency) if inp.currency else '',
             'currency_id': inp.currency_id,
+            'unit_measure_id': inp.unit_measure_id,
         })
     except Input.DoesNotExist:
         return JsonResponse({'error': 'not found'}, status=404)

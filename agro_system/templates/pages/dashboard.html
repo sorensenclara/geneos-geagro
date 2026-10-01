@@ -22,7 +22,7 @@
 
     {% if selected_crop %}
       <i class="mdi mdi-chevron-right"></i>
-      <span>CULTIVO: {{ selected_crop.activity|default:"-" }}</span>
+      <span>CULTIVO: {{ selected_crop.variety|default:"-" }}</span>
     {% endif %}
   </div>
 </div>
@@ -266,7 +266,7 @@
                 <div class="text-muted mb-1">Cultivo</div>
                 <div class="h5 mb-0">
                 {% if selected_crop %}
-                    {{ selected_crop.activity|default:"-" }}
+                    {{ selected_crop.variety|default:"-" }}
                 {% else %}
                     -
                 {% endif %}

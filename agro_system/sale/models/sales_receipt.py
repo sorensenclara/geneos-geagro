@@ -37,6 +37,11 @@ class SalesReceipt(models.Model):
     producer = models.ForeignKey('user.UserProducer', on_delete=models.RESTRICT, verbose_name= _('producer'))
     state = models.CharField(max_length=7, choices=states, default='pending', verbose_name=_('state'))
 
+    def save(self, *args, **kwargs):
+        if not self.cost_center_id:
+            self.cost_center = CostCenter.get_default(self.producer if self.producer_id else None)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.number}"
 

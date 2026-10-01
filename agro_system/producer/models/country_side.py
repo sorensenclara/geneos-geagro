@@ -19,8 +19,8 @@ class Countryside(models.Model):
     city = models.ForeignKey(City, models.CASCADE, verbose_name = _('city'))
     phone = models.CharField(max_length=20, verbose_name = _('phone'))
     email = models.EmailField(null=True, blank=True, verbose_name = _('email'))
-    cost_center = models.ForeignKey(CostCenter, models.CASCADE, verbose_name = _('cost center'))
-    store = models.ForeignKey(Store, models.CASCADE, verbose_name = _('store'))
+    cost_center = models.ForeignKey(CostCenter, models.CASCADE, null=True, blank=True, verbose_name = _('cost center'))
+    store = models.ForeignKey(Store, models.CASCADE, null=True, blank=True, verbose_name = _('store'))
     observation = models.TextField(blank=True, null=True,verbose_name = _('observation'))
     producer = models.ForeignKey('user.UserProducer', models.CASCADE, verbose_name = _('producer'))
 

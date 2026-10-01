@@ -10,7 +10,7 @@
     <span>Stock, movimientos y órdenes de compra</span>
     {% if selected_crop %}
       <i class="mdi mdi-chevron-right"></i>
-      <span>CULTIVO: {{ selected_crop.activity|default:selected_crop }}</span>
+      <span>CULTIVO: {{ selected_crop.variety|default:selected_crop }}</span>
     {% endif %}
   </div>
 </div>
@@ -237,7 +237,7 @@
       <div>
         <h5 class="card-title mb-1">Consumo del cultivo seleccionado</h5>
         <div class="text-muted small">
-          {{ selected_crop.activity }} — insumos usados en órdenes de trabajo{% if selected_store %} · {{ selected_store.name }}{% endif %}
+          {{ selected_crop.variety }} — insumos usados en órdenes de trabajo{% if selected_store %} · {{ selected_store.name }}{% endif %}
         </div>
       </div>
       <i class="mdi mdi-sprout font-size-24 text-success"></i>

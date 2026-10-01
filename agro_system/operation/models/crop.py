@@ -3,7 +3,7 @@ from producer.models.country_side import Countryside
 from parameter.models.area import Area
 from django.utils.translation import gettext_lazy as _
 from producer.models.staff import Staff
-from operation.models.activity import Activity
+from operation.models.variety import Variety
 from parameter.models.campaign import Campaing
 from producer.models.lot import Lot
 from parameter.models.cultivation_state import CiltivationState
@@ -20,7 +20,7 @@ class Crop(models.Model):
     countryside = models.ForeignKey(Countryside, models.CASCADE,verbose_name = _('countryside'))
     area = models.ForeignKey(Area, models.CASCADE,verbose_name = _('area'))
     lot = models.ForeignKey(Lot, models.CASCADE,verbose_name = _('lot'))
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, verbose_name = _('activity'))
+    variety = models.ForeignKey(Variety, on_delete=models.CASCADE, verbose_name = _('variety'))
     responsible = models.ForeignKey(Staff, models.CASCADE,verbose_name = _('responsible'))
     state = models.ForeignKey(CiltivationState, models.CASCADE, verbose_name = _('state'))
     hectares_productive = models.FloatField(default=0, verbose_name = _('hectares productive'))
@@ -40,7 +40,7 @@ class Crop(models.Model):
 
 
     def __str__(self):
-        return f"{self.campaing} - {self.countryside} / {self.lot} - {self.activity}"    
+        return f"{self.campaing} - {self.countryside} / {self.lot} - {self.variety}"    
 
     class Meta:
         verbose_name = _('crop')

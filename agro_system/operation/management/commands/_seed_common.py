@@ -119,7 +119,7 @@ class SeedCommandBase(BaseCommand):
         self.gender, _ = Gender.objects.get_or_create(name='Masculino')
         self.condition, _ = CountrysideCondition.objects.get_or_create(name='Propio')
         self.type_staff, _ = TypeStaff.objects.get_or_create(name='Técnico Agrónomo')
-        self.cost_center, _ = CostCenter.objects.get_or_create(name='Centro de Costo Plan Trigo-Cebada (Demo)')
+        self.cost_center, _ = CostCenter.objects.get_or_create(name='Centro de Costo Plan Trigo-Cebada (Demo)', producer=None)
 
         Currency.objects.get_or_create(name='Pesos Argentinos')
         Currency.objects.get_or_create(name='Dólares')
@@ -205,15 +205,15 @@ class SeedCommandBase(BaseCommand):
         self.store_principal = Store.objects.filter(producer=producer).first()
         if not self.store_principal:
             self.store_principal, _ = Store.objects.get_or_create(
-                name='Depósito Principal (Demo)',
-                defaults={'address': 'Acceso Norte s/n', 'city': self.city, 'default': True, 'producer': producer},
+                name='Depósito Principal (Demo)', producer=producer,
+                defaults={'address': 'Acceso Norte s/n', 'city': self.city, 'default': True},
             )
 
         # Depósito secundario: siempre se garantiza para poder ejemplificar
         # movimientos de inventario entre depósitos distintos.
         self.store_secundario, _ = Store.objects.get_or_create(
-            name='Depósito Insumos - Sucursal (Demo)',
-            defaults={'address': 'Ruta 226 Km 20', 'city': self.city, 'default': False, 'producer': producer},
+            name='Depósito Insumos - Sucursal (Demo)', producer=producer,
+            defaults={'address': 'Ruta 226 Km 20', 'city': self.city, 'default': False},
         )
 
         self.countryside = Countryside.objects.filter(producer=producer).first()
@@ -247,14 +247,14 @@ class SeedCommandBase(BaseCommand):
         from parameter.models.area import Area
         from parameter.models.cultivation_state import CiltivationState
         from parameter.models.lot_rating import LotRating
-        from operation.models.activity import Activity
+        from operation.models.variety import Variety
 
         specie_trigo, _ = Specie.objects.get_or_create(name='Trigo')
         specie_cebada, _ = Specie.objects.get_or_create(name='Cebada')
 
-        self.activity_trigo, _ = Activity.objects.get_or_create(
+        self.variety_trigo, _ = Variety.objects.get_or_create(
             name='Trigo', defaults={'specie': specie_trigo, 'is_agricultural': True})
-        self.activity_cebada, _ = Activity.objects.get_or_create(
+        self.variety_cebada, _ = Variety.objects.get_or_create(
             name='Cebada', defaults={'specie': specie_cebada, 'is_agricultural': True})
 
         self.area, _ = Area.objects.get_or_create(name='Zona Núcleo Demo')
@@ -327,7 +327,7 @@ class SeedCommandBase(BaseCommand):
                 'LotRating': self.lot_rating,
             },
         )
-        self.lot_trigo.activity.add(self.activity_trigo)
+        self.lot_trigo.variety.add(self.variety_trigo)
 
         self.lot_cebada, _ = Lot.objects.get_or_create(
             name='Lote Cebada - Plan Demo 2026/2027',
@@ -341,7 +341,7 @@ class SeedCommandBase(BaseCommand):
                 'LotRating': self.lot_rating,
             },
         )
-        self.lot_cebada.activity.add(self.activity_cebada)
+        self.lot_cebada.variety.add(self.variety_cebada)
 
         self.stdout.write(self.style.SUCCESS('  ✓'))
 
@@ -366,13 +366,13 @@ class SeedCommandBase(BaseCommand):
         def _input(name, tipo, unidad, cost, presentation):
             obj, _ = Input.objects.get_or_create(
                 name=name,
+                producer=producer,
                 defaults={
                     'type': tipo,
                     'unit_measure': unidad,
                     'presentation': presentation,
                     'cost': cost,
                     'currency': self.currency,
-                    'producer': producer,
                 },
             )
             return obj
@@ -431,13 +431,13 @@ class SeedCommandBase(BaseCommand):
             ('Cosecha', servicio_cosecha, 3, 2),
         ]
 
-        def _crear_plan(codigo, activity, insumos_por_etapa):
+        def _crear_plan(codigo, variety, insumos_por_etapa):
             plan, _ = TechnicalPlan.objects.get_or_create(
                 code=codigo,
                 defaults={
-                    'detail': f'Plan técnico de ejemplo para {activity.name} - Campaña 2026/2027',
+                    'detail': f'Plan técnico de ejemplo para {variety.name} - Campaña 2026/2027',
                     'hectares': self.PLAN_REFERENCE_HECTARES,
-                    'activity': activity,
+                    'variety': variety,
                     'area': self.area,
                     'active': True,
                     'producer': producer,
@@ -449,7 +449,7 @@ class SeedCommandBase(BaseCommand):
 
             for secuencia, (nombre_etapa, servicio, dias, personas) in enumerate(etapas_base, start=1):
                 stage, _ = Stage.objects.get_or_create(
-                    name=nombre_etapa, activity=activity, defaults={'order': secuencia})
+                    name=nombre_etapa, variety=variety, defaults={'order': secuencia})
                 detail, _ = TechnicalPlanDetail.objects.get_or_create(
                     technical_plan=plan,
                     secuence=secuencia,
@@ -483,7 +483,7 @@ class SeedCommandBase(BaseCommand):
 
         # La urea y el fungicida de cebada se aplican desde el depósito secundario
         # (hacia donde se transfirió stock), el resto se retira del depósito principal.
-        self.plan_trigo = _crear_plan('PT-TRIGO-2026-2027', self.activity_trigo, {
+        self.plan_trigo = _crear_plan('PT-TRIGO-2026-2027', self.variety_trigo, {
             'Barbecho Químico': [(self.input_herbicida, 2, self.store_principal)],
             'Siembra': [
                 (self.input_semilla_trigo, 120, self.store_principal),
@@ -493,7 +493,7 @@ class SeedCommandBase(BaseCommand):
             'Control de Enfermedades': [(self.input_fungicida, 0.5, self.store_principal)],
         })
 
-        self.plan_cebada = _crear_plan('PT-CEBADA-2026-2027', self.activity_cebada, {
+        self.plan_cebada = _crear_plan('PT-CEBADA-2026-2027', self.variety_cebada, {
             'Barbecho Químico': [(self.input_herbicida, 2, self.store_principal)],
             'Siembra': [
                 (self.input_semilla_cebada, 100, self.store_principal),
@@ -520,7 +520,7 @@ class SeedCommandBase(BaseCommand):
                 'countryside': self.countryside,
                 'area': self.area,
                 'lot': self.lot_trigo,
-                'activity': self.activity_trigo,
+                'variety': self.variety_trigo,
                 'responsible': self.responsible,
                 'state': self.estado_trigo,
                 'hectares_productive': 100,
@@ -539,7 +539,7 @@ class SeedCommandBase(BaseCommand):
                 'countryside': self.countryside,
                 'area': self.area,
                 'lot': self.lot_cebada,
-                'activity': self.activity_cebada,
+                'variety': self.variety_cebada,
                 'responsible': self.responsible,
                 'state': self.estado_cebada,
                 'hectares_productive': 80,
@@ -1245,7 +1245,7 @@ class SeedCommandBase(BaseCommand):
             date_issue=date(2026, 11, 26),
             storage_provider=self.provider_acopiador,
             campaing=self.campaing,
-            specie=self.activity_trigo.specie,
+            specie=self.variety_trigo.specie,
             crop=self.crop_trigo,
             quantity_entry=100,
             humidity_entry=13.5,
@@ -1270,7 +1270,7 @@ class SeedCommandBase(BaseCommand):
             date_issue=date(2026, 11, 28),
             storage_provider=self.provider_acopiador,
             campaing=self.campaing,
-            specie=self.activity_trigo.specie,
+            specie=self.variety_trigo.specie,
             crop=self.crop_trigo,
             quantity_entry=20,
             humidity_entry=13.2,
@@ -1290,7 +1290,7 @@ class SeedCommandBase(BaseCommand):
             date_issue=date(2026, 11, 11),
             storage_provider=self.provider_acopiador,
             campaing=self.campaing,
-            specie=self.activity_cebada.specie,
+            specie=self.variety_cebada.specie,
             crop=self.crop_cebada,
             quantity_entry=60,
             humidity_entry=12.8,
@@ -1378,7 +1378,7 @@ class SeedCommandBase(BaseCommand):
             cuit_custom=_cuit('3066666666'),
             campaing=self.campaing,
             cost_center=self.cost_center,
-            especie=self.activity_trigo.specie,
+            especie=self.variety_trigo.specie,
             amount=100,  # toneladas
             subtotal=25000000,
             taxes=5250000,

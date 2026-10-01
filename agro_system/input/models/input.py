@@ -17,7 +17,7 @@ class Input(models.Model):
 
     """ Modelo para representar los insumos """
 
-    name = models.CharField(max_length=200, unique=True, verbose_name=_('name'))
+    name = models.CharField(max_length=200, verbose_name=_('name'))
     type = models.ForeignKey(TypeInput, verbose_name=_('type of input'), on_delete=models.CASCADE)
     unit_measure = models.ForeignKey(MaensureUnit, models.CASCADE, verbose_name=_('unit of measure'))
     presentation = models.CharField(max_length=200, null=True, blank=True, verbose_name=_('presentation'))
@@ -57,3 +57,9 @@ class Input(models.Model):
         verbose_name = _('input')
         verbose_name_plural = _('inputs')
         ordering = ["name"]
+        # Nombre único por productor (y entre los compartidos, sin productor)
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'producer'], name='unique_input_name_per_producer'),
+            models.UniqueConstraint(fields=['name'], condition=models.Q(producer__isnull=True),
+                                    name='unique_input_name_shared'),
+        ]

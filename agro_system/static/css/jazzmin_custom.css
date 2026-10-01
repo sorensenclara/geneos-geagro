@@ -318,6 +318,10 @@ button:active {
     background-image: url("/static/img/icons/ventas.svg");
 }
 
+.icon-acopio {
+    background-image: url("/static/img/icons/Acopio-white.svg");
+}
+
 
 /* SISTEMA / ADMIN
 ========================= */

@@ -1,6 +1,6 @@
 from django.contrib import admin, messages
 from django.db.models import Q
-from user.admin.adminSite import adminSite, ProducerAwareMixin, get_producer_for_request
+from user.admin.adminSite import adminSite, ProducerAwareMixin, DefaultStoreAdminMixin, get_producer_for_request
 from input.models.purchase_reception import PurchaseReception
 from input.models.purchase_reception_detail import PurchaseReceptionDetail
 from user.models.user_producer import UserProducer
@@ -94,7 +94,7 @@ class DetalleRecepcionInline(ProducerAwareMixin, admin.StackedInline):
             return [field.name for field in self.model._meta.fields]
         return super().get_readonly_fields(request, obj)
 
-class PurchaseReceptionAdmin(ProducerAwareMixin, admin.ModelAdmin):
+class PurchaseReceptionAdmin(DefaultStoreAdminMixin, ProducerAwareMixin, admin.ModelAdmin):
     list_display = ['code', 'purchase_order', 'delivery_date', 'state', 'store']
     list_filter = ['state', 'store']
     search_fields = ['code', 'purchase_order__number']

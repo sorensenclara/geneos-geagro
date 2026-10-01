@@ -157,6 +157,16 @@
   }
   .wo-table tr:last-child td { border-bottom: none; }
   .wo-table tr:hover td { background: #f8f9fa; }
+  .wo-table .num { text-align: right; white-space: nowrap; }
+  /* Diferencia real - planeado: rojo si se gastó más de lo planeado, verde si menos */
+  .diff-over  { color: #842029; font-weight: 600; }
+  .diff-under { color: #0f5132; font-weight: 600; }
+  .wo-table tfoot td {
+    background: #f4f6f8;
+    border-top: 2px solid #dee2e6;
+    font-weight: 600;
+    color: #2c3e50;
+  }
   .state-badge {
     display: inline-block;
     padding: 0.2rem 0.6rem;
@@ -331,12 +341,15 @@
               <th>Inicio</th>
               <th>Fin</th>
               <th>Cultivo</th>
+              <th class="num">Superficie (ha)</th>
               <th>Estadio</th>
               <th>Servicio</th>
               <th>Tipo</th>
               <th>Estado</th>
               <th>Contratista</th>
-              <th>Costo labor</th>
+              <th class="num">Costo planeado (MB)</th>
+              <th class="num">Costo real (MB)</th>
+              <th class="num">Diferencia (MB)</th>
               <th>Personal</th>
             </tr>
           </thead>
@@ -347,18 +360,43 @@
               <td>{{ wo.date_init|date:"d/m/Y" }}</td>
               <td>{{ wo.date_fin|date:"d/m/Y" }}</td>
               <td>{{ wo.crop }}</td>
-              <td>{{ wo.stage }}</td>
-              <td>{{ wo.service }}</td>
+              <td class="num">{% if wo.surface is not None %}{{ wo.surface|floatformat:2 }}{% else %}—{% endif %}</td>
+              <td>{{ wo.stage|default:"—" }}</td>
+              <td>{{ wo.service|default:"—" }}</td>
               <td><span class="type-badge type-{{ wo.type }}">{{ wo.get_type_display }}</span></td>
               <td><span class="state-badge">{{ wo.stateOT }}</span></td>
               <td>{{ wo.contractor|default:"—" }}</td>
-              <td>{% if wo.contractor_cost %}{{ wo.contractor_cost|floatformat:2 }}{% else %}—{% endif %}</td>
-              <td>{{ wo.staff }}</td>
+              <td class="num">{% if wo.contractor_cost is not None %}{{ wo.contractor_cost|floatformat:2 }}{% else %}—{% endif %}</td>
+              <td class="num">{% if wo.contractor_cost_real is not None %}{{ wo.contractor_cost_real|floatformat:2 }}{% else %}—{% endif %}</td>
+              {% with diff=wo.contractor_cost_diff %}
+              <td class="num {% if diff > 0 %}diff-over{% elif diff < 0 %}diff-under{% endif %}">
+                {% if diff is not None %}{% if diff > 0 %}+{% endif %}{{ diff|floatformat:2 }}{% else %}—{% endif %}
+              </td>
+              {% endwith %}
+              <td>{{ wo.staff|default:"—" }}</td>
             </tr>
             {% endfor %}
           </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4">Totales</td>
+              <td class="num">{{ totals.surface|floatformat:2 }}</td>
+              <td colspan="5"></td>
+              <td class="num">{{ totals.cost_planned|floatformat:2 }}</td>
+              <td class="num">{{ totals.cost_real|floatformat:2 }}</td>
+              <td class="num {% if totals.cost_diff > 0 %}diff-over{% elif totals.cost_diff < 0 %}diff-under{% endif %}">
+                {% if totals.cost_diff is not None %}{% if totals.cost_diff > 0 %}+{% endif %}{{ totals.cost_diff|floatformat:2 }}{% else %}—{% endif %}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
+      <p class="summary-bar" style="padding: 0.5rem 1rem 0; margin-bottom: 0.75rem;">
+        Diferencia = costo real − costo planeado (en rojo: se gastó más de lo planeado).
+        La diferencia total compara solo las {{ totals.compared }} orden{{ totals.compared|pluralize:"es" }}
+        con ambos costos cargados; los totales planeado y real suman todas las órdenes.
+      </p>
     {% else %}
       <p class="empty-msg">No hay órdenes de trabajo para los filtros seleccionados.</p>
     {% endif %}

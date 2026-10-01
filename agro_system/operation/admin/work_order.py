@@ -15,11 +15,13 @@ from parameter.models.exchange_rate import exchangeRate
 
 
 def _get_work_order_store(work_order):
-    """Returns the store associated with the work order's countryside, or None."""
+    """Returns the store of the work order's countryside, or the producer's default store."""
+    from producer.models.store import Store
     try:
-        return work_order.crop.countryside.store
+        store = work_order.crop.countryside.store
     except AttributeError:
-        return None
+        store = None
+    return store or Store.get_default(work_order.producer)
 
 
 def _subtract_from_store_stock(input_obj, store, amount):
@@ -53,12 +55,13 @@ def _refresh_value_real(work_order):
         )
 
 
-class InputWorkOrderInline(admin.StackedInline):
+class InputWorkOrderInline(ProducerAwareMixin, admin.StackedInline):
     model = InputWorkOrder
     extra = 0
     show_change_link = True
     verbose_name_plural = _("Inputs")
-    fields = ['input', 'dose', 'value_estimated', 'dose_applied', 'value_real',  'currency', 'exchange_rate', 'value_real_base', 'total_real_display','store', 'details']
+    fields = ['input', 'unit_measure', 'dose', 'dose_applied', 'total_quantity',
+              'value_estimated', 'value_real', 'currency', 'exchange_rate', 'value_real_base', 'total_real_display', 'store', 'details']
     readonly_fields = ['value_real_base', 'total_real_display']
 
     def total_real_display(self, obj):
@@ -75,6 +78,13 @@ class InputWorkOrderInline(admin.StackedInline):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "input":
             kwargs["queryset"] = _filter_inputs(request)
+        elif db_field.name == "store":
+            # Almacenes del productor y los compartidos (sin productor)
+            producers = self._producers_for_user(request)
+            if producers is not None:
+                from django.db.models import Q
+                from producer.models.store import Store
+                kwargs["queryset"] = Store.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -114,25 +124,29 @@ def download_pdf(modeladmin, request, queryset):
 
 
 class WorkOrderAdmin(ProducerAwareMixin, admin.ModelAdmin):
-    list_display = ['code', 'crop', 'stage', 'date_init', 'stateOT', 'type']
+    list_display = ['code', 'crop', 'surface', 'stage', 'date_init', 'stateOT', 'type']
     list_filter = ['campaing', 'stage', 'stateOT', 'crop', 'staff']
     search_fields = ['code', 'crop__name']
     ordering = ['code']
     inlines = [InputWorkOrderInline]
     actions = [finish_order, download_pdf]
     fieldsets = [
-        (None, {
+        (_('General'), {
+            'fields': ['code', 'date_init', 'crop', 'surface', 'service', 'contractor', 'contractor_cost', 'contractor_cost_real'],
+            #'description': _('Contractor costs are in base currency.'),
+        }),
+        # Si se dejan vacíos se completan solos: emisión = hoy, fin = inicio,
+        # campaña activa, zona del cultivo y estado por defecto (Pendiente)
+        (_('Additional fields'), {
             'fields': [
-                'code', 'date_emission', 'date_init', 'date_fin',
-                'campaing', 'crop', 'area', 'stage', 'service',
+                'date_emission', 'date_fin', 'campaing', 'area', 'stage',
                 'stateOT', 'type', 'staff', 'partner',
             ],
-        }),
-        (_('Contratista'), {
-            'fields': ['contractor', 'contractor_cost', 'contractor_cost_real'],
-            'description': _('Valores en moneda base'),
+            'description': _('If left empty, they are filled in automatically.'),
         }),
     ]
+    # Jazzmin: General arriba, luego los insumos y los campos adicionales al final
+    jazzmin_section_order = [_('General'), _('Inputs')]
 
     class Media:
         js = ('js/admin_input_autocost.js', 'js/admin_work_order.js')

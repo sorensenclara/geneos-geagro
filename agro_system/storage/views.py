@@ -68,7 +68,7 @@ def _build_acopio_data(request):
     if source in ('', 'silo'):
         sm_qs = SiloMovement.objects.select_related(
             'silo', 'silo__countryside',
-            'crop', 'crop__campaing', 'crop__activity', 'crop__activity__specie',
+            'crop', 'crop__campaing', 'crop__variety', 'crop__variety__specie',
             'destination_silo', 'driver', 'related_sale',
         ).order_by('-date', '-id')
         sm_qs = _apply_prod(sm_qs, 'producer')
@@ -92,7 +92,7 @@ def _build_acopio_data(request):
             if m.type == 'transfer' and m.destination_silo:
                 dest = f'→ {m.destination_silo}'
             try:
-                specie_str = str(m.crop.activity.specie) if (m.crop and m.crop.activity) else '—'
+                specie_str = str(m.crop.variety.specie) if (m.crop and m.crop.variety) else '—'
             except Exception:
                 specie_str = '—'
             silo_rows.append({
@@ -180,7 +180,7 @@ def _build_acopio_data(request):
     # Filter option querysets
     campaigns_qs = Campaing.objects.order_by('-name')
 
-    crops_qs = Crop.objects.select_related('campaing', 'activity').order_by('name')
+    crops_qs = Crop.objects.select_related('campaing', 'variety').order_by('name')
     if campaing_id:
         crops_qs = crops_qs.filter(campaing_id=campaing_id)
     else:
@@ -570,15 +570,15 @@ def _build_conciliation_data(request):
 
     # ── Crops ──────────────────────────────────────────────────────────
     crops_qs = Crop.objects.select_related(
-        'campaing', 'countryside', 'lot', 'activity', 'activity__specie', 'producer',
-    ).order_by('campaing__name', 'countryside__name', 'activity__name')
+        'campaing', 'countryside', 'lot', 'variety', 'variety__specie', 'producer',
+    ).order_by('campaing__name', 'countryside__name', 'variety__name')
 
     if prod_filter is not None:
         crops_qs = crops_qs.filter(producer__in=prod_filter)
     if campaing_id:
         crops_qs = crops_qs.filter(campaing_id=campaing_id)
     if specie_id:
-        crops_qs = crops_qs.filter(activity__specie_id=specie_id)
+        crops_qs = crops_qs.filter(variety__specie_id=specie_id)
 
     crops = list(crops_qs)
     crop_ids = [c.pk for c in crops]
@@ -672,8 +672,8 @@ def _build_conciliation_data(request):
             'campaing': str(crop.campaing),
             'countryside': str(crop.countryside),
             'lot': str(crop.lot),
-            'specie': str(crop.activity.specie),
-            'activity': str(crop.activity),
+            'specie': str(crop.variety.specie),
+            'variety': str(crop.variety),
             'ha': ha,
             'est_rate': est_rate,
             'tn_est': tn_est,
@@ -743,7 +743,7 @@ def conciliation_excel(request):
     hdr_align = Alignment(horizontal='center', vertical='center', wrap_text=True)
 
     headers = [
-        'Campaña', 'Campo', 'Lote', 'Especie', 'Actividad',
+        'Campaña', 'Campo', 'Lote', 'Especie', 'Variedad',
         'Ha cosechadas',
         'Rinde est. (tn/ha)', 'Tn estimadas',
         'Rinde real (tn/ha)', 'Tn reales',
@@ -767,7 +767,7 @@ def conciliation_excel(request):
         ws.cell(row=row_idx, column=2, value=r['countryside'])
         ws.cell(row=row_idx, column=3, value=r['lot'])
         ws.cell(row=row_idx, column=4, value=r['specie'])
-        ws.cell(row=row_idx, column=5, value=r['activity'])
+        ws.cell(row=row_idx, column=5, value=r['variety'])
         ws.cell(row=row_idx, column=6, value=r['ha'])
         ws.cell(row=row_idx, column=6).number_format = num_fmt
         ws.cell(row=row_idx, column=7, value=r['est_rate'])

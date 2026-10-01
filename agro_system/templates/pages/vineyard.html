@@ -89,7 +89,7 @@
         </h3>
 
         <p class="text-muted mb-3">
-          {{ main_crop.lot }} · {{ main_crop.activity }} · {{ main_crop.campaing }}
+          {{ main_crop.lot }} · {{ main_crop.variety }} · {{ main_crop.campaing }}
         </p>
 
         <div class="d-flex flex-wrap gap-2 mb-3">
@@ -385,7 +385,7 @@
         <thead class="table-light">
           <tr>
             <th>Especie</th>
-            <th>Actividad</th>
+            <th>Variedad</th>
             <th>Lote</th>
             <th class="text-end">Ha plantadas</th>
             <th class="text-end">Estimado</th>
@@ -397,7 +397,7 @@
           {% for row in crops_yield_detail %}
           <tr>
             <td><span class="badge bg-light text-dark border">{{ row.specie }}</span></td>
-            <td>{{ row.activity }}</td>
+            <td>{{ row.variety }}</td>
             <td class="text-muted small">{{ row.lot }}</td>
             <td class="text-end">{{ row.ha|floatformat:1 }} ha</td>
             <td class="text-end">

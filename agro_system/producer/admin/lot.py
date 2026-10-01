@@ -24,6 +24,10 @@ class LotAdmin(ProducerAwareMixin, LeafletGeoAdmin):
                 kwargs['queryset'] = Countryside.objects.filter(producer__in=producers)
             elif db_field.name == 'responsible':
                 kwargs['queryset'] = Staff.objects.filter(producer__in=producers)
+            elif db_field.name == 'cost_center':
+                from django.db.models import Q
+                from producer.models.cost_center import CostCenter
+                kwargs['queryset'] = CostCenter.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):

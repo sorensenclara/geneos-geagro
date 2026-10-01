@@ -55,7 +55,9 @@ def topbar_filter(request):
     else:
         selected_crop = crops_qs.filter(is_main=True).first() or crops_qs.order_by('-id').first()
 
-    notifications = Notification.objects.filter(user=user).order_by('-date')[:10]
+    # Menú de la campana: las últimas 10; el número es el total real de no leídas
+    notifications = Notification.objects.filter(user=user).order_by('-date', '-id')[:10]
+    unread_count = Notification.objects.filter(user=user, read=False).count()
 
     return {
         'campaings': campaings,
@@ -64,5 +66,5 @@ def topbar_filter(request):
         'selected_crop': selected_crop,
         'campaign_active': campaign_active,
         'topbar_notifications': notifications,
-        'topbar_notifications_count': notifications.count(),
+        'topbar_notifications_count': unread_count,
     }

@@ -284,9 +284,10 @@
                                   </div>
 
                                   <div class="small text-muted">
-                                    {{ order.service }}
+                                    {{ order.service|default:"—" }}
                                     ·
-                                    {{ order.staff }}
+                                    {{ order.staff|default:"—" }}
+                                    {% if order.surface is not None %}· {{ order.surface|floatformat:2 }} ha{% endif %}
                                   </div>
 
                                 </div>

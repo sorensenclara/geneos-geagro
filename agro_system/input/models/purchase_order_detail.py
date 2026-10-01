@@ -25,6 +25,9 @@ class PurchaseOrderDetail(models.Model):
         return f"{self.input} - {self.amount}"
 
     def save(self, *args, **kwargs):
+        if not self.costo_center_id:
+            self.costo_center = CostCenter.get_default(
+                self.purchase_order.producer if self.purchase_order_id else None)
         if not self.price_unit:
             self.price_unit = self.input.cost
         if self.price_unit and self.tax and self.amount:

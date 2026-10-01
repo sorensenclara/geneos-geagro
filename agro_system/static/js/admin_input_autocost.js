@@ -26,6 +26,23 @@
     return row ? row.querySelector('input[id$="-exchange_rate"]') : null;
   }
 
+  function findUnitSelect(selectEl) {
+    var row = findRow(selectEl);
+    return row ? row.querySelector('select[id$="-unit_measure"]') : null;
+  }
+
+  // Asigna el valor a un <select> (con o sin Select2) y dispara change.
+  function setSelectValue(selectEl, value) {
+    if (!selectEl || value === undefined || value === null) return;
+    var jq = (window.django && window.django.jQuery) || window.jQuery || window.$;
+    if (jq && typeof jq === 'function') {
+      jq(selectEl).val(String(value)).trigger('change');
+    } else {
+      selectEl.value = value;
+      selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
+
   // Devuelve true si la fila ya fue guardada (tiene PK en el campo hidden "-id").
   function isExistingRow(el) {
     var row = findRow(el);
@@ -108,8 +125,9 @@
       .catch(function () {});
   }
 
-  // Al seleccionar un insumo: llena value_estimated (solo si vacío) y moneda/tasa.
-  function fetchAndFillOnChange(selectEl) {
+  // Al seleccionar un insumo: llena value_estimated (solo si vacío), unidad y moneda/tasa.
+  // explicit=true cuando el usuario eligió el insumo en Select2 (no en la inicialización).
+  function fetchAndFillOnChange(selectEl, explicit) {
     var inputId = selectEl.value;
     if (!inputId) return;
 
@@ -119,6 +137,14 @@
         var estimatedField = findValueEstimatedField(selectEl);
         if (estimatedField && !estimatedField.value && data.cost !== undefined) {
           estimatedField.value = data.cost;
+        }
+
+        // Unidad por defecto la del insumo. En filas guardadas solo se pisa si el usuario
+        // eligió el insumo explícitamente (o si la unidad está vacía), para no perder la elegida.
+        var unitSelect = findUnitSelect(selectEl);
+        if (unitSelect && data.unit_measure_id &&
+            (!isExistingRow(selectEl) || explicit || !unitSelect.value)) {
+          setSelectValue(unitSelect, data.unit_measure_id);
         }
 
         if (data.currency_id !== undefined && data.currency_id !== null) {
@@ -188,13 +214,28 @@
     if (selectEl._autoCostBound) return;
     selectEl._autoCostBound = true;
 
-    selectEl.addEventListener('change', function () { fetchAndFillOnChange(selectEl); });
+    // Se activa cuando el usuario elige explícitamente en Select2 (no en la inicialización).
+    var s2SelectPending = false;
+    var jqForS2 = (window.django && window.django.jQuery) || window.jQuery || window.$;
+    if (jqForS2 && typeof jqForS2 === 'function') {
+      jqForS2(selectEl).on('select2:select', function () {
+        s2SelectPending = true;
+      });
+    }
+
+    function onInputChange() {
+      var explicit = s2SelectPending;
+      s2SelectPending = false;
+      fetchAndFillOnChange(selectEl, explicit);
+    }
+
+    selectEl.addEventListener('change', onInputChange);
 
     var seen = [];
     [window.django && window.django.jQuery, window.jQuery, window.$].forEach(function (jq) {
       if (jq && typeof jq === 'function' && seen.indexOf(jq) === -1) {
         seen.push(jq);
-        jq(selectEl).on('change', function () { fetchAndFillOnChange(selectEl); });
+        jq(selectEl).on('change', onInputChange);
       }
     });
 
@@ -207,14 +248,79 @@
     }, 200);
   }
 
+  // ── Cantidad total = dosis (real, o técnica si no hay real) x superficie de la orden ──
+  // Se recalcula sola mientras el usuario no la edite a mano. Si la borra, vuelve a ser automática.
+
+  function parseNumber(value) {
+    if (value === undefined || value === null || String(value).trim() === '') return null;
+    var n = parseFloat(String(value).replace(',', '.'));
+    return isNaN(n) ? null : n;
+  }
+
+  function computeTotal(row) {
+    var surfaceEl = document.getElementById('id_surface');
+    var surface = surfaceEl ? parseNumber(surfaceEl.value) : null;
+    var doseEl = row.querySelector('input[id$="-dose"]');
+    var doseAppliedEl = row.querySelector('input[id$="-dose_applied"]');
+    var doseApplied = doseAppliedEl ? parseNumber(doseAppliedEl.value) : null;
+    var dose = doseApplied !== null ? doseApplied : (doseEl ? parseNumber(doseEl.value) : null);
+    if (dose === null || surface === null) return null;
+    return Math.round(dose * surface * 100) / 100;
+  }
+
+  function refreshTotal(row) {
+    var totalEl = row.querySelector('input[id$="-total_quantity"]');
+    if (!totalEl || totalEl._manual) return;
+    var total = computeTotal(row);
+    totalEl.value = total === null ? '' : total;
+  }
+
+  function bindTotalRow(totalEl) {
+    if (totalEl._totalBound || totalEl.id.indexOf('__prefix__') !== -1) return;
+    totalEl._totalBound = true;
+    var row = findRow(totalEl);
+    if (!row) return;
+
+    // Al cargar: si ya tiene un valor distinto al calculado, se considera cargado a mano
+    var current = parseNumber(totalEl.value);
+    totalEl._manual = current !== null && current !== computeTotal(row);
+
+    totalEl.addEventListener('input', function () {
+      totalEl._manual = totalEl.value.trim() !== '';
+      if (!totalEl._manual) refreshTotal(row);
+    });
+    ['-dose', '-dose_applied'].forEach(function (suffix) {
+      var el = row.querySelector('input[id$="' + suffix + '"]');
+      if (el) el.addEventListener('input', function () { refreshTotal(row); });
+    });
+    refreshTotal(row);
+  }
+
+  function refreshAllTotals() {
+    document.querySelectorAll('input[id*="inputworkorder_set"][id$="-total_quantity"]').forEach(function (el) {
+      if (el.id.indexOf('__prefix__') !== -1) return;
+      var row = findRow(el);
+      if (row) refreshTotal(row);
+    });
+  }
+
+  function bindSurface() {
+    var surfaceEl = document.getElementById('id_surface');
+    if (!surfaceEl || surfaceEl._totalBound) return;
+    surfaceEl._totalBound = true;
+    surfaceEl.addEventListener('input', refreshAllTotals);
+  }
+
   function bindAll() {
     document.querySelectorAll('select[id*="inputworkorder_set"][id$="-input"]').forEach(bindSelect);
     document.querySelectorAll('select[id*="inputworkorder_set"][id$="-currency"]').forEach(bindCurrencySelect);
+    document.querySelectorAll('input[id*="inputworkorder_set"][id$="-total_quantity"]').forEach(bindTotalRow);
     applyDefaultCurrencyToNewRows();
   }
 
   function init() {
     bindAll();
+    bindSurface();
     prefillRatesOnLoad();
     fetchBaseCurrency();
 

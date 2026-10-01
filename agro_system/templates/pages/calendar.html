@@ -30,7 +30,7 @@
       <i class="mdi mdi-chevron-right"></i>
       <span>
         CULTIVO:
-        {{ selected_crop.name|default:selected_crop.activity|default:"-" }}
+        {{ selected_crop.name|default:selected_crop.variety|default:"-" }}
       </span>
     {% endif %}
   </div>
@@ -101,11 +101,11 @@
                     <div class="date">{{ order.date_init|date:"d M" }}</div>
 
                     <p class="activity-text mb-1 fw-semibold">
-                      {{ order.service }}
+                      {{ order.service|default:"Orden de trabajo" }}
                     </p>
 
                     <div class="small text-muted mb-1">
-                      {{ order.crop.lot }}
+                      {{ order.crop.lot }}{% if order.surface is not None %} · {{ order.surface|floatformat:2 }} ha{% endif %}
                     </div>
 
                     {% if order.stateOT %}
@@ -155,11 +155,11 @@
                     <div class="date">{{ order.date_init|date:"d M" }}</div>
 
                     <p class="activity-text mb-1 fw-semibold">
-                      {{ order.service }}
+                      {{ order.service|default:"Orden de trabajo" }}
                     </p>
 
                     <div class="small text-muted mb-1">
-                      {{ order.crop.lot }}
+                      {{ order.crop.lot }}{% if order.surface is not None %} · {{ order.surface|floatformat:2 }} ha{% endif %}
                     </div>
 
                     {% if order.stateOT %}
