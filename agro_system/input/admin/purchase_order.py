@@ -140,6 +140,10 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
                 kwargs["queryset"] = UserProducer.objects.filter(association=request.user)
             elif request.user.type == "Producer":
                 kwargs["queryset"] = UserProducer.objects.filter(email=request.user.email)
+        if db_field.name == "store":
+            # Almacenes del productor y los compartidos (sin productor)
+            from user.admin.producer_scope import visible_stores
+            kwargs["queryset"] = visible_stores(request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 

@@ -18,6 +18,16 @@ def accessible_crops(user):
     return Crop.objects.all() if producers is None else Crop.objects.filter(producer__in=producers)
 
 
+def visible_stores(user):
+    """Almacenes del usuario: todos (superusuario / Administración); si no, los de su productor y los sin productor."""
+    from django.db.models import Q
+    from producer.models.store import Store
+    producers = producers_for(user)
+    if producers is None:
+        return Store.objects.all()
+    return Store.objects.filter(Q(producer__in=producers) | Q(producer__isnull=True))
+
+
 def producers_for(user):
     user_type = getattr(user, 'type', None)
     if user.is_superuser or user_type == 'Administration':

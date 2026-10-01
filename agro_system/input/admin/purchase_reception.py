@@ -58,7 +58,8 @@ class DetalleRecepcionInline(admin.StackedInline):
 
 class PurchaseReceptionAdmin(admin.ModelAdmin):
     list_display = ['purchase_order', 'delivery_date', 'state', 'store']
-    list_filter = ['state', 'purchase_order', 'store']
+    # RelatedOnlyFieldListFilter: el filtro solo ofrece los almacenes de las recepciones visibles
+    list_filter = ['state', 'purchase_order', ('store', admin.RelatedOnlyFieldListFilter)]
     actions = [process_reception]
     inlines = [DetalleRecepcionInline]
 
@@ -102,6 +103,10 @@ class PurchaseReceptionAdmin(admin.ModelAdmin):
                 kwargs["queryset"] = UserProducer.objects.filter(association=request.user)
             elif request.user.type == "Producer":
                 kwargs["queryset"] = UserProducer.objects.filter(email=request.user.email)
+        if db_field.name == "store":
+            # Almacenes del productor y los compartidos (sin productor)
+            from user.admin.producer_scope import visible_stores
+            kwargs["queryset"] = visible_stores(request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 adminSite.register(PurchaseReception, PurchaseReceptionAdmin)
