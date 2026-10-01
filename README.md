@@ -230,3 +230,19 @@ Para cambiar de entorno, editar `manage.py`:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'agro_system.settings.dev')
     # o
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'agro_system.settings.prod')
+
+
+
+## DATOS DE PRUEBA SERVIDOR 
+python manage.py seed_demo_tandil
+
+PRODUCER_EMAIL = "demo.tandil@geneos.com.ar"
+STAFF_EMAIL = "agronomo.tandil@geneos.com.ar"
+DEMO_PASSWORD = "Demo1234!"
+
+
+El servidor necesita salida a internet hacia api.open-meteo.com. Si no la tiene, corré seed_demo_tandil --sin-clima: crea todo menos el clima y las alertas reales, y las 3 de prueba igual se crean.
+
+Dos bugs del motor de vid que no corregí, porque no son del seed:
+Una acción de indicador sin etapa hace fallar la creación de la orden (la etapa es obligatoria), y con eso falla la emisión de la alerta. En el seed lo evité poniéndole etapa a las acciones.
+Si una alerta de pronóstico se aborta y el motor vuelve a dispararla para la misma fecha, choca con el nombre único de la alerta.

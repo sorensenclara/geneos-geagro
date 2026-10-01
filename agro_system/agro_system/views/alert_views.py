@@ -11,6 +11,7 @@ from producer.models.lot import Lot
 from parameter.models.campaign import Campaing
 from producer.models.staff import Staff
 from user.models.notification import Notification
+from user.admin.producer_scope import accessible_crops, producers_for
 from django.utils import timezone
 
 
@@ -45,25 +46,11 @@ def AlertView(request):
 
     user = request.user
 
-    # =========================================================
-    # DEV ORIGINAL - visibilidad según tipo usuario
-    # =========================================================
-    if user.type == 'Producer':
-        country_sides = Countryside.objects.filter(producer=user)
-        crops_base = Crop.objects.filter(producer=user)
-
-    elif user.type == 'Staff':
-        staff = Staff.objects.filter(user=user).first()
-        country_sides = Countryside.objects.filter(producer=staff.producer)
-        crops_base = Crop.objects.filter(producer=staff.producer)
-
-    elif user.type == 'Administration':
-        country_sides = Countryside.objects.all()
-        crops_base = Crop.objects.all()
-
-    else:
-        country_sides = Countryside.objects.none()
-        crops_base = Crop.objects.none()
+    # Visibilidad: solo cultivos/campos del productor del usuario (todo para Administración).
+    # Sin fallbacks a "todos": un productor sin cultivos no ve los de otros.
+    crops_base = accessible_crops(user)
+    producers = producers_for(user)
+    country_sides = Countryside.objects.all() if producers is None else Countryside.objects.filter(producer__in=producers)
 
     campaings = Campaing.objects.all()
     campaign_active = campaings.filter(active=True).first()
@@ -73,21 +60,12 @@ def AlertView(request):
     else:
         selected_campaing = campaign_active or campaings.first()
 
-    if not crops_base.exists():
-        crops_base = Crop.objects.all()
-
-    if not country_sides.exists():
-        country_sides = Countryside.objects.all()
-
     lots = Lot.objects.filter(countryside__in=country_sides)
 
     crops = crops_base
 
     if selected_campaing:
         crops = crops.filter(campaing_id=selected_campaing.id)
-
-    if selected_campaing and not crops.exists():
-        crops = Crop.objects.filter(campaing_id=selected_campaing.id)
 
     if countryside_id:
         crops = crops.filter(countryside_id=countryside_id)
@@ -101,11 +79,6 @@ def AlertView(request):
         selected_crop = crops.filter(id=crop_id).first()
     else:
         selected_crop = crops.filter(is_main=True).first() or crops.order_by('-id').first()
-
-    if not selected_crop and selected_campaing:
-        selected_crop = Crop.objects.filter(
-            campaing_id=selected_campaing.id
-        ).order_by('-id').first()
 
     alerts = Alert.active.none()
 
@@ -154,7 +127,8 @@ def AlertView(request):
 
 @login_required
 def AlertOutcomeView(request, alert_id):
-    alert = get_object_or_404(Alert, pk=alert_id)
+    # Solo alertas de cultivos del usuario: una alerta ajena da 404 (ni se ve ni se edita)
+    alert = get_object_or_404(Alert, pk=alert_id, crop__in=accessible_crops(request.user))
     outcome, _ = AlertOutcome.objects.get_or_create(alert=alert)
 
     staff = Staff.objects.filter(user=request.user).first()

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from user.admin.adminSite import adminSite
+from user.admin.producer_scope import producers_for_user
 from crop_monitoring.models.biofix import Biofix
 from crop_monitoring.models.gdd_accumulator import GDDAccumulator
 from crop_monitoring.models.phenological_state import PhenologicalState
@@ -47,6 +48,20 @@ class BiofixAdmin(admin.ModelAdmin):
     search_fields  = ("crop__name", "crop__lot__name")
     readonly_fields = ("gdd_acumulado", "estado_fenologico")
     inlines        = [GDDAccumulatorInline]
+
+    def get_queryset(self, request):
+        # Productor / Staff / Organización: solo los biofix de sus cultivos
+        qs = super().get_queryset(request)
+        producers = producers_for_user(request)
+        return qs if producers is None else qs.filter(crop__producer__in=producers)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "crop":
+            producers = producers_for_user(request)
+            if producers is not None:
+                from operation.models.crop import Crop
+                kwargs["queryset"] = Crop.objects.filter(producer__in=producers)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     fieldsets = [
         (None, {

@@ -33,12 +33,9 @@ EFFECTIVENESS_LABELS = {
 
 
 def _accessible_crops(user):
-    if user.type == "Producer":
-        return Crop.objects.filter(producer=user)
-    if user.type == "Staff":
-        staff = Staff.objects.filter(user=user).first()
-        return Crop.objects.filter(producer=staff.producer) if staff else Crop.objects.none()
-    return Crop.objects.all()
+    # Todo para superusuario / Administración; el resto solo los cultivos de su(s) productor(es)
+    from user.admin.producer_scope import accessible_crops
+    return accessible_crops(user)
 
 
 def _build_stats(alerts_qs):

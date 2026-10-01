@@ -59,17 +59,20 @@ class MiAdmin(AdminSite):
         else:
             campaing = Campaing.objects.filter(active=True).first() or Campaing.objects.order_by("-date_init").first()
 
+        # Solo cultivos visibles para el usuario: un ?crop= ajeno no muestra nada
+        from user.admin.producer_scope import accessible_crops
+        visible_crops = accessible_crops(request.user)
         if crop_id:
-            crop = Crop.objects.filter(id=crop_id).first()
+            crop = visible_crops.filter(id=crop_id).first()
         else:
             crop = (
-                Crop.objects.filter(campaing=campaing, is_main=True).first()
-                or Crop.objects.filter(campaing=campaing).order_by("-id").first()
+                visible_crops.filter(campaing=campaing, is_main=True).first()
+                or visible_crops.filter(campaing=campaing).order_by("-id").first()
                 if campaing else None
             )
 
         campaings = Campaing.objects.all().order_by("-date_init")
-        crops = Crop.objects.filter(campaing=campaing).order_by("-id") if campaing else Crop.objects.none()
+        crops = visible_crops.filter(campaing=campaing).order_by("-id") if campaing else Crop.objects.none()
 
         ordenes = WorkOrder.objects.filter(crop=crop).order_by("date_init") if crop else WorkOrder.objects.none()
 

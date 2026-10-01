@@ -168,8 +168,9 @@ def custom_admin_dashboard(request):
         ).order_by('-date')
 
     elif selected_campaing:
+        # Solo los cultivos visibles para el usuario (crops ya está filtrado por productor y campaña)
         alerts = Alert.objects.filter(
-            crop__campaing=selected_campaing
+            crop__in=crops
         ).order_by('-date')
 
     alerts_count = alerts.count()

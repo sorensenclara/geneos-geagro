@@ -65,8 +65,9 @@
                     </a>
                 </li>
 
-                <li>
-                    <a href="wines" class=" waves-effect">
+                <li class="{% if request.resolver_match.url_name == 'vineyard' %}mm-active{% endif %}">
+                    <a href="{% url 'vineyard' %}"
+                       class="waves-effect {% if request.resolver_match.url_name == 'vineyard' %}active{% endif %}">
                         <img src="{% static 'images/icon/vinedos.svg' %}" class="menu-icon-img" />
                         <span>Mis Viñedos</span>
                     </a>

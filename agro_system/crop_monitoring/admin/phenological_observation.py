@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from user.admin.adminSite import adminSite
+from user.admin.producer_scope import producers_for_user
 from crop_monitoring.models.phenological_observation import PhenologicalObservation
 from crop_monitoring.models.gdd_accumulator import GDDAccumulator
 from crop_monitoring.models.biofix import Biofix
@@ -41,6 +42,23 @@ class PhenologicalObservationAdmin(admin.ModelAdmin):
     ]
 
     # ------------------------------------------------------------------
+
+    def get_queryset(self, request):
+        # Productor / Staff / Organización: solo las observaciones de sus cultivos
+        qs = super().get_queryset(request)
+        producers = producers_for_user(request)
+        return qs if producers is None else qs.filter(crop__producer__in=producers)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        producers = producers_for_user(request)
+        if producers is not None:
+            if db_field.name == "crop":
+                from operation.models.crop import Crop
+                kwargs["queryset"] = Crop.objects.filter(producer__in=producers)
+            elif db_field.name == "registered_by":
+                from producer.models.staff import Staff
+                kwargs["queryset"] = Staff.objects.filter(producer__in=producers)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def gdd_acumulador_referencia(self, obj):
         """Muestra el GDD actual del acumulador como referencia al editar."""

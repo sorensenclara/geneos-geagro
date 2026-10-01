@@ -21,6 +21,7 @@ from weather.models.station_weather import WeatherStation
 
 from alert.models.alert import Alert
 from alert.models.alert_profile_indicator import AlertProfileIndicator
+from user.admin.producer_scope import accessible_crops
 from alert.models.indicator import Indicator
 from operation.models.input_work_order import InputWorkOrder
 
@@ -150,7 +151,8 @@ def DashboardView(request):
             base_qs = base_qs.filter(campaing=selected_campaing)
 
     elif selected_campaing:
-        base_qs = WorkOrder.active.filter(campaing=selected_campaing)
+        # Siempre acotado a los cultivos visibles para el usuario (antes, sin lotes, traía las de todos)
+        base_qs = WorkOrder.active.filter(campaing=selected_campaing, crop__in=accessible_crops(user))
 
         if lots.exists():
             base_qs = base_qs.filter(crop__lot__in=lots)
@@ -249,15 +251,15 @@ def DashboardView(request):
             if selected_crop.countryside:
                 country_side_selected = selected_crop.countryside
 
-            # Asegurar que el listado de cultivos no quede vacío
-            crops = Crop.objects.filter(campaing=selected_campaing)
+            # Asegurar que el listado de cultivos no quede vacío (solo cultivos visibles para el usuario)
+            crops = accessible_crops(user).filter(campaing=selected_campaing)
 
     alerts = Alert.active.none()
 
     if selected_crop:
         alerts = Alert.active.filter(crop=selected_crop).order_by('-date')
     elif selected_campaing:
-        alerts = Alert.active.filter(crop__campaing=selected_campaing).order_by('-date')
+        alerts = Alert.active.filter(crop__in=crops, crop__campaing=selected_campaing).order_by('-date')
     alerts_today    = alerts.filter(date=today, is_forecast=False)
     alerts_forecast = alerts.filter(date__gt=today, is_forecast=True).order_by('date')
     alerts_count    = alerts_today.count()

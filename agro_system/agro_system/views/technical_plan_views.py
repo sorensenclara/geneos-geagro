@@ -19,6 +19,7 @@ from django.db.models import Case, When, IntegerField, Value
 
 from alert.models.alert import Alert
 from alert.models.indicator import Indicator
+from user.admin.producer_scope import accessible_crops, producers_for
 
 
 @login_required
@@ -31,22 +32,11 @@ def TechnicalPlanView(request):
 
     user = request.user
 
-    if user.type == 'Producer':
-        country_sides = Countryside.objects.filter(producer=user)
-        crops_base = Crop.objects.filter(producer=user)
-
-    elif user.type == 'Staff':
-        staff = Staff.objects.filter(user=user).first()
-        country_sides = Countryside.objects.filter(producer=staff.producer)
-        crops_base = Crop.objects.filter(producer=staff.producer)
-
-    elif user.type == 'Administration':
-        country_sides = Countryside.objects.all()
-        crops_base = Crop.objects.all()
-
-    else:
-        country_sides = Countryside.objects.none()
-        crops_base = Crop.objects.none()
+    # Visibilidad: solo cultivos/campos del productor del usuario (todo para Administración).
+    # Sin fallbacks a "todos": un productor sin cultivos no ve los de otros.
+    crops_base = accessible_crops(user)
+    producers = producers_for(user)
+    country_sides = Countryside.objects.all() if producers is None else Countryside.objects.filter(producer__in=producers)
 
     campaings = Campaing.objects.all()
     campaign_active = campaings.filter(active=True).first()
@@ -58,12 +48,6 @@ def TechnicalPlanView(request):
         selected_campaing = campaign_active or campaings.first()
 
 
-    if not crops_base.exists():
-        crops_base = Crop.objects.all()
-
-    if not country_sides.exists():
-        country_sides = Countryside.objects.all()
-
     lots = Lot.objects.filter(countryside__in=country_sides)
 
 
@@ -71,9 +55,6 @@ def TechnicalPlanView(request):
 
     if selected_campaing:
         crops = crops.filter(campaing_id=selected_campaing.id)
-
-    if selected_campaing and not crops.exists():
-        crops = Crop.objects.filter(campaing_id=selected_campaing.id)
 
     if countryside_id:
         crops = crops.filter(countryside_id=countryside_id)
@@ -88,11 +69,6 @@ def TechnicalPlanView(request):
         selected_crop = crops.filter(id=crop_id).first()
     else:
         selected_crop = crops.filter(is_main=True).first() or crops.order_by('-id').first()
-
-    if not selected_crop and selected_campaing:
-        selected_crop = Crop.objects.filter(
-            campaing_id=selected_campaing.id
-        ).order_by('-id').first()
 
 
     _completed_q = (

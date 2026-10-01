@@ -1,8 +1,10 @@
 from django.contrib import admin
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.urls import path, reverse
 
 from user.admin.adminSite import adminSite
+from user.admin.producer_scope import producers_for_user
 from crop_monitoring.models.gdd_accumulator import GDDAccumulator
 
 
@@ -27,6 +29,12 @@ class GDDAccumulatorAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+    def get_queryset(self, request):
+        # Productor / Staff / Organización: solo los acumuladores de sus cultivos
+        qs = super().get_queryset(request)
+        producers = producers_for_user(request)
+        return qs if producers is None else qs.filter(biofix__crop__producer__in=producers)
+
     def get_urls(self):
         urls = super().get_urls()
         custom = [
@@ -40,7 +48,10 @@ class GDDAccumulatorAdmin(admin.ModelAdmin):
 
     def recalculate_view(self, request, pk):
         try:
-            acc = GDDAccumulator.objects.get(pk=pk)
+            # get_queryset: no se puede recalcular el acumulador de otro productor
+            acc = self.get_queryset(request).get(pk=pk)
+            if not self.has_change_permission(request, acc):
+                raise PermissionDenied
             acc.recalculate()
             self.message_user(
                 request,
