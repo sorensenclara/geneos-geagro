@@ -26,42 +26,8 @@ class Migration(migrations.Migration):
                 'ordering': ['order'],
             },
         ),
-        migrations.RemoveField(
-            model_name='indicator',
-            name='max_var_one',
-        ),
-        migrations.RemoveField(
-            model_name='indicator',
-            name='max_var_three',
-        ),
-        migrations.RemoveField(
-            model_name='indicator',
-            name='max_var_two',
-        ),
-        migrations.RemoveField(
-            model_name='indicator',
-            name='min_var_one',
-        ),
-        migrations.RemoveField(
-            model_name='indicator',
-            name='min_var_three',
-        ),
-        migrations.RemoveField(
-            model_name='indicator',
-            name='min_var_two',
-        ),
-        migrations.RemoveField(
-            model_name='indicator',
-            name='variable_one',
-        ),
-        migrations.RemoveField(
-            model_name='indicator',
-            name='variable_three',
-        ),
-        migrations.RemoveField(
-            model_name='indicator',
-            name='variable_two',
-        ),
+        # Los campos viejos del indicador (variable_*/min_var_*/max_var_*) se eliminan en 0013,
+        # después de copiar sus valores a IndicatorVariable (acá todavía no tiene sus FKs).
         migrations.AddField(
             model_name='alert',
             name='bbch_stage',
