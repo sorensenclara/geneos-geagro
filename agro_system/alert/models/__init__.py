@@ -8,3 +8,4 @@ from .indicator_recommendation import IndicatorRecommendation
 from .alert import Alert
 from .alert_profile import AlertProfile
 from .alert_profile_indicator import AlertProfileIndicator
+from .alert_outcome import AlertOutcome

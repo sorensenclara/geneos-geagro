@@ -11,4 +11,4 @@ class VariableRegisterAdmin(admin.ModelAdmin):
     list_filter = ('variable', 'date')
     ordering = ('-date',)
 
-adminSite.register(VariableRegister, VariableRegisterAdmin)
+#adminSite.register(VariableRegister, VariableRegisterAdmin)

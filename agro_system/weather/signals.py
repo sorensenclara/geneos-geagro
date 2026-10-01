@@ -49,38 +49,38 @@ from parameter.models.var_crop_technique import VarCropTechnique
 
 
 # CREAR SIEMPRE PARA EVALUAR INDICADORES
-@receiver(post_save, sender=WeatherData)
-def create_variable_registers(sender, instance, created, **kwargs):
+# @receiver(post_save, sender=WeatherData)
+# def create_variable_registers(sender, instance, created, **kwargs):
 
-    station = instance.station
-    date = instance.timestamp.date()
+#     station = instance.station
+#     date = instance.timestamp.date()
 
-    variables_map = {
-        "Precipitaciones": instance.rain_total,
-        "Humedad": instance.humidity,
-        "Viento": instance.wind_speed,
-        "Temperatura": instance.temp,
-    }
+#     variables_map = {
+#         "Precipitaciones": instance.rain_total,
+#         "Humedad": instance.humidity,
+#         "Viento": instance.wind_speed,
+#         "Temperatura": instance.temp,
+#     }
 
-    for var_name, value in variables_map.items():
+#     for var_name, value in variables_map.items():
 
-        if value is None:
-            continue
+#         if value is None:
+#             continue
 
-        try:
-            variable = VarCropTechnique.objects.get(name__iexact=var_name)
-        except VarCropTechnique.DoesNotExist:
-            continue
+#         try:
+#             variable = VarCropTechnique.objects.get(name__iexact=var_name)
+#         except VarCropTechnique.DoesNotExist:
+#             continue
         
-        VariableRegister.objects.update_or_create(
-            variable=variable,
-            station=station,
-            date=date,
-            hour=instance.timestamp.time(),
+#         VariableRegister.objects.update_or_create(
+#             variable=variable,
+#             station=station,
+#             date=date,
+#             hour=instance.timestamp.time(),
 
-            defaults={
-                "name": f"{var_name} - {instance.timestamp}",
-                "value": value,
-                "detail": "Auto generado desde estación meteorológica"
-            }
-)
+#             defaults={
+#                 "name": f"{var_name} - {instance.timestamp}",
+#                 "value": value,
+#                 "detail": "Auto generado desde estación meteorológica"
+#             }
+# )

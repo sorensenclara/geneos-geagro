@@ -36,8 +36,27 @@ class PhenologicalState(models.Model):
         return f"BBCH {self.bbch} — {self.stage_name}"
 
     @classmethod
-    def current_stage(cls, vine_gdd):
-        """Estadio donde cae el GDD actual (base 10, contador 'vine')."""
+    def current_stage(cls, vine_gdd, specie=None, area=None):
+        """
+        Estadio donde cae el GDD actual.
+        Cuando se pasan specie y area, busca en PhenologicalCalibration
+        (valores ajustados por observaciones de campo).
+        Si no hay calibración para esa combo, cae a los campos gdd_from/gdd_to
+        del propio PhenologicalState (valores base del seed).
+        """
+        if specie and area:
+            from .phenological_calibration import PhenologicalCalibration
+            cal = (
+                PhenologicalCalibration.objects
+                .filter(specie=specie, area=area,
+                        gdd_from__lte=vine_gdd, gdd_to__gte=vine_gdd)
+                .select_related("state")
+                .order_by("state__order")
+                .first()
+            )
+            if cal:
+                return cal.state
+        # fallback: gdd_from/gdd_to en PhenologicalState (seed base)
         return (
             cls.objects.filter(gdd_from__lte=vine_gdd, gdd_to__gte=vine_gdd)
             .order_by("order")
@@ -45,8 +64,21 @@ class PhenologicalState(models.Model):
         )
 
     @classmethod
-    def next_stage(cls, vine_gdd):
+    def next_stage(cls, vine_gdd, specie=None, area=None):
         """Próximo estadio por delante del GDD actual."""
+        current = cls.current_stage(vine_gdd, specie, area)
+        if specie and area and current:
+            from .phenological_calibration import PhenologicalCalibration
+            cal = (
+                PhenologicalCalibration.objects
+                .filter(specie=specie, area=area, state__order__gt=current.order)
+                .select_related("state")
+                .order_by("state__order")
+                .first()
+            )
+            if cal:
+                return cal.state
+        # fallback
         return cls.objects.filter(gdd_from__gt=vine_gdd).order_by("order").first()
 
 

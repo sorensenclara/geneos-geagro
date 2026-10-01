@@ -13,7 +13,9 @@ from producer.models.country_side import Countryside
 from producer.models.lot import Lot
 
 from parameter.models.campaign import Campaing
+from parameter.models.ot_state import OTState
 from producer.models.staff import Staff
+from django.db.models import Case, When, IntegerField, Value
 
 from alert.models.alert import Alert
 from alert.models.indicator import Indicator
@@ -158,7 +160,7 @@ def TechnicalPlanView(request):
 
     next_alert = alerts.first()
 
-    # Ventana de aplicación: muestra verde si no hay alerta activa del indicador
+    # Ventana de aplicación: nivel de hoy (solo alerta real, no pronóstico)
     ventana_nivel = None
     if selected_crop:
         ventana_ind = Indicator.objects.filter(name="ventana_aplicacion").first()
@@ -166,7 +168,9 @@ def TechnicalPlanView(request):
             ventana_alert = Alert.active.filter(
                 crop=selected_crop,
                 indicator=ventana_ind,
-            ).order_by("-date").first()
+                date=today,
+                is_forecast=False,
+            ).first()
             ventana_nivel = ventana_alert.level if ventana_alert else "verde"
 
     why_now_title = "Según planificación técnica"
@@ -273,6 +277,17 @@ def TechnicalPlanView(request):
 
         'current_staff_id': current_staff_id,
         'ventana_nivel': ventana_nivel,
+        'ot_states': OTState.objects.exclude(name="Contingente").annotate(
+            sort_order=Case(
+                When(name="Pendiente",            then=Value(0)),
+                When(name="En curso",             then=Value(1)),
+                When(name="Finalizada",           then=Value(2)),
+                When(name="Cancelada",            then=Value(3)),
+                When(name="Cancelada por alerta", then=Value(4)),
+                default=Value(99),
+                output_field=IntegerField(),
+            )
+        ).order_by("sort_order"),
     }
 
     return render(request, 'pages/plan.html', data)

@@ -1,0 +1,150 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block title %}Notificaciones{% endblock title %}
+
+{% block content %}
+
+<div class="geagro-dashboard-title mb-4">
+  <h1>Notificaciones</h1>
+  <div class="geagro-dashboard-context">
+    <span>{{ notifications.count }} notificacion{{ notifications.count|pluralize:"es" }}</span>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Todas las notificaciones</h5>
+        {% if notifications %}
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            id="btn-mark-all-read"
+            data-url="{% url 'notifications-read-all' %}"
+          >
+            <i class="mdi mdi-check-all me-1"></i>Marcar todas como leídas
+          </button>
+        {% endif %}
+      </div>
+
+      <div class="card-body p-0">
+        {% if notifications %}
+          <ul class="list-group list-group-flush" id="notifications-list">
+            {% for notif in notifications %}
+            <li class="list-group-item notification-row {% if not notif.is_read %}notification-unread{% endif %}"
+                data-pk="{{ notif.pk }}"
+                data-url="{% url 'notification-read' notif.pk %}">
+              <div class="d-flex align-items-start gap-3 py-1">
+
+                <!-- Ícono -->
+                <div class="flex-shrink-0">
+                  <div class="avatar-xs mt-1">
+                    <span class="avatar-title {{ notif.style.border }} rounded-circle">
+                      <i class="mdi {{ notif.style.icon }}"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Contenido -->
+                <div class="flex-grow-1">
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <strong class="notification-name">{{ notif.name }}</strong>
+                    {% if not notif.is_read %}
+                      <span class="badge bg-primary rounded-pill" style="font-size:.65rem;">Nueva</span>
+                    {% endif %}
+                  </div>
+                  <p class="mb-1 text-muted">{{ notif.detail }}</p>
+                  <small class="text-muted">{{ notif.date }}</small>
+                </div>
+
+                <!-- Acción -->
+                {% if not notif.is_read %}
+                <div class="flex-shrink-0">
+                  <button class="btn btn-sm btn-link text-muted p-0 btn-mark-read"
+                          title="Marcar como leída"
+                          data-pk="{{ notif.pk }}"
+                          data-url="{% url 'notification-read' notif.pk %}">
+                    <i class="mdi mdi-check fs-5"></i>
+                  </button>
+                </div>
+                {% endif %}
+
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-center py-5 text-muted">
+            <i class="mdi mdi-bell-off-outline fs-1 d-block mb-2"></i>
+            <p class="mb-0">No tenés notificaciones</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .notification-unread {
+    background-color: var(--bs-primary-bg-subtle, #e8f0fe);
+  }
+  .notification-row {
+    transition: background-color .25s;
+  }
+</style>
+
+<script>
+  const csrfToken = "{{ csrf_token }}";
+
+  function markRead(url, row) {
+    fetch(url, { method: "POST", headers: { "X-CSRFToken": csrfToken } })
+      .then(r => r.json())
+      .then(() => {
+        row.classList.remove("notification-unread");
+        const badge = row.querySelector(".badge.bg-primary");
+        if (badge) badge.remove();
+        const btn = row.querySelector(".btn-mark-read");
+        if (btn) btn.remove();
+        updateBadge();
+      });
+  }
+
+  function updateBadge() {
+    const unread = document.querySelectorAll(".notification-unread").length;
+    const badge = document.querySelector("#page-header-notifications-dropdown .badge");
+    if (badge) {
+      if (unread > 0) { badge.textContent = unread; badge.style.display = ""; }
+      else badge.style.display = "none";
+    }
+  }
+
+  document.querySelectorAll(".btn-mark-read").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      const row = btn.closest(".notification-row");
+      markRead(btn.dataset.url, row);
+    });
+  });
+
+  const btnAll = document.getElementById("btn-mark-all-read");
+  if (btnAll) {
+    btnAll.addEventListener("click", function() {
+      fetch(btnAll.dataset.url, { method: "POST", headers: { "X-CSRFToken": csrfToken } })
+        .then(r => r.json())
+        .then(() => {
+          document.querySelectorAll(".notification-unread").forEach(row => {
+            row.classList.remove("notification-unread");
+            const badge = row.querySelector(".badge.bg-primary");
+            if (badge) badge.remove();
+            const btn = row.querySelector(".btn-mark-read");
+            if (btn) btn.remove();
+          });
+          updateBadge();
+        });
+    });
+  }
+</script>
+
+{% endblock content %}

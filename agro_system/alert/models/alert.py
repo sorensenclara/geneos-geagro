@@ -17,10 +17,10 @@ class Alert(models.Model):
     El lote y la campaña se derivan via crop.lot y crop.campaing.
     """
 
-    name      = models.CharField(max_length=200, unique=True, verbose_name=_("name"))
-    indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE, null=True, verbose_name=_("indicator"))
-    date      = models.DateField(verbose_name=_("date"))
-    detail    = models.TextField(verbose_name=_("detail"))
+    name      = models.CharField(max_length=200, unique=True, verbose_name=_("nombre"))
+    indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE, null=True, verbose_name=_("indicador"))
+    date      = models.DateField(verbose_name=_("fecha"))
+    detail    = models.TextField(verbose_name=_("detalle"))
 
     # Cultivo que originó la alerta (tiene lot, campaing, activity, area)
     crop = models.ForeignKey(

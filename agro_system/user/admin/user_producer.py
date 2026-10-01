@@ -2,6 +2,7 @@ from .user_extend import UserExtendAdmin
 from user.models.user_producer import UserProducer
 from user.models.user_organization import UserOrganization
 from django.contrib.auth.models import Group
+from django.utils.translation import gettext_lazy as _
 from user.admin.adminSite import adminSite
 from producer.models.staff import Staff
 from django.contrib import admin
@@ -21,7 +22,7 @@ class UserProducerAdmin(UserExtendAdmin):
     list_display = ('name', 'email', 'cuit', 'address')
     fieldsets = (
         (None, {'fields': ('name', 'cuit', 'address','city', 'phone', 'organization', 'email', 'password', 'prefix', 'sequence')}),
-        ('Permissions', {'fields': ('is_active',)}),
+        (_('Permissions'), {'fields': ('is_active',)}),
         ('Grupos', {'fields': ('groups',)}),
     )
     add_fieldsets = (

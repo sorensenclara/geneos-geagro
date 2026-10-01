@@ -1,5 +1,6 @@
 from ..models.user_extend import UserExtend
 from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import gettext_lazy as _
 from user.models import UserExtend
 from user.admin.adminSite import adminSite
 
@@ -12,7 +13,7 @@ class UserExtendAdmin(UserAdmin):
     list_display = ('email','first_name', 'last_name','type')
     fieldsets = (
         (None, {'fields': ('email', 'password','first_name', 'last_name','type')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active')}),
+        (_('Permissions'), {'fields': ('is_staff', 'is_active')}),
         ('Permisos', {'fields': ('groups','user_permissions')}),
     )
     add_fieldsets = (

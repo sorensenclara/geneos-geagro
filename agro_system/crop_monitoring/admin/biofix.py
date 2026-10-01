@@ -11,7 +11,7 @@ class GDDAccumulatorInline(admin.TabularInline):
     extra         = 0
     can_delete    = False
     readonly_fields = ("accumulated_gdd", "calculation_date", "estado_fenologico", "recalculate_link")
-    fields          = ("accumulated_gdd", "calculation_date", "estado_fenologico", "recalculate_link")
+    fields          = ("accumulated_gdd", "gdd_offset", "calculation_date", "estado_fenologico", "recalculate_link")
 
     def recalculate_link(self, obj):
         if obj and obj.pk:
@@ -27,11 +27,12 @@ class GDDAccumulatorInline(admin.TabularInline):
             return "—"
         if obj.biofix.counter != Biofix.COUNTER_VINE:
             return "—"
-        gdd = float(obj.accumulated_gdd)
-        stage = PhenologicalState.current_stage(gdd)
+        gdd    = float(obj.accumulated_gdd)
+        crop   = obj.biofix.crop
+        stage  = PhenologicalState.current_stage(gdd, specie=crop.activity.specie, area=crop.area)
         if not stage:
             return "—"
-        next_s = PhenologicalState.next_stage(gdd)
+        next_s = PhenologicalState.next_stage(gdd, specie=crop.activity.specie, area=crop.area)
         text = f"BBCH {stage.bbch} — {stage.stage_name}"
         if next_s:
             faltan = next_s.gdd_from - gdd
@@ -76,10 +77,11 @@ class BiofixAdmin(admin.ModelAdmin):
             gdd = float(obj.accumulator.accumulated_gdd)
         except GDDAccumulator.DoesNotExist:
             return "Sin GDD calculado"
-        stage = PhenologicalState.current_stage(gdd)
+        crop   = obj.crop
+        stage  = PhenologicalState.current_stage(gdd, specie=crop.activity.specie, area=crop.area)
         if not stage:
             return f"Sin etapa para {gdd} GDD"
-        next_s = PhenologicalState.next_stage(gdd)
+        next_s = PhenologicalState.next_stage(gdd, specie=crop.activity.specie, area=crop.area)
         text = f"BBCH {stage.bbch} — {stage.stage_name} ({gdd:.1f} GDD)"
         if next_s:
             faltan = next_s.gdd_from - gdd

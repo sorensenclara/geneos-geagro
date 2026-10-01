@@ -21,6 +21,11 @@ class GDDAccumulator(models.Model):
         verbose_name=_("biofix"),
     )
     accumulated_gdd  = models.DecimalField(max_digits=7, decimal_places=1, default=0, verbose_name=_("accumulated GDD"))
+    gdd_offset       = models.DecimalField(
+        max_digits=6, decimal_places=1, default=0,
+        verbose_name=_("GDD offset"),
+        help_text=_("Manual correction added after recalculation. Set it once and it persists."),
+    )
     calculation_date = models.DateField(null=True, blank=True, verbose_name=_("calculation date"))
 
     def __str__(self):
@@ -65,7 +70,45 @@ class GDDAccumulator(models.Model):
             # sin DailySummary ese día → contribuye 0
             current += timedelta(days=1)
 
-        self.accumulated_gdd  = round(total, 1)
+        self.accumulated_gdd  = round(total + float(self.gdd_offset), 1)
         self.calculation_date = until
         self.save()
         return self.accumulated_gdd
+
+    # ------------------------------------------------------------------
+    # Estado fenológico actual
+    # ------------------------------------------------------------------
+
+    @property
+    def calculated_state(self):
+        """Estado BBCH derivado del GDD acumulado + calibración especie/zona."""
+        from .phenological_state import PhenologicalState
+        crop = self.biofix.crop
+        return PhenologicalState.current_stage(
+            vine_gdd=float(self.accumulated_gdd),
+            specie=crop.activity.specie,
+            area=crop.area,
+        )
+
+    @property
+    def observed_state(self):
+        """Última observación de campo registrada para este cultivo (puede ser None)."""
+        return (
+            self.biofix.crop.phenological_observations
+            .filter(observed_state__isnull=False)
+            .order_by("-date")
+            .values_list("observed_state", flat=True)
+            .first()
+        )
+
+    @property
+    def effective_state(self):
+        """
+        Estado a usar en pantalla y en evaluadores de alerta.
+        Prioridad: observado en campo > calculado por GDD.
+        """
+        from .phenological_state import PhenologicalState
+        obs_id = self.observed_state
+        if obs_id:
+            return PhenologicalState.objects.filter(pk=obs_id).first()
+        return self.calculated_state

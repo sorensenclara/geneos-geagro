@@ -67,6 +67,13 @@
   {% endif %}
 </div>
 
+{% if errors %}
+<div class="alert alert-danger d-flex align-items-center gap-2 mb-3" role="alert">
+  <i class="mdi mdi-alert-circle-outline fs-5"></i>
+  <div>Revisá los campos marcados antes de guardar.</div>
+</div>
+{% endif %}
+
 <form method="post" novalidate>
   {% csrf_token %}
   <input type="hidden" name="new_inputs_count" id="newInputsCount" value="0">
@@ -120,8 +127,9 @@
             <div class="col-sm-6">
               <label class="form-label wo-label" for="id_code">Código <span class="text-danger">*</span></label>
               <input type="text" name="code" id="id_code"
-                     class="form-control form-control-sm"
-                     placeholder="Ej. OT-2025-001" required>
+                     class="form-control form-control-sm {% if errors.code %}is-invalid{% endif %}"
+                     placeholder="Ej. OT-2025-001" value="{{ post.code }}" required>
+              {% if errors.code %}<div class="invalid-feedback">{{ errors.code }}</div>{% endif %}
             </div>
 
             <div class="col-sm-6">
@@ -132,7 +140,9 @@
             <div class="col-sm-6">
               <label class="form-label wo-label" for="id_date_init">Fecha inicio <span class="text-danger">*</span></label>
               <input type="date" name="date_init" id="id_date_init"
-                     class="form-control form-control-sm" required>
+                     class="form-control form-control-sm {% if errors.date_init %}is-invalid{% endif %}"
+                     value="{{ post.date_init }}" required>
+              {% if errors.date_init %}<div class="invalid-feedback">{{ errors.date_init }}</div>{% endif %}
             </div>
 
             <div class="col-sm-6">
@@ -143,22 +153,25 @@
 
             <div class="col-sm-6">
               <label class="form-label wo-label" for="id_service">Servicio / Labor <span class="text-danger">*</span></label>
-              <select name="service" id="id_service" class="form-select form-select-sm" required>
+              <select name="service" id="id_service" class="form-select form-select-sm {% if errors.service %}is-invalid{% endif %}" required>
                 <option value="">— Elegir —</option>
                 {% for s in services %}
-                  <option value="{{ s.pk }}">{{ s.name }}</option>
+                  <option value="{{ s.pk }}" {% if post.service == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
                 {% endfor %}
               </select>
+              {% if errors.service %}<div class="invalid-feedback">{{ errors.service }}</div>{% endif %}
             </div>
 
             <div class="col-sm-6">
-              <label class="form-label wo-label" for="id_stage">Etapa fenológica <span class="text-danger">*</span></label>
-              <select name="stage" id="id_stage" class="form-select form-select-sm" required>
-                <option value="">— Elegir —</option>
+              <label class="form-label wo-label" for="id_stage">Etapa fenológica</label>
+              <select name="stage" id="id_stage" class="form-select form-select-sm {% if errors.stage %}is-invalid{% endif %}">
+                <option value="">— Automático según BBCH —</option>
                 {% for st in stages %}
-                  <option value="{{ st.pk }}">{{ st.name }}</option>
+                  <option value="{{ st.pk }}" {% if post.stage == st.pk|stringformat:"s" %}selected{% endif %}>{{ st.name }}</option>
                 {% endfor %}
               </select>
+              <div class="form-text text-muted" style="font-size:.7rem;">Si no elegís, se completa con la etapa actual del cultivo.</div>
+              {% if errors.stage %}<div class="invalid-feedback">{{ errors.stage }}</div>{% endif %}
             </div>
 
             <div class="col-sm-6">
@@ -171,13 +184,14 @@
             </div>
 
             <div class="col-sm-6">
-              <label class="form-label wo-label" for="id_staff">Responsable (personal) <span class="text-danger">*</span></label>
-              <select name="staff" id="id_staff" class="form-select form-select-sm" required>
+              <label class="form-label wo-label" for="id_staff">Responsable (personal)</label>
+              <select name="staff" id="id_staff" class="form-select form-select-sm">
                 <option value="">— Elegir —</option>
                 {% for s in staff_list %}
-                  <option value="{{ s.pk }}">{{ s.surname }}, {{ s.name }}</option>
+                  <option value="{{ s.pk }}" {% if post.staff == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.surname }}, {{ s.name }}</option>
                 {% endfor %}
               </select>
+              <div class="form-text text-muted" style="font-size:.7rem;">Si no elegís, la notificación llega a todo el staff del productor.</div>
             </div>
 
             {% if not selected_crop %}

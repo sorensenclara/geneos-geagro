@@ -26,6 +26,8 @@ STATES = [
     {"name": "Finalizada",  "is_default": False},
     {"name": "Contingente", "is_default": False},
     {"name": "Cancelada",   "is_default": False},
+    {"name": "Omitida",     "is_default": False},
+    {"name": "Cancelada por alerta", "is_default": False},
 ]
 
 for s in STATES:

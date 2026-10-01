@@ -1,0 +1,328 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}Fenología{% endblock title %}
+
+{% block content %}
+<style>
+  .ph-label {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #6c757d;
+    margin-bottom: .15rem;
+  }
+  .ph-section {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #6c757d;
+    font-weight: 600;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 1.25rem;
+  }
+  .gdd-big {
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #3F2642;
+  }
+  .gdd-big small {
+    font-size: .9rem;
+    font-weight: 400;
+    color: #6c757d;
+  }
+  .stage-pill {
+    display: inline-block;
+    padding: .35em .85em;
+    border-radius: 50px;
+    font-size: .85rem;
+    font-weight: 600;
+  }
+  .stage-pill.effective  { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+  .stage-pill.calculated { background: #f3e5f5; color: #4a148c; border: 1px solid #ce93d8; }
+  .stage-pill.observed   { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+  .badge-coincide   { background: #e8f5e9; color: #2e7d32; font-size: .75rem; padding: .2em .55em; border-radius: 4px; }
+  .badge-difiere    { background: #ffebee; color: #c62828; font-size: .75rem; padding: .2em .55em; border-radius: 4px; }
+  .obs-table td, .obs-table th { font-size: .82rem; vertical-align: middle; }
+  .offset-sign { font-size: .8rem; color: #6c757d; }
+</style>
+
+<!-- Mensajes -->
+{% if messages %}
+<div class="mb-3">
+  {% for msg in messages %}
+  <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show" role="alert">
+    {{ msg }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Título -->
+<div class="geagro-dashboard-title mb-4">
+  <h1 class="mb-0">Estado fenológico</h1>
+  {% if selected_crop %}
+  <div class="text-muted" style="font-size:.85rem;">
+    {{ selected_crop }} {% if selected_crop.lot %}· {{ selected_crop.lot }}{% endif %}
+  </div>
+  {% endif %}
+</div>
+
+{% if not selected_crop %}
+<div class="alert alert-warning">Seleccioná un cultivo en el filtro superior para ver su estado fenológico.</div>
+{% elif not biofix %}
+<div class="alert alert-secondary">Este cultivo no tiene biofix configurado. Configuralo desde el admin para habilitar el seguimiento de GDD.</div>
+{% elif not accumulator %}
+<div class="alert alert-secondary">Sin acumulador de GDD. Ejecutá el cálculo diario para generarlo.</div>
+{% else %}
+
+<!-- ══ Estado actual ══════════════════════════════════════════════════════ -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="ph-section">Estado actual</div>
+    <div class="row g-4 align-items-start">
+
+      <!-- GDD -->
+      <div class="col-sm-4">
+        <div class="ph-label">GDD acumulado</div>
+        <div class="gdd-big">{{ vine_gdd|floatformat:1 }} <small>GDD</small></div>
+        {% if gdd_offset != 0 %}
+        <div class="mt-1 offset-sign">
+          Climático: {{ vine_gdd_climatico|floatformat:1 }}
+          {% if gdd_offset > 0 %}
+          + offset <strong style="color:#1565c0;">+{{ gdd_offset|floatformat:1 }}</strong>
+          {% else %}
+          + offset <strong style="color:#c62828;">{{ gdd_offset|floatformat:1 }}</strong>
+          {% endif %}
+        </div>
+        {% endif %}
+        <div class="text-muted mt-1" style="font-size:.75rem;">
+          Biofix: {{ biofix.date|date:"d/m/Y" }}
+          {% if accumulator.calculation_date %} · calculado al {{ accumulator.calculation_date|date:"d/m/Y" }}{% endif %}
+        </div>
+      </div>
+
+      <!-- Estado calculado -->
+      <div class="col-sm-4">
+        <div class="ph-label">Calculado por el sistema</div>
+        {% if calculated_state %}
+        <span class="stage-pill calculated">BBCH {{ calculated_state.bbch }} — {{ calculated_state.stage_name }}</span>
+        {% if calculated_state %}
+        <div class="mt-2" style="font-size:.78rem; color:#6c757d;">
+          {{ calculated_state.gdd_from }}–{{ calculated_state.gdd_to }} GDD
+        </div>
+        <div class="progress mt-1" style="height:6px;">
+          <div class="progress-bar" style="width:{{ gdd_stage_percent }}%; background:#6b3f6e;"></div>
+        </div>
+        <div class="offset-sign mt-1">{{ gdd_stage_percent }}% de la etapa completado</div>
+        {% endif %}
+        {% else %}
+        <span class="text-muted">Sin etapa para {{ vine_gdd|floatformat:0 }} GDD</span>
+        {% endif %}
+      </div>
+
+      <!-- Estado efectivo -->
+      <div class="col-sm-4">
+        <div class="ph-label">Estado efectivo <span class="text-muted" style="font-size:.7rem;">(el que usa el sistema)</span></div>
+        {% if effective_state %}
+        <span class="stage-pill effective">BBCH {{ effective_state.bbch }} — {{ effective_state.stage_name }}</span>
+        {% if last_observation %}
+        <div class="mt-2" style="font-size:.78rem; color:#6c757d;">
+          Última observación: {{ last_observation.date|date:"d/m/Y" }}
+          {% if last_observation.registered_by %} · {{ last_observation.registered_by }}{% endif %}
+        </div>
+        {% if last_observation.calculated_state %}
+        <div class="mt-1">
+          {% if last_observation.matches_calculated %}
+          <span class="badge-coincide">✓ Coincidía con el calculado</span>
+          {% else %}
+          <span class="badge-difiere">✗ Difería: sistema tenía BBCH {{ last_observation.calculated_state.bbch }}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="offset-sign mt-1">Sin observaciones de campo — usando valor calculado</div>
+        {% endif %}
+        {% else %}
+        <span class="text-muted">—</span>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ Formularios ════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+
+  <!-- Registrar observación -->
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="ph-section">Registrar observación de campo</div>
+        <p class="text-muted" style="font-size:.82rem;">
+          Indicá el estadio BBCH que observaste en el viñedo hoy.
+          El sistema registra el desvío y recalibra automáticamente los rangos de GDD para esta especie y zona.
+        </p>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="register_observation">
+
+          <div class="mb-3">
+            <label class="form-label ph-label">Estadio BBCH observado <span class="text-danger">*</span></label>
+            <select name="observed_state" class="form-select" required>
+              <option value="">— Seleccioná un estadio —</option>
+              {% for state in phenological_states %}
+              <option value="{{ state.id }}">BBCH {{ state.bbch }} — {{ state.stage_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label ph-label">GDD observado</label>
+            <div class="input-group">
+              <input type="number" name="observed_gdd" class="form-control"
+                     step="0.1" min="0" placeholder="Opcional">
+              <span class="input-group-text text-muted" style="font-size:.78rem;">GDD</span>
+            </div>
+            <div class="form-text">
+              Si lo dejás vacío se usa el acumulador actual
+              ({{ vine_gdd|floatformat:1 }} GDD).
+              Completalo solo si sabés que ese valor está mal.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label ph-label">Notas</label>
+            <textarea name="notes" class="form-control" rows="2"
+                      placeholder="Condiciones observadas, variedad específica, etc."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="mdi mdi-clipboard-check-outline me-1"></i> Guardar observación
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Corregir GDD offset -->
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="ph-section">Corregir GDD acumulado</div>
+        <p class="text-muted" style="font-size:.82rem;">
+          Usá esto cuando el acumulador climático difiere sistemáticamente de la realidad
+          (microclima más cálido, datos faltantes, etc.).
+          El offset se suma al cálculo climático y persiste entre recalculaciones.
+        </p>
+
+        <div class="mb-3 p-3 rounded" style="background:#f8f9fa;">
+          <div class="ph-label">Valores actuales</div>
+          <div class="row g-2 mt-1" style="font-size:.85rem;">
+            <div class="col-6">GDD climático</div>
+            <div class="col-6 text-end fw-semibold">{{ vine_gdd_climatico|floatformat:1 }}</div>
+            <div class="col-6">Offset actual</div>
+            <div class="col-6 text-end fw-semibold
+              {% if gdd_offset > 0 %}text-primary{% elif gdd_offset < 0 %}text-danger{% endif %}">
+              {% if gdd_offset >= 0 %}+{% endif %}{{ gdd_offset|floatformat:1 }}
+            </div>
+            <div class="col-6 border-top pt-1">Total mostrado</div>
+            <div class="col-6 text-end fw-bold border-top pt-1">{{ vine_gdd|floatformat:1 }} GDD</div>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="set_offset">
+
+          <div class="mb-3">
+            <label class="form-label ph-label">Nuevo offset</label>
+            <div class="input-group">
+              <input type="number" name="gdd_offset" class="form-control"
+                     step="0.5" value="{{ gdd_offset|floatformat:1 }}"
+                     placeholder="0">
+              <span class="input-group-text text-muted" style="font-size:.78rem;">GDD</span>
+            </div>
+            <div class="form-text">
+              Positivo → suma GDD. Negativo → resta. Poné 0 para cancelar la corrección.
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-outline-primary">
+            <i class="mdi mdi-calculator-variant-outline me-1"></i> Aplicar y recalcular
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ Observaciones recientes ═══════════════════════════════════════════ -->
+{% if recent_observations %}
+<div class="card">
+  <div class="card-body">
+    <div class="ph-section">Observaciones recientes</div>
+    <div class="table-responsive">
+      <table class="table table-sm table-hover obs-table mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Fecha</th>
+            <th>BBCH observado</th>
+            <th>GDD observado</th>
+            <th>Sistema calculaba</th>
+            <th>¿Coincide?</th>
+            <th>Registrado por</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for obs in recent_observations %}
+          <tr>
+            <td>{{ obs.date|date:"d/m/Y" }}</td>
+            <td>
+              {% if obs.observed_state %}
+              <span class="stage-pill observed" style="font-size:.75rem; padding:.2em .6em;">
+                BBCH {{ obs.observed_state.bbch }} — {{ obs.observed_state.stage_name }}
+              </span>
+              {% else %}—{% endif %}
+            </td>
+            <td>{{ obs.observed_gdd|floatformat:1|default:"—" }} {% if obs.observed_gdd %}GDD{% endif %}</td>
+            <td>
+              {% if obs.calculated_state %}
+              BBCH {{ obs.calculated_state.bbch }} — {{ obs.calculated_state.stage_name }}
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% if obs.calculated_state %}
+                {% if obs.matches_calculated %}
+                <span class="badge-coincide">✓ Sí</span>
+                {% else %}
+                <span class="badge-difiere">✗ No</span>
+                {% endif %}
+              {% else %}—{% endif %}
+            </td>
+            <td>{{ obs.registered_by|default:"—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="card">
+  <div class="card-body text-muted" style="font-size:.85rem;">
+    <i class="mdi mdi-information-outline me-1"></i>
+    Sin observaciones de campo todavía para este cultivo.
+    Registrá la primera usando el formulario de arriba.
+  </div>
+</div>
+{% endif %}
+
+{% endif %}{# /selected_crop #}
+
+{% endblock content %}

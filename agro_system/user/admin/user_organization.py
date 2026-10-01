@@ -1,6 +1,7 @@
 from .user_extend import UserExtendAdmin
 from user.models.user_organization import UserOrganization
 from django.contrib.auth.models import Group
+from django.utils.translation import gettext_lazy as _
 from user.admin.adminSite import adminSite
 
 class UserOrganizationAdmin(UserExtendAdmin):
@@ -12,7 +13,7 @@ class UserOrganizationAdmin(UserExtendAdmin):
     list_display = ('company_name', 'email', 'identification_number', 'address')
     fieldsets = (
         (None, {'fields': ('company_name', 'identification_number', 'address','email', 'password')}),
-        ('Permissions', {'fields': ('is_active',)}),
+        (_('Permissions'), {'fields': ('is_active',)}),
         ('Permisos', {'fields': ('groups',)}),
     )
     add_fieldsets = (

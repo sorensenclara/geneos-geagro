@@ -48,10 +48,11 @@ class Indicator(models.Model):
         default=REVIEW_DAILY,
         verbose_name=_("review mode"),
         help_text=_(
-            "Revisión diaria: se evalúa una vez por día con el resumen diario. "
-            "Revisión por registro: se evalúa en cada lectura horaria u de estación; "
-            "todos los filtros deben cumplirse simultáneamente en el mismo registro. "
-            "No aplica a pronóstico (los pronósticos son siempre diarios)."
+            "Daily: evaluated once per day from the daily summary (Open-Meteo or EOD station). "
+            "Per reading: evaluated on every individual record from any source (station or "
+            "Open-Meteo); all filters must pass in the same record. In forecast mode, "
+            "per-reading indicators iterate each hourly forecast row so simultaneous-condition "
+            "checks work correctly."
         ),
     )
 

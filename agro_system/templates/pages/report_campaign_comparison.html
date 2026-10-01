@@ -1,0 +1,419 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <!-- ── page header ──────────────────────────────────────────────────── -->
+  <div class="row mb-3 align-items-center">
+    <div class="col">
+      <h4 class="mb-0 fw-bold">
+        <i class="mdi mdi-chart-bar me-2 text-primary"></i>Informe comparativo de alertas
+      </h4>
+      <small class="text-muted">Compará el historial de alertas y daños entre campañas</small>
+    </div>
+    {% if has_results %}
+    <div class="col-auto">
+      <a href="?{{ request.GET.urlencode }}&download=1" class="btn btn-success">
+        <i class="mdi mdi-microsoft-excel me-1"></i>Descargar Excel
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── filter form ──────────────────────────────────────────────────── -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <form method="get" id="filter-form">
+        <div class="row g-3 align-items-end">
+
+          <!-- campaigns -->
+          <div class="col-md-5">
+            <label class="form-label fw-semibold mb-1">Campañas a comparar</label>
+            <select name="campaigns" id="sel-campaigns" class="form-select" multiple size="4">
+              {% for c in all_campaigns %}
+              <option value="{{ c.id }}"
+                {% if c.id in selected_campaign_ids %}selected{% endif %}>
+                {{ c.name }}{% if c.active %} ★{% endif %}
+              </option>
+              {% endfor %}
+            </select>
+            <small class="text-muted">Mantené Ctrl/⌘ para seleccionar varias</small>
+          </div>
+
+          <!-- group by -->
+          <div class="col-md-2">
+            <label class="form-label fw-semibold mb-1">Agrupar por</label>
+            <div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="group_by" id="gb-lot" value="lot"
+                  {% if group_by == 'lot' %}checked{% endif %}>
+                <label class="form-check-label" for="gb-lot">Lote</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="group_by" id="gb-variety" value="variety"
+                  {% if group_by == 'variety' %}checked{% endif %}>
+                <label class="form-check-label" for="gb-variety">Variedad</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- indicator filter -->
+          <div class="col-md-3">
+            <label class="form-label fw-semibold mb-1">Tipo de alerta <small class="text-muted">(opcional)</small></label>
+            <select name="indicators" id="sel-indicators" class="form-select" multiple size="4">
+              {% for ind in all_indicators %}
+              <option value="{{ ind.id }}"
+                {% if ind.id in selected_indicator_ids %}selected{% endif %}>
+                {{ ind.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- submit -->
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="mdi mdi-magnify me-1"></i>Comparar
+            </button>
+            {% if has_results %}
+            <a href="{% url 'report-campaign-comparison' %}" class="btn btn-outline-secondary w-100 mt-2">
+              Limpiar
+            </a>
+            {% endif %}
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if not has_results %}
+  <!-- ── empty state ────────────────────────────────────────────────── -->
+  <div class="text-center py-5 text-muted">
+    <i class="mdi mdi-chart-timeline-variant-shimmer" style="font-size:3rem"></i>
+    <p class="mt-2">Seleccioná al menos una campaña para ver el informe.</p>
+  </div>
+
+  {% else %}
+
+  <!-- ── selected campaigns chips ────────────────────────────────────── -->
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    {% for camp in selected_campaigns %}
+    <span class="badge rounded-pill bg-primary fs-6 px-3 py-2">
+      {{ camp.name }}
+      <small class="opacity-75 ms-1">{{ camp.date_init|date:"Y" }}</small>
+    </span>
+    {% endfor %}
+  </div>
+
+  <!-- ── crop detail: grouped by lot or variety ──────────────────────── -->
+  {% if crop_detail_rows %}
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <h6 class="mb-0 fw-bold">
+          <i class="mdi mdi-{% if group_by == 'variety' %}leaf{% else %}map-marker-outline{% endif %} me-2"></i>
+          Por {% if group_by == 'variety' %}variedad{% else %}lote{% endif %}
+        </h6>
+        <small class="text-muted">Detalle de cada alerta agrupada</small>
+      </div>
+      <div class="btn-group btn-group-sm">
+        <a href="?{% for id in selected_campaign_ids %}campaigns={{ id }}&{% endfor %}{% for id in selected_indicator_ids %}indicators={{ id }}&{% endfor %}group_by=lot"
+           class="btn {% if group_by != 'variety' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+          Por lote
+        </a>
+        <a href="?{% for id in selected_campaign_ids %}campaigns={{ id }}&{% endfor %}{% for id in selected_indicator_ids %}indicators={{ id }}&{% endfor %}group_by=variety"
+           class="btn {% if group_by == 'variety' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+          Por variedad
+        </a>
+      </div>
+    </div>
+    <div class="accordion accordion-flush" id="crop-detail-accordion">
+      {% for group in crop_detail_rows %}
+      {% with gslug=forloop.counter %}
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button {% if not forloop.first %}collapsed{% endif %} fw-semibold"
+                  type="button" data-bs-toggle="collapse" data-bs-target="#crop-grp-{{ gslug }}">
+            {{ group.group_name }}
+            <span class="badge bg-secondary rounded-pill ms-2 fw-normal" style="font-size:.7rem;">
+              {{ group.crops|length }} cultivo{{ group.crops|length|pluralize:"s" }}
+            </span>
+          </button>
+        </h2>
+        <div id="crop-grp-{{ gslug }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}">
+          <div class="accordion-body p-0">
+            {% for crop_row in group.crops %}
+            <div class="px-3 pt-3 pb-1">
+              <span class="fw-semibold small">
+                {% if group_by == 'variety' %}
+                  <i class="mdi mdi-map-marker-outline me-1 text-muted"></i>{{ crop_row.lot }}
+                {% else %}
+                  <i class="mdi mdi-leaf me-1 text-muted"></i>{{ crop_row.variety }}
+                {% endif %}
+                <span class="text-muted fw-normal ms-1">· {{ crop_row.campaing }}</span>
+              </span>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-sm table-hover mb-0 small align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Tipo de alerta</th>
+                    <th class="text-center">Nivel</th>
+                    <th class="text-center">BBCH</th>
+                    <th class="text-center">¿Daño?</th>
+                    <th class="text-center">Sup. afect.</th>
+                    <th class="text-center">Pérd. kg/ha</th>
+                    <th class="text-center">Pérd. $</th>
+                    <th class="text-center">Interv. efectiva</th>
+                    <th>Notas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for alert in crop_row.alerts %}
+                  {% with o=alert.outcome %}
+                  <tr {% if o and o.damage_occurred %}class="table-warning"{% endif %}>
+                    <td class="text-nowrap">{{ alert.date|date:"d/m/Y" }}</td>
+                    <td class="fw-semibold">{{ alert.indicator.name }}</td>
+                    <td class="text-center">
+                      <span class="badge {% if alert.level == 'critical' %}bg-danger{% elif alert.level == 'alert' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %}">
+                        {{ alert.get_level_display }}
+                      </span>
+                    </td>
+                    <td class="text-center text-muted">{{ alert.bbch_stage|default:"—" }}</td>
+                    <td class="text-center">
+                      {% if o %}{% if o.damage_occurred %}<span class="text-danger fw-bold">Sí</span>{% else %}<span class="text-success">No</span>{% endif %}
+                      {% else %}<span class="text-muted">Sin reg.</span>{% endif %}
+                    </td>
+                    <td class="text-center">{% if o and o.area_affected_pct %}{{ o.area_affected_pct }}%{% else %}—{% endif %}</td>
+                    <td class="text-center">{% if o and o.estimated_loss_kg_ha %}{{ o.estimated_loss_kg_ha|floatformat:0 }}{% else %}—{% endif %}</td>
+                    <td class="text-center">{% if o and o.estimated_loss_ars %}<strong>${{ o.estimated_loss_ars|floatformat:0 }}</strong>{% else %}—{% endif %}</td>
+                    <td class="text-center">{% if o %}{{ o.get_intervention_effective_display }}{% else %}—{% endif %}</td>
+                    <td class="text-muted">{{ o.notes|default:""|truncatechars:60 }}</td>
+                  </tr>
+                  {% endwith %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if not forloop.last %}<hr class="my-0 mx-3">{% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endwith %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── table: by indicator ──────────────────────────────────────────── -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+      <h6 class="mb-0 fw-bold"><i class="mdi mdi-bell-outline me-2"></i>Por tipo de alerta</h6>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered mb-0 small align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th rowspan="2" class="align-middle">Tipo de alerta</th>
+              <th rowspan="2" class="align-middle text-center">Criticidad</th>
+              {% for camp in selected_campaigns %}
+              <th colspan="7" class="text-center text-warning">{{ camp.name }}</th>
+              {% endfor %}
+            </tr>
+            <tr>
+              {% for camp in selected_campaigns %}
+              <th class="text-center">Total</th>
+              <th class="text-center">Con daño</th>
+              <th class="text-center">Sup. afect. (%)</th>
+              <th class="text-center">Pérd. (kg/ha)</th>
+              <th class="text-center">Pérd. ($)</th>
+              <th class="text-center">Interv. efectiva</th>
+              <th class="text-center">Sin reg.</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in indicator_summary %}
+            <tr>
+              <td class="fw-semibold">{{ row.indicator.name }}</td>
+              <td class="text-center">
+                <span class="badge {% if row.indicator.criticality_level == 'high' %}bg-danger{% elif row.indicator.criticality_level == 'medium' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                  {{ row.indicator.get_criticality_level_display }}
+                </span>
+              </td>
+              {% for cd in row.camps %}
+              <td class="text-center fw-semibold">{{ cd.stats.total }}</td>
+              <td class="text-center {% if cd.stats.with_damage > 0 %}table-danger fw-bold{% endif %}">
+                {{ cd.stats.with_damage }}
+              </td>
+              <td class="text-center {% if cd.stats.area_pct %}table-warning{% endif %}">
+                {% if cd.stats.area_pct %}{{ cd.stats.area_pct }}%{% else %}—{% endif %}
+              </td>
+              <td class="text-center {% if cd.stats.loss_kg %}table-warning{% endif %}">
+                {% if cd.stats.loss_kg %}{{ cd.stats.loss_kg|floatformat:0 }}{% else %}—{% endif %}
+              </td>
+              <td class="text-center {% if cd.stats.loss_ars %}table-danger{% endif %}">
+                {% if cd.stats.loss_ars %}${{ cd.stats.loss_ars|floatformat:0 }}{% else %}—{% endif %}
+              </td>
+              <td class="text-center {% if cd.stats.effective > 0 %}text-success{% endif %}">
+                {{ cd.stats.effective|add:cd.stats.partial }}
+              </td>
+              <td class="text-center text-muted">{{ cd.stats.without_outcome }}</td>
+              {% endfor %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="100" class="text-center text-muted py-3">No hay alertas para las campañas seleccionadas.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── detail accordion ────────────────────────────────────────────── -->
+  {% if indicator_detail %}
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-3">
+      <h6 class="mb-0 fw-bold"><i class="mdi mdi-text-box-search-outline me-2"></i>Detalle por evento</h6>
+      <small class="text-muted">Qué sucedió en cada alerta, qué se hizo y cuánto se perdió</small>
+    </div>
+    <div class="card-body p-0">
+      <div class="accordion accordion-flush" id="detail-accordion">
+
+        {% for group in indicator_detail %}
+        {% with slug=group.indicator.id %}
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#acc-{{ slug }}">
+              {{ group.indicator.name }}
+              <span class="badge ms-2
+                {% if group.indicator.criticality_level == 'high' %}bg-danger
+                {% elif group.indicator.criticality_level == 'medium' %}bg-warning text-dark
+                {% else %}bg-secondary{% endif %}">
+                {{ group.indicator.get_criticality_level_display }}
+              </span>
+              <span class="badge bg-light text-dark ms-2 border">{{ group.alerts|length }} eventos</span>
+            </button>
+          </h2>
+          <div id="acc-{{ slug }}" class="accordion-collapse collapse">
+            <div class="accordion-body p-0">
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0 small align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Campaña</th>
+                      <th>Fecha</th>
+                      <th>Lote</th>
+                      <th>Variedad</th>
+                      <th class="text-center">Nivel</th>
+                      <th class="text-center">BBCH</th>
+                      <th class="text-center">¿Daño?</th>
+                      <th class="text-center">Severidad</th>
+                      <th class="text-center">Área afect.</th>
+                      <th class="text-center">Pérd. kg/ha</th>
+                      <th class="text-center">Pérd. $</th>
+                      <th class="text-center">Efectividad</th>
+                      <th>Qué se hizo / observaciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for alert in group.alerts %}
+                    {% with o=alert.outcome %}
+                    <tr class="{% if o and o.damage_occurred %}table-warning{% endif %}">
+                      <td class="text-nowrap">{{ alert.crop.campaing.name }}</td>
+                      <td class="text-nowrap">{{ alert.date|date:"d/m/Y" }}</td>
+                      <td>{{ alert.crop.lot.name|default:"—" }}</td>
+                      <td>{{ alert.crop.activity.name|default:"—" }}</td>
+                      <td class="text-center">
+                        <span class="badge
+                          {% if alert.level == 'critical' %}bg-danger
+                          {% elif alert.level == 'alert' %}bg-warning text-dark
+                          {% else %}bg-info text-dark{% endif %}">
+                          {% if alert.level == 'critical' %}Crítico
+                          {% elif alert.level == 'alert' %}Alerta
+                          {% else %}Aviso{% endif %}
+                        </span>
+                      </td>
+                      <td class="text-center text-muted">{{ alert.bbch_stage|default:"—" }}</td>
+
+                      {% if o %}
+                        <td class="text-center">
+                          {% if o.damage_occurred %}
+                            <span class="text-danger fw-bold">Sí</span>
+                          {% else %}
+                            <span class="text-success">No</span>
+                          {% endif %}
+                        </td>
+                        <td class="text-center">
+                          {% if o.damage_severity == 'total' %}<span class="badge bg-danger">Total</span>
+                          {% elif o.damage_severity == 'severe' %}<span class="badge bg-danger">Grave</span>
+                          {% elif o.damage_severity == 'moderate' %}<span class="badge bg-warning text-dark">Moderado</span>
+                          {% elif o.damage_severity == 'minor' %}<span class="badge bg-secondary">Leve</span>
+                          {% else %}<span class="text-muted">Sin daño</span>
+                          {% endif %}
+                        </td>
+                        <td class="text-center">
+                          {% if o.area_affected_pct %}{{ o.area_affected_pct }}%{% else %}—{% endif %}
+                        </td>
+                        <td class="text-center">
+                          {% if o.estimated_loss_kg_ha %}{{ o.estimated_loss_kg_ha|floatformat:0 }}{% else %}—{% endif %}
+                        </td>
+                        <td class="text-center">
+                          {% if o.estimated_loss_ars %}${{ o.estimated_loss_ars|floatformat:0 }}{% else %}—{% endif %}
+                        </td>
+                        <td class="text-center">
+                          {% if o.intervention_effective == 'yes' %}<span class="badge bg-success">Efectiva</span>
+                          {% elif o.intervention_effective == 'partial' %}<span class="badge bg-warning text-dark">Parcial</span>
+                          {% elif o.intervention_effective == 'no' %}<span class="badge bg-danger">No efectiva</span>
+                          {% else %}<span class="text-muted">N/A</span>
+                          {% endif %}
+                        </td>
+                        <td style="max-width:300px">
+                          {% if o.notes %}
+                            {{ o.notes }}
+                            {% if o.registered_by %}
+                            <br><small class="text-muted">— {{ o.registered_by.name }} {{ o.registered_by.surname }}</small>
+                            {% endif %}
+                          {% else %}
+                            <span class="text-muted fst-italic">Sin notas</span>
+                          {% endif %}
+                        </td>
+                      {% else %}
+                        <td colspan="7" class="text-center text-muted fst-italic">Sin registro de resultado</td>
+                      {% endif %}
+                    </tr>
+                    {% endwith %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+
+      </div>{# accordion #}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── legend ───────────────────────────────────────────────────────── -->
+  <div class="alert alert-light border py-2 px-3 small">
+    <strong>Total</strong> = alertas no abortadas &nbsp;·&nbsp;
+    <span class="text-danger"><strong>Con daño</strong></span> = se registró daño en campo &nbsp;·&nbsp;
+    <span class="text-success"><strong>Interv. efectiva</strong></span> = intervención efectiva o parcial &nbsp;·&nbsp;
+    <strong>Sin reg.</strong> = sin registro de resultado
+  </div>
+
+  {% endif %}{# has_results #}
+
+</div>
+{% endblock content %}

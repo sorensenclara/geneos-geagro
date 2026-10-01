@@ -601,7 +601,7 @@
                 <div class="p-3 rounded-3 border h-100">
                   <div class="d-flex align-items-center mb-2 gap-2">
                     <i class="mdi mdi-bell-ring-outline text-warning"></i>
-                    <strong>Alertas activas en esta etapa</strong>
+                    <strong>Alertas posibles en esta etapa</strong>
                   </div>
                   {% if current_stage_alerts %}
                     <div class="d-flex flex-wrap gap-2">
@@ -622,7 +622,7 @@
                 <div class="p-3 rounded-3 border h-100" style="border-style:dashed !important;">
                   <div class="d-flex align-items-center mb-2 gap-2">
                     <i class="mdi mdi-bell-plus-outline text-info"></i>
-                    <strong>Se activan en la próxima etapa</strong>
+                    <strong>Posibles en la próxima etapa</strong>
                     {% if next_stage %}<span class="text-muted small">(BBCH {{ next_stage.bbch }})</span>{% endif %}
                   </div>
                   {% if next_stage_alerts %}

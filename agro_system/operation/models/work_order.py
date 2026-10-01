@@ -12,7 +12,7 @@ from producer.models.staff import Staff
 
 class ActiveWorkOrderManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().exclude(stateOT__name="Cancelada")
+        return super().get_queryset().exclude(stateOT__name="Cancelada por alerta").exclude(stateOT__name="Omitida").exclude(stateOT__name="Cancelada")
 
 
 class WorkOrder(models.Model):
@@ -40,7 +40,7 @@ class WorkOrder(models.Model):
     stateOT = models.ForeignKey(OTState, on_delete=models.CASCADE,verbose_name= _('state ot'))
     type = models.CharField(max_length=3, choices=types, default='OW', verbose_name= _('type'))
     # Responsable interno de ejecutar o controlar según corresponda
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE, verbose_name= _('staff'))
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE, null=True, blank=True, verbose_name= _('staff'))
     # Si es una labor de terceros detallar el contratista
     contractor = models.ForeignKey('user.UserProducer', on_delete=models.CASCADE, related_name="contractor_wo", null=True, blank=True,verbose_name= _('contractor'))
     # Si es una labor de socios detallar el contratista

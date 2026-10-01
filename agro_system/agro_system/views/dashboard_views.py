@@ -262,7 +262,7 @@ def DashboardView(request):
     alerts_forecast = alerts.filter(date__gt=today, is_forecast=True).order_by('date')
     alerts_count    = alerts_today.count()
 
-    # Ventana de aplicación: verde si no hay alerta activa del indicador
+    # Ventana de aplicación: verde si no hay alerta confirmada HOY del indicador
     ventana_nivel = None
     if selected_crop:
         _ventana_ind = Indicator.objects.filter(name="ventana_aplicacion").first()
@@ -270,7 +270,9 @@ def DashboardView(request):
             _ventana_alert = Alert.active.filter(
                 crop=selected_crop,
                 indicator=_ventana_ind,
-            ).order_by("-date").first()
+                date=today,
+                is_forecast=False,
+            ).first()
             ventana_nivel = _ventana_alert.level if _ventana_alert else "verde"
 
     # ── Fenología ────────────────────────────────────────────────
@@ -294,8 +296,13 @@ def DashboardView(request):
 
         if vine_gdd is not None:
             try:
-                current_stage = PhenologicalState.current_stage(vine_gdd)
-                next_stage    = PhenologicalState.next_stage(vine_gdd)
+                current_stage = biofix_vine.accumulator.effective_state
+                next_stage = (
+                    PhenologicalState.objects
+                    .filter(order__gt=current_stage.order)
+                    .order_by('order')
+                    .first()
+                ) if current_stage else None
 
                 current_order = current_stage.order if current_stage else 0
                 for stage in PhenologicalState.objects.all():

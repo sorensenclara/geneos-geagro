@@ -237,7 +237,7 @@ class Command(BaseCommand):
         VARIABLES = [
             ("Temperatura media", "filter", 10.0,  None),
             ("Lluvia (mm)",       "filter", 10.0,  None),
-            ("Humedad relativa",  "filter", 80.0,  None),
+            ("Humedad relativa",  "filter", 95.0,  None),
         ]
         for var_name, role, min_val, max_val in VARIABLES:
             try:

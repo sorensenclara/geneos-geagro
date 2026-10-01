@@ -7,8 +7,22 @@ from crop_monitoring.models.gdd_accumulator import GDDAccumulator
 
 
 class GDDAccumulatorAdmin(admin.ModelAdmin):
-    list_display  = ("biofix", "accumulated_gdd", "calculation_date")
+    list_display    = ("biofix", "accumulated_gdd", "gdd_offset", "calculation_date")
     readonly_fields = ("biofix", "accumulated_gdd", "calculation_date")
+
+    fieldsets = [
+        (None, {
+            "fields": ["biofix", "accumulated_gdd", "calculation_date"],
+        }),
+        ("Corrección manual", {
+            "fields": ["gdd_offset"],
+            "description": (
+                "Offset que se suma al total calculado desde el biofix. "
+                "Persiste entre recalculaciones. Usarlo cuando el microclima "
+                "o factores no térmicos generan un desvío sistemático."
+            ),
+        }),
+    ]
 
     def has_add_permission(self, request):
         return False

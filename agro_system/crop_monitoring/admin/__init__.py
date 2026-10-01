@@ -1,3 +1,5 @@
 from .biofix import BiofixAdmin
 from .gdd_accumulator import GDDAccumulatorAdmin
 from .phenological_state import PhenologicalStateAdmin
+from .phenological_calibration import PhenologicalCalibrationAdmin
+from .phenological_observation import PhenologicalObservationAdmin

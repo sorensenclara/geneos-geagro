@@ -258,13 +258,31 @@
                   <tbody>
                     {% for row in pending_orders %}
                       {% with o=row.order %}
-                      <tr class="{% if current_staff_id and o.staff_id == current_staff_id %}plan-row-mine{% endif %}">
+                      <tr class="{% if current_staff_id and o.staff_id == current_staff_id %}plan-row-mine{% endif %}"
+                          data-wo-pk="{{ o.pk }}" data-wo-url="{% url 'work-order-quick-state' o.pk %}">
                         <td class="plan-order-date">{{ o.date_init|date:"d/m/Y" }}</td>
                         <td class="fw-semibold">{{ o.service }}</td>
                         <td class="text-muted small">{{ o.stage|default:"—" }}</td>
                         <td class="text-muted small">{{ o.staff|default:"—" }}</td>
                         <td>
-                          <span class="plan-state-badge plan-state-pending">{{ o.stateOT }}</span>
+                          <div class="dropdown wo-quick-state-wrap">
+                            <button class="plan-state-badge plan-state-pending wo-state-btn dropdown-toggle"
+                                    type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                    style="border:none; cursor:pointer;">
+                              <span class="wo-state-label">{{ o.stateOT }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-sm">
+                              {% for st in ot_states %}
+                              <li>
+                                <button class="dropdown-item wo-state-option"
+                                        data-state-id="{{ st.pk }}"
+                                        data-state-name="{{ st.name }}">
+                                  {{ st.name }}
+                                </button>
+                              </li>
+                              {% endfor %}
+                            </ul>
+                          </div>
                         </td>
                         <td>
                           <a href="{% url 'work-order-detail' o.pk %}"
@@ -551,4 +569,33 @@
 
 {% block extra_javascript %}
 <script src="{% static 'js/pages/plan_tecnico.js' %}"></script>
+<script>
+(function () {
+  const csrf = document.cookie.match(/csrftoken=([^;]+)/)?.[1] ?? "";
+
+  document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".wo-state-option");
+    if (!btn) return;
+
+    const row   = btn.closest("tr[data-wo-url]");
+    const url   = row.dataset.woUrl;
+    const name  = btn.dataset.stateName;
+    const id    = btn.dataset.stateId;
+    const label = row.querySelector(".wo-state-label");
+
+    fetch(url, {
+      method: "POST",
+      headers: { "X-CSRFToken": csrf, "Content-Type": "application/x-www-form-urlencoded" },
+      body: "stateOT=" + encodeURIComponent(id),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        label.textContent = data.state_name;
+      }
+    })
+    .catch(() => {});
+  });
+}());
+</script>
 {% endblock %}

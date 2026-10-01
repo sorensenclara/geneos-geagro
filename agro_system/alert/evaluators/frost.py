@@ -7,8 +7,11 @@ Configurar en el indicador:
 No requiere IndicatorVariable ni IndicatorBand — toda la lógica es interna:
   - Umbral depende del BBCH (tabla Poni et al. 2022)
   - Temperatura efectiva es Tw (bulbo húmedo, Stull 2011), no T seca
-  - Nivel depende de cuánto se supera el umbral
-  - Helada radiativa (viento < 8 km/h) agrava el nivel
+  - Los umbrales BBCH son el piso de critical; hay dos escalones por encima:
+      critical → T o Tw en o por debajo del umbral
+      alert    → dentro de 0.5 °C sobre el umbral
+      warning  → dentro de 1.0 °C sobre el umbral
+  - Helada radiativa (viento < 8 km/h): sube un escalón (warning→alert, alert→critical)
 
 Fuente de datos: OpenMeteoHourly (temperature, humidity, wind_speed por hora).
 Se evalúa hora a hora y se devuelve el nivel más grave del día.
@@ -16,9 +19,6 @@ Se evalúa hora a hora y se devuelve el nivel más grave del día.
 
 import math
 from alert.evaluators.base import BaseEvaluator
-
-# Umbral de viento para clasificar tipo de helada
-WIND_RADIATIVE_KMH = 8.0
 
 # Tabla BBCH → umbral crítico de temperatura (Poni et al. 2022)
 # Cada tupla: (bbch_desde, bbch_hasta, umbral_°C)
@@ -33,7 +33,38 @@ BBCH_THRESHOLDS = [
     (81, 99, -1.5),   # maduración / envero en adelante
 ]
 
-FALLBACK_THRESHOLD = -2.0   # sin BBCH conocido
+FALLBACK_THRESHOLD   = -2.0  # sin BBCH conocido
+WIND_RADIATIVE_KMH   = 8.0   # por debajo de este viento → helada radiativa
+
+# Márgenes por encima del umbral crítico BBCH
+ALERT_MARGIN   = 0.5   # °C sobre el umbral → alert
+WARNING_MARGIN = 1.0   # °C sobre el umbral → warning
+
+
+def _bump_level(level: str | None) -> str | None:
+    """Sube un escalón de severidad (helada radiativa). critical no cambia."""
+    if level == "warning":
+        return "alert"
+    if level == "alert":
+        return "critical"
+    return level
+
+
+def _level_from_excess(excess: float) -> str | None:
+    """
+    excess = temperatura - umbral_crítico_BBCH.
+    <= 0  → critical  (en o por debajo del umbral de daño)
+    <= 0.5 → alert    (dentro de medio grado del umbral)
+    <= 1.0 → warning  (dentro de un grado del umbral)
+    > 1.0  → None     (sin riesgo por esta variable)
+    """
+    if excess <= 0:
+        return "critical"
+    elif excess <= ALERT_MARGIN:
+        return "alert"
+    elif excess <= WARNING_MARGIN:
+        return "warning"
+    return None
 
 
 def _stull_tw(t: float, hr: float) -> float:
@@ -62,24 +93,6 @@ def _get_threshold(bbch_code: int | None) -> float | None:
     return None
 
 
-def _level_from_diff(diff: float, is_radiative: bool) -> str:
-    """
-    diff = min(T - umbral_T, Tw - umbral_Tw)
-    Negativo significa que está por debajo del umbral.
-    La helada radiativa sube un escalón por ser más peligrosa.
-    """
-    if diff > -1.0:
-        level = "warning"
-    elif diff > -2.0:
-        level = "alert"
-    else:
-        level = "critical"
-
-    if is_radiative and level == "warning":
-        level = "alert"
-
-    return level
-
 
 class FrostEvaluator(BaseEvaluator):
 
@@ -88,26 +101,28 @@ class FrostEvaluator(BaseEvaluator):
         if threshold is None:
             return None   # post-floración, sin riesgo
 
-        tw_threshold = threshold - 1.0   # Tw dispara 1 °C antes que T seca
         worst_level = None
 
         for row in self.hourly_qs(daily_summary):
             if row.temperature is None or row.humidity is None:
                 continue
 
-            t  = float(row.temperature)
-            hr = float(row.humidity)
+            t    = float(row.temperature)
+            hr   = float(row.humidity)
             wind = float(row.wind_speed) if row.wind_speed is not None else 0.0
+            tw   = _stull_tw(t, hr)
 
-            tw = _stull_tw(t, hr)
-            is_radiative = wind < WIND_RADIATIVE_KMH
-
-            triggered = (t <= threshold) or (tw <= tw_threshold)
-            if not triggered:
-                continue
-
-            diff = min(t - threshold, tw - tw_threshold)
-            level = _level_from_diff(diff, is_radiative)
-            worst_level = self.highest_level(worst_level, level)
+            # Tw y T se comparan contra el mismo umbral crítico BBCH;
+            # Tw es siempre <= T, así que en aire seco dispara antes.
+            hour_level = self.highest_level(
+                _level_from_excess(t  - threshold),
+                _level_from_excess(tw - threshold),
+            )
+            # Helada radiativa (noche calma): sube un escalón de severidad.
+            if wind < WIND_RADIATIVE_KMH:
+                hour_level = _bump_level(hour_level)
+            worst_level = self.highest_level(worst_level, hour_level)
+            if worst_level == "critical":
+                break  # ya no puede empeorar
 
         return worst_level

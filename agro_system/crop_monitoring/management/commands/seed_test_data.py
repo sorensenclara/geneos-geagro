@@ -93,6 +93,8 @@ class Command(BaseCommand):
         OTState.objects.get_or_create(name="Finalizada")
         OTState.objects.get_or_create(name="Contingente")
         OTState.objects.get_or_create(name="Cancelada")
+        OTState.objects.get_or_create(name="Omitida")
+        OTState.objects.get_or_create(name="Cancelada por alerta")
         self._ok("Estados de OT: Pendiente, En curso, Finalizada, Contingente, Cancelada")
 
         # Acciones

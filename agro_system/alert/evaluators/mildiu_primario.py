@@ -1,83 +1,117 @@
 """
-Evaluador de Mildiu primario (Plasmopara viticola).
+Evaluador de Mildiu primario (Plasmopara viticola) — ventana horaria 48h.
 
 Configurar en el indicador:
     evaluator = "alert.evaluators.mildiu_primario.MildiuPrimarioEvaluator"
 
-Diseño híbrido: el código maneja solo la lógica estructural que no puede
-expresarse con el motor genérico; los umbrales y los niveles viven en el admin.
+Lógica de infección (basada en Goidanich / Mills adaptado):
+  Una "hora de infección" ocurre cuando simultáneamente:
+    - temperature >= T_MIN  (condición mínima de germinación)
+    - precipitation > 0  O  humidity >= HR_WETNESS  (follaje mojado)
+  Se evalúan las últimas 48 horas (hoy + ayer en OpenMeteoHourly).
 
-Lógica estructural (en código):
-  - T_media = (tmin + tmax) / 2  (campo no disponible en DailySummary)
-  - Ventana 24–48 h: se suma lluvia de hoy + lluvia de ayer
+  Filtros obligatorios (AND — si alguno falla, no hay alerta):
+    1. Lluvia total en 48h  >= LLUVIA_MIN mm
+    2. Horas de infección   >= HORAS_INF_MIN
 
-Umbrales (IndicatorVariable, role='filter'):
-  - "Temperatura media"  min_value=10  → T_media mínima para infección (bloquea si no se cumple)
-  - "Lluvia (mm)"        min_value=10  → lluvia mínima en 24–48 h (bloquea si no se cumple)
-  - "Humedad relativa"   min_value=80  → HR alta sube un nivel de criticidad (NO bloquea)
-  Si una variable no está configurada en el admin, se usa el DEFAULT_* interno.
+  Nivel base por BBCH (IndicatorBand):
+    - BBCH 14–59  → warning
+    - BBCH 60–69  → critical   (floración — máximo riesgo)
+    - BBCH 70–79  → alert
 
-Niveles (IndicatorBand, sin threshold — solo por BBCH):
-  - BBCH 14–59  → alert    (pre-floración)
-  - BBCH 60–69  → critical (floración — riesgo máximo, siempre crítico)
-  - BBCH 70–79  → alert    (cuaje → envero)
+  Escalada adicional por intensidad de condiciones:
+    - horas de infección >= HORAS_INF_CRITICAL  → sube un escalón
 
-  Si HR ≥ umbral: sube un escalón adicional (alert → critical).
-  En floración ya es critical, así que HR no cambia nada ahí.
+Umbrales configurables vía IndicatorVariable (role='filter'):
+  "Temperatura mínima"   min_value → T_MIN         (default 10 °C)
+  "Lluvia mínima (mm)"   min_value → LLUVIA_MIN     (default 10 mm)
+  "Horas de infección"   min_value → HORAS_INF_MIN  (default 4 h)
+  "Humedad relativa"     min_value → HR_WETNESS      (default 90 %)
 
-Fuente de datos: DailySummary (tmin, tmax, lluvia_mm, hr_media)
-                 + DailySummary del día anterior (lluvia_mm).
+Fuente de datos: OpenMeteoHourly (temperature, precipitation, humidity).
+Si el lote no tiene external_station cae a None (sin alerta).
 """
 
 from __future__ import annotations
 from datetime import timedelta
+
+from weather.models.open_meteo_hourly import OpenMeteoHourly
 from alert.evaluators.base import BaseEvaluator
 
-# Defaults si no hay IndicatorVariable configuradas en el admin
-DEFAULT_T_MEDIA_MIN  = 10.0   # °C
-DEFAULT_LLUVIA_MM    = 10.0   # mm en 24–48 h
-DEFAULT_HR_MIN       = 80.0   # %
+# Defaults — sobreescribibles desde IndicatorVariable en el admin
+DEFAULT_T_MIN        = 10.0   # °C — mínimo para germinación de oosporas
+DEFAULT_LLUVIA_MIN   = 10.0   # mm — lluvia acumulada en 48 h
+DEFAULT_HORAS_MIN    =  4     # h  — horas de infección mínimas para disparar
+DEFAULT_HORAS_CRIT   = 12     # h  — horas de infección para escalar un nivel
+DEFAULT_HR_WETNESS   = 90.0   # %  — HR que considera follaje mojado (sin lluvia)
 
 
 class MildiuPrimarioEvaluator(BaseEvaluator):
 
     def evaluate(self, indicator, daily_summary, bbch_code):
-        # 1. Leer umbrales desde IndicatorVariable (fallback a defaults)
-        t_umbral   = self._umbral(indicator, "Temperatura media", DEFAULT_T_MEDIA_MIN)
-        lluvia_min = self._umbral(indicator, "Lluvia (mm)",       DEFAULT_LLUVIA_MM)
-        hr_min     = self._umbral(indicator, "Humedad relativa",  DEFAULT_HR_MIN)
-
-        # 2. T media > umbral  (lógica estructural: no existe t_media en DailySummary)
-        if daily_summary.tmin is None or daily_summary.tmax is None:
-            return None
-        t_media = (float(daily_summary.tmin) + float(daily_summary.tmax)) / 2.0
-        if t_media <= t_umbral:
+        lot = daily_summary.lot
+        if not hasattr(lot, "external_station") or lot.external_station is None:
             return None
 
-        # 3. Lluvia ≥ umbral en ventana 24–48 h  (lógica estructural: dos días)
-        lluvia_hoy  = float(daily_summary.lluvia_mm or 0)
-        lluvia_ayer = self._lluvia_dia_anterior(daily_summary)
-        lluvia_max  = max(lluvia_hoy, lluvia_ayer)
-        if lluvia_max < lluvia_min:
+        # ── umbrales desde IndicatorVariable ──────────────────────────────
+        t_min       = self._umbral(indicator, "Temperatura mínima", DEFAULT_T_MIN)
+        lluvia_min  = self._umbral(indicator, "Lluvia mínima (mm)", DEFAULT_LLUVIA_MIN)
+        horas_min   = int(self._umbral(indicator, "Horas de infección", DEFAULT_HORAS_MIN))
+        horas_crit  = int(self._umbral(indicator, "Horas escalada",    DEFAULT_HORAS_CRIT))
+        hr_wetness  = self._umbral(indicator, "Humedad relativa",    DEFAULT_HR_WETNESS)
+
+        # ── ventana 48 h: hoy + ayer ───────────────────────────────────────
+        ayer = daily_summary.date - timedelta(days=1)
+        rows = (
+            OpenMeteoHourly.objects
+            .filter(
+                station=lot.external_station,
+                datetime__date__in=[ayer, daily_summary.date],
+            )
+            .order_by("datetime")
+            .values("temperature", "precipitation", "humidity")
+        )
+
+        if not rows:
             return None
 
-        # 4. Nivel base solo por BBCH (bandas sin threshold)
+        lluvia_total   = 0.0
+        horas_infeccion = 0
+
+        for row in rows:
+            t    = float(row["temperature"])  if row["temperature"]  is not None else None
+            prec = float(row["precipitation"]) if row["precipitation"] is not None else 0.0
+            hr   = float(row["humidity"])      if row["humidity"]      is not None else 0.0
+
+            lluvia_total += prec
+
+            if t is None:
+                continue
+
+            follaje_mojado = prec > 0 or hr >= hr_wetness
+            if t >= t_min and follaje_mojado:
+                horas_infeccion += 1
+
+        # ── filtros obligatorios ───────────────────────────────────────────
+        if lluvia_total < lluvia_min:
+            return None
+        if horas_infeccion < horas_min:
+            return None
+
+        # ── nivel base por BBCH ───────────────────────────────────────────
         level = self.level_from_bands(indicator, bbch_code)
         if level is None:
             return None
 
-        # 5. HR alta → sube un escalón de criticidad (no bloquea, solo agrava)
-        if daily_summary.hr_media is not None and float(daily_summary.hr_media) >= hr_min:
-            level = self._escalar_nivel(level)
+        # ── escalar por intensidad ────────────────────────────────────────
+        if horas_infeccion >= horas_crit:
+            level = self._escalar(level)
 
         return level
 
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
+    # ── helpers ───────────────────────────────────────────────────────────
 
     def _umbral(self, indicator, var_name: str, default: float) -> float:
-        """Lee min_value del IndicatorVariable con ese nombre. Fallback al default."""
         iv = (
             indicator.variables
             .filter(variable__name=var_name, role="filter")
@@ -88,17 +122,7 @@ class MildiuPrimarioEvaluator(BaseEvaluator):
             return float(iv.min_value)
         return default
 
-    def _escalar_nivel(self, level: str) -> str:
-        """Sube un nivel: warning→alert, alert→critical, critical→critical."""
+    def _escalar(self, level: str) -> str:
         escala = ("warning", "alert", "critical")
         idx = escala.index(level) if level in escala else 0
         return escala[min(idx + 1, len(escala) - 1)]
-
-    def _lluvia_dia_anterior(self, daily_summary) -> float:
-        """Lluvia del DailySummary del día anterior para el mismo lote."""
-        from weather.models.daily_summary import DailySummary
-        prev = DailySummary.objects.filter(
-            lot=daily_summary.lot,
-            date=daily_summary.date - timedelta(days=1),
-        ).first()
-        return float(prev.lluvia_mm or 0) if prev else 0.0

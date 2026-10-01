@@ -88,56 +88,47 @@
         <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="mdi mdi-bell-outline"></i>
-          <span class="badge text-bg-primary rounded-pill">2</span>
+          {% if user_notifications_count %}
+            <span class="badge text-bg-primary rounded-pill">{{ user_notifications_count }}</span>
+          {% endif %}
         </button>
 
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
           aria-labelledby="page-header-notifications-dropdown">
 
           <div class="p-3">
-            <h5 class="m-0">Notificaciones (2)</h5>
+            <h5 class="m-0">Notificaciones ({{ user_notifications_count }})</h5>
           </div>
 
           <div data-simplebar style="max-height: 230px;">
+            {% for notif in user_notifications %}
             <a href="javascript:void(0);" class="text-reset notification-item">
               <div class="d-flex">
                 <div class="flex-shrink-0 me-3">
                   <div class="avatar-xs">
-                    <span class="avatar-title border-success rounded-circle">
-                      <i class="mdi mdi-billboard"></i>
+                    <span class="avatar-title {{ notif.style.border }} rounded-circle">
+                      <i class="mdi {{ notif.style.icon }}"></i>
                     </span>
                   </div>
                 </div>
                 <div class="flex-grow-1">
-                  <h6 class="mb-1">Nuevo plan de acción</h6>
+                  <h6 class="mb-1">{{ notif.name }}</h6>
                   <div class="text-muted">
-                    <p class="mb-1">Campaña 2026</p>
+                    <p class="mb-1">{{ notif.detail }}</p>
                   </div>
                 </div>
               </div>
             </a>
-
-            <a href="javascript:void(0);" class="text-reset notification-item">
-              <div class="d-flex">
-                <div class="flex-shrink-0 me-3">
-                  <div class="avatar-xs">
-                    <span class="avatar-title border-warning rounded-circle">
-                      <i class="mdi mdi-alert-circle-outline"></i>
-                    </span>
-                  </div>
-                </div>
-                <div class="flex-grow-1">
-                  <h6 class="mb-1">Alerta y avisos</h6>
-                  <div class="text-muted">
-                    <p class="mb-1">Alertas heladas (48hs)</p>
-                  </div>
-                </div>
-              </div>
-            </a>
+            {% empty %}
+            <div class="p-3 text-center text-muted">
+              <i class="mdi mdi-bell-off-outline fs-4 d-block mb-1"></i>
+              Sin notificaciones
+            </div>
+            {% endfor %}
           </div>
 
           <div class="p-2 border-top">
-            <a class="btn btn-sm btn-link font-size-14 w-100 text-center" href="javascript:void(0)">
+            <a class="btn btn-sm btn-link font-size-14 w-100 text-center" href="{% url 'notifications-list' %}">
               Ver todas
             </a>
           </div>
@@ -159,6 +150,14 @@
             <a class="dropdown-item" href="{% url 'account_change_password' %}">
               <i class="mdi mdi-key text-muted fs-16 align-middle me-1"></i>
               Cambiar contraseña
+            </a>
+
+            <a class="dropdown-item" href="{% url 'notifications-list' %}">
+              <i class="mdi mdi-bell-outline text-muted fs-16 align-middle me-1"></i>
+              Notificaciones
+              {% if user_notifications_count %}
+                <span class="badge bg-primary rounded-pill ms-1" style="font-size:.65rem;">{{ user_notifications_count }}</span>
+              {% endif %}
             </a>
 
             <div class="dropdown-divider"></div>

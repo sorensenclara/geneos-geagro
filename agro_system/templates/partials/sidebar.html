@@ -49,6 +49,22 @@
                     </a>
                 </li>
 
+                <li class="{% if request.resolver_match.url_name == 'fenologia' %}mm-active{% endif %}">
+                    <a href="{% url 'fenologia' %}?campaing={{ selected_campaing.id }}&crop={{ selected_crop.id }}"
+                       class="waves-effect {% if request.resolver_match.url_name == 'fenologia' %}active{% endif %}">
+                        <i class="mdi mdi-sprout-outline font-size-16 me-2"></i>
+                        <span>Fenología</span>
+                    </a>
+                </li>
+
+                <li class="{% if request.resolver_match.url_name == 'report-campaign-comparison' %}mm-active{% endif %}">
+                    <a href="{% url 'report-campaign-comparison' %}"
+                       class="waves-effect {% if request.resolver_match.url_name == 'report-campaign-comparison' %}active{% endif %}">
+                        <i class="mdi mdi-chart-bar font-size-16 me-2"></i>
+                        <span>Informes</span>
+                    </a>
+                </li>
+
                 <li>
                     <a href="wines" class=" waves-effect">
                         <img src="{% static 'images/icon/vinedos.svg' %}" class="menu-icon-img" />

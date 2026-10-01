@@ -230,7 +230,7 @@ def _abort_forecast_alert(alert):
     from parameter.models.ot_state import OTState
     alert.is_aborted = True
     alert.save(update_fields=["is_aborted"])
-    cancelada = OTState.objects.filter(name="Cancelada").first()
+    cancelada = OTState.objects.filter(name="Cancelada por alerta").first()
     if cancelada:
         updated = alert.work_orders.filter(stateOT__name="Contingente").update(stateOT=cancelada)
         if updated:
@@ -253,6 +253,53 @@ def _abort_unconfirmed_for_date(lot, date):
     )
     for alert in stale:
         _abort_forecast_alert(alert)
+
+
+def _abort_overconfirmed_for_date(lot, date, emitted_pairs):
+    """
+    Ciclo EOD: aborta alertas confirmadas HOY (is_forecast=False) cuyo indicador
+    no disparó con los datos reales de la estación propia.
+
+    Ocurre cuando el ciclo de mañana (Open-Meteo) confirmó la alerta y movió la OT
+    a Pendiente, pero al final del día la estación dice que el evento no ocurrió.
+
+    Solo se llama cuando DailySummary.fuente_predominante == 'station'.
+    """
+    from operation.models.crop import Crop
+    from parameter.models.ot_state import OTState
+
+    crop_ids = list(Crop.objects.filter(lot=lot).values_list("id", flat=True))
+    overconfirmed_qs = Alert.objects.filter(
+        crop_id__in=crop_ids,
+        date=date,
+        is_forecast=False,
+        is_aborted=False,
+    )
+    if emitted_pairs:
+        exclude_q = models.Q()
+        for crop_id, ind_id in emitted_pairs:
+            exclude_q |= models.Q(crop_id=crop_id, indicator_id=ind_id)
+        overconfirmed_qs = overconfirmed_qs.exclude(exclude_q)
+
+    cancelada = OTState.objects.filter(name="Cancelada por alerta").first()
+    aborted_count = 0
+    for alert in overconfirmed_qs:
+        alert.is_aborted = True
+        alert.save(update_fields=["is_aborted"])
+        if cancelada:
+            alert.work_orders.filter(stateOT__name="Pendiente").update(stateOT=cancelada)
+        aborted_count += 1
+        logger.info(
+            "Alert pk=%s aborted-overconfirmed (indicator=%s date=%s): "
+            "Open-Meteo confirmó pero la estación no disparó",
+            alert.pk, alert.indicator_id, date,
+        )
+
+    if aborted_count:
+        logger.warning(
+            "EOD: %d alerta(s) abortada(s) por sobreconfirmación — lote=%s fecha=%s",
+            aborted_count, lot, date,
+        )
 
 
 def _abort_stale_forecast(lot, today, emitted_ids):
@@ -463,21 +510,26 @@ def _emit_alert(crop, indicator, date, level, bbch_label, status, is_forecast=Fa
         return alert  # solo registrar, no notificar
 
     escalated = level_changed and not created
+    from producer.models.staff import Staff
     users = set()
     users.add(crop.producer)
     if crop.responsible and crop.responsible.user_id:
         users.add(crop.responsible.user)
     for user in indicator.report_user.all():
         users.add(user)
+    for staff in Staff.objects.filter(producer=crop.producer, user__isnull=False).select_related("user"):
+        users.add(staff.user)
 
-    prefix = "[ESCALADA] " if escalated else ""
+    prefix = "[ESCALADA] " if escalated else "[PRONÓSTICO] " if is_forecast else ""
+    short_name = f"{prefix}Alerta: {indicator.name}"
+    short_detail = f"{crop.name}" + (f" — {bbch_label}" if bbch_label else "")
     for user in users:
         Notification.objects.create(
-            name   = f"{prefix}Notificación {indicator.name} — {date} — {crop.name}",
-            detail = _build_alert_detail(level, bbch_label, is_forecast,
-                                     _recommendation_detail(indicator, level, bbch_code)),
-            date   = date,
-            user   = user,
+            name              = short_name,
+            detail            = short_detail,
+            date              = date,
+            user              = user,
+            notification_type = Notification.TYPE_ALERT,
         )
     return alert
 
@@ -487,28 +539,31 @@ def _emit_alert(crop, indicator, date, level, bbch_label, status, is_forecast=Fa
 # ──────────────────────────────────────────────────────────────────────────────
 
 def _run_indicator(indicator, crop, daily_summary, bbch_code, date, status):
-    """Evalúa un indicador y emite alerta si corresponde."""
+    """Evalúa un indicador y emite alerta si corresponde. Retorna True si disparó."""
     try:
         evaluator = indicator.get_evaluator()
         if evaluator and daily_summary is not None:
             level = evaluator.evaluate(indicator, daily_summary, bbch_code)
         elif evaluator:
-            return  # custom evaluators requieren daily_summary
+            return False  # custom evaluators requieren daily_summary
         else:
             level = _evaluate_generic(indicator, crop, daily_summary, bbch_code, date)
     except Exception:
         logger.exception("Error evaluando '%s' para cultivo '%s'", indicator, crop)
-        return
+        return False
 
     if level:
         bbch_label = _get_bbch_stage_label(crop)
         _emit_alert(crop, indicator, date, level, bbch_label, status, is_forecast=False, bbch_code=bbch_code)
+        return True
+    return False
 
 
-def _evaluate_crop(crop, daily_summary, skip_indicator_ids=None, date=None):
+def _evaluate_crop(crop, daily_summary, skip_indicator_ids=None, date=None, emitted_pairs=None):
     """
     Evalúa los indicadores propios del cultivo (Crop.indicators),
     excluyendo los ya cubiertos por la zona (skip_indicator_ids).
+    Actualiza emitted_pairs con (crop_id, indicator_id) que dispararon.
     """
     skip_ids = skip_indicator_ids or set()
     ref_date = date or (daily_summary.date if daily_summary else None)
@@ -524,7 +579,9 @@ def _evaluate_crop(crop, daily_summary, skip_indicator_ids=None, date=None):
         .exclude(review_mode=Indicator.REVIEW_PER_READING)
         .prefetch_related("variables", "bands")
     ):
-        _run_indicator(indicator, crop, daily_summary, bbch_code, ref_date, status="on")
+        fired = _run_indicator(indicator, crop, daily_summary, bbch_code, ref_date, status="on")
+        if fired and emitted_pairs is not None:
+            emitted_pairs.add((crop.id, indicator.id))
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -664,6 +721,20 @@ def evaluate_indicators_per_reading(lot, record):
 # Evaluación por cultivo (pronóstico)
 # ──────────────────────────────────────────────────────────────────────────────
 
+def _run_indicator_forecast_per_reading(indicator, crop, record, bbch_code, date, status, emitted_ids=None):
+    """Evaluates a per_reading indicator against a single hourly forecast row, emits is_forecast=True."""
+    try:
+        level = _evaluate_generic_per_reading(indicator, crop, record, bbch_code)
+    except Exception:
+        logger.exception("Error evaluando forecast per_reading '%s' cultivo '%s' fecha %s", indicator, crop, date)
+        return
+    if level:
+        bbch_label = _get_bbch_stage_label(crop)
+        alert = _emit_alert(crop, indicator, date, level, bbch_label, status, is_forecast=True, bbch_code=bbch_code)
+        if alert is not None and emitted_ids is not None:
+            emitted_ids.add(alert.pk)
+
+
 def _run_indicator_forecast(indicator, crop, daily_summary, bbch_code, date, status, emitted_ids=None):
     """Igual que _run_indicator pero emite alertas con is_forecast=True.
 
@@ -693,8 +764,11 @@ def _evaluate_crop_forecast(crop, summary_by_date, gdd_by_date, today, skip_indi
     from crop_monitoring.models.phenological_state import PhenologicalState
 
     skip_ids = skip_indicator_ids or set()
+    lot = crop.lot
 
     from alert.models.indicator import Indicator as _Indicator
+
+    # Daily indicators: evaluated once per day using the daily summary
     for indicator in (
         crop.indicators
         .exclude(id__in=skip_ids)
@@ -710,6 +784,22 @@ def _evaluate_crop_forecast(crop, summary_by_date, gdd_by_date, today, skip_indi
             projected_gdd = gdd_by_date.get(target_date)
             bbch_code = _bbch_int(PhenologicalState.current_stage(projected_gdd)) if projected_gdd is not None else None
             _run_indicator_forecast(indicator, crop, daily_summary, bbch_code, target_date, status="on", emitted_ids=emitted_ids)
+
+    # Per-reading indicators: iterate each hourly forecast row (checks simultaneous conditions)
+    if lot.external_station_id:
+        for indicator in (
+            crop.indicators
+            .exclude(id__in=skip_ids)
+            .filter(review_mode=_Indicator.REVIEW_PER_READING)
+            .prefetch_related("variables", "bands")
+        ):
+            horizon = indicator.max_forecast_days or DEFAULT_FORECAST_DAYS
+            for i in range(1, horizon + 1):
+                target_date = today + timedelta(days=i)
+                projected_gdd = gdd_by_date.get(target_date)
+                bbch_code = _bbch_int(PhenologicalState.current_stage(projected_gdd)) if projected_gdd is not None else None
+                for row in OpenMeteoHourly.objects.filter(station=lot.external_station, datetime__date=target_date):
+                    _run_indicator_forecast_per_reading(indicator, crop, row, bbch_code, target_date, status="on", emitted_ids=emitted_ids)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -733,6 +823,7 @@ def evaluate_indicators_for_lot(lot, date):
         return
 
     crops = Crop.objects.filter(lot=lot).select_related("area__alert_profile", "responsible")
+    emitted_pairs = set()  # (crop_id, indicator_id) que dispararon en este ciclo
 
     for crop in crops:
         zone_indicator_ids = set()
@@ -752,16 +843,22 @@ def evaluate_indicators_for_lot(lot, date):
 
             for pi in profile_indicators:
                 zone_indicator_ids.add(pi.indicator_id)
-                _run_indicator(pi.indicator, crop, daily_summary, bbch_code, date, pi.status)
+                fired = _run_indicator(pi.indicator, crop, daily_summary, bbch_code, date, pi.status)
+                if fired:
+                    emitted_pairs.add((crop.id, pi.indicator_id))
 
         except Exception:
             pass  # área sin perfil configurado
 
         # — Indicadores propios del cultivo no cubiertos por la zona —
-        _evaluate_crop(crop, daily_summary, skip_indicator_ids=zone_indicator_ids, date=date)
+        _evaluate_crop(crop, daily_summary, skip_indicator_ids=zone_indicator_ids, date=date, emitted_pairs=emitted_pairs)
 
     # Caso 1: pronósticos que no se confirmaron hoy → abortar
     _abort_unconfirmed_for_date(lot, date)
+
+    # Caso 2: alertas confirmadas por Open-Meteo durante el día pero la estación dice que no
+    if daily_summary.fuente_predominante == DailySummary.SOURCE_STATION:
+        _abort_overconfirmed_for_date(lot, date, emitted_pairs)
 
 
 def evaluate_indicators_for_technical(crop, variable, date):
@@ -860,6 +957,26 @@ def evaluate_indicators_forecast(lot, today):
                     projected_gdd = gdd_by_date.get(target_date)
                     bbch_code = _bbch_int(PhenologicalState.current_stage(projected_gdd)) if projected_gdd is not None else None
                     _run_indicator_forecast(indicator, crop, daily_summary, bbch_code, target_date, pi.status, emitted_ids=emitted_ids)
+
+            # Per-reading zone indicators: iterate each hourly forecast row
+            if lot.external_station_id:
+                per_reading_pis = (
+                    AlertProfileIndicator.objects
+                    .filter(profile=profile, status__in=["on", "vigilance"],
+                            indicator__review_mode=Indicator.REVIEW_PER_READING)
+                    .select_related("indicator")
+                    .prefetch_related("indicator__variables", "indicator__bands")
+                )
+                for pi in per_reading_pis:
+                    zone_indicator_ids.add(pi.indicator_id)
+                    horizon = pi.indicator.max_forecast_days or DEFAULT_FORECAST_DAYS
+                    for i in range(1, horizon + 1):
+                        target_date = today + timedelta(days=i)
+                        projected_gdd = gdd_by_date.get(target_date)
+                        bbch_code = _bbch_int(PhenologicalState.current_stage(projected_gdd)) if projected_gdd is not None else None
+                        for row in OpenMeteoHourly.objects.filter(station=lot.external_station, datetime__date=target_date):
+                            _run_indicator_forecast_per_reading(pi.indicator, crop, row, bbch_code, target_date, pi.status, emitted_ids)
+
         except Exception:
             pass
 

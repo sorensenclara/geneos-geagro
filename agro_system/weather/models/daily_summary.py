@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .weather_data import WeatherData
 from .open_meteo_hourly import OpenMeteoHourly
+from weather.eto import penman_monteith_eto
 
 
 class DailySummary(models.Model):
@@ -89,7 +90,7 @@ class DailySummary(models.Model):
         horas_hr_alta / horas_banda_oidio cuentan filas (lecturas) con esa condición;
         si las lecturas son horarias el conteo equivale a horas reales.
         lluvia_mm = Max(rain_total) — acumulado diario que resetea la estación a medianoche.
-        eto_mm queda null (viene de Open-Meteo, se puede completar externamente).
+        eto_mm se calcula con FAO-56 Penman-Monteith si la estación tiene solar_radiation y wind_speed.
         """
         if not lot.station_id:
             return None
@@ -103,13 +104,29 @@ class DailySummary(models.Model):
                 hr_media=Avg("humidity"),
                 lluvia_mm=Max("rain_total"),
                 wind_max=Max("wind_speed"),
+                wind_avg=Avg("wind_speed"),
                 wind_gusts_max=Max("wind_gust_max"),
+                solar_avg=Avg("solar_radiation"),
                 horas_hr_alta=Count("id", filter=Q(humidity__gte=90)),
                 horas_banda_oidio=Count("id", filter=Q(temp__gte=21, temp__lte=30)),
             )
         )
         if agg["tmin"] is None:
             return None
+
+        # ETo via FAO-56 Penman-Monteith — only when station has the required sensors
+        eto = None
+        latitude = getattr(lot.station, "latitude", None)
+        if latitude is not None and agg["solar_avg"] is not None and agg["wind_avg"] is not None and agg["hr_media"] is not None:
+            eto = penman_monteith_eto(
+                tmin=agg["tmin"],
+                tmax=agg["tmax"],
+                hr_mean=agg["hr_media"],
+                wind_mph_avg=agg["wind_avg"],
+                solar_wm2_avg=agg["solar_avg"],
+                latitude=latitude,
+                day_of_year=date.timetuple().tm_yday,
+            )
 
         obj, _ = cls.objects.update_or_create(
             lot=lot,
@@ -123,6 +140,7 @@ class DailySummary(models.Model):
                 "wind_gusts_max":     round(agg["wind_gusts_max"], 1) if agg["wind_gusts_max"] is not None else None,
                 "horas_hr_alta":      agg["horas_hr_alta"],
                 "horas_banda_oidio":  agg["horas_banda_oidio"],
+                "eto_mm":             eto,
                 "fuente_predominante": cls.SOURCE_STATION,
             },
         )

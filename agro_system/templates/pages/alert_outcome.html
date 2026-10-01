@@ -1,0 +1,158 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block title %}Registro de daños — {{ alert.name }}{% endblock title %}
+
+{% block content %}
+<style>
+.outcome-label {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #6c757d;
+  margin-bottom: .2rem;
+}
+.outcome-section {
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #6c757d;
+  font-weight: 600;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 1.25rem;
+}
+</style>
+
+<div class="geagro-dashboard-title mb-4">
+  <div class="d-flex align-items-center gap-2 flex-wrap">
+    <a href="{{ back_url }}" class="btn btn-sm btn-outline-secondary me-1">
+      <i class="mdi mdi-arrow-left"></i> Volver
+    </a>
+    <h1 class="mb-0">Registro de daños</h1>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+<div class="col-xl-8">
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="outcome-section">Alerta</div>
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <div class="outcome-label">Nombre</div>
+          <strong>{{ alert.name }}</strong>
+        </div>
+        <div class="col-sm-3">
+          <div class="outcome-label">Fecha</div>
+          {{ alert.date|date:"d/m/Y" }}
+        </div>
+        <div class="col-sm-3">
+          <div class="outcome-label">Nivel</div>
+          {{ alert.level|upper }}
+        </div>
+        {% if alert.crop %}
+        <div class="col-sm-6">
+          <div class="outcome-label">Cultivo</div>
+          {{ alert.crop }}
+        </div>
+        {% endif %}
+        {% if alert.crop.lot %}
+        <div class="col-sm-6">
+          <div class="outcome-label">Lote</div>
+          {{ alert.crop.lot }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="back_url" value="{{ back_url }}">
+
+        <div class="outcome-section">Daño registrado</div>
+
+        <div class="mb-3 form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="damage_occurred"
+                 name="damage_occurred" {% if outcome.damage_occurred %}checked{% endif %}>
+          <label class="form-check-label" for="damage_occurred">Se registró daño</label>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label outcome-label">Severidad del daño</label>
+          <select name="damage_severity" class="form-select">
+            {% for value, label in severity_choices %}
+            <option value="{{ value }}" {% if outcome.damage_severity == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-sm-4">
+            <label class="form-label outcome-label">Superficie afectada (%)</label>
+            <input type="number" name="area_affected_pct" class="form-control"
+                   min="0" max="100" step="0.1"
+                   value="{{ outcome.area_affected_pct|default:'' }}">
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label outcome-label">Pérdida estimada (kg/ha)</label>
+            <input type="number" name="estimated_loss_kg_ha" class="form-control"
+                   min="0" step="0.1"
+                   value="{{ outcome.estimated_loss_kg_ha|default:'' }}">
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label outcome-label">Pérdida económica ($)</label>
+            <input type="number" name="estimated_loss_ars" class="form-control"
+                   min="0" step="0.01"
+                   value="{{ outcome.estimated_loss_ars|default:'' }}">
+          </div>
+        </div>
+
+        <div class="outcome-section mt-4">Intervención</div>
+
+        <div class="mb-3">
+          <label class="form-label outcome-label">Efectividad de la intervención</label>
+          <select name="intervention_effective" class="form-select">
+            {% for value, label in effectiveness_choices %}
+            <option value="{{ value }}" {% if outcome.intervention_effective == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label outcome-label">Observaciones</label>
+          <textarea name="notes" class="form-control" rows="4"
+                    placeholder="Condiciones observadas, acciones adicionales tomadas...">{{ outcome.notes }}</textarea>
+        </div>
+
+        {% if outcome.registered_by %}
+        <div class="text-muted mb-3" style="font-size:.8rem;">
+          Registrado por {{ outcome.registered_by }} el {{ outcome.registered_at|date:"d/m/Y H:i" }}
+          {% if outcome.updated_at != outcome.registered_at %}
+          · Actualizado {{ outcome.updated_at|date:"d/m/Y H:i" }}
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="mdi mdi-content-save-outline me-1"></i> Guardar registro
+          </button>
+          <a href="{{ back_url }}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+</div>
+
+{% endblock content %}

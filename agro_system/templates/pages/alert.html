@@ -142,6 +142,7 @@
                 <th>Lote</th>
                 <th>Detalle</th>
                 <th>Estado</th>
+                <th></th>
             </tr>
             </thead>
 
@@ -175,11 +176,27 @@
                     <span class="badge rounded-pill bg-light text-dark border">Historial</span>
                 {% endif %}
                 </td>
+
+                <td data-label="Registro">
+                {% if not alert.is_forecast %}
+                  {% if alert.outcome %}
+                    <a href="{% url 'alert-outcome' alert.id %}?back={% url 'alert' %}{% if selected_campaing %}&campaing={{ selected_campaing.id }}{% endif %}{% if selected_crop %}&crop={{ selected_crop.id }}{% endif %}"
+                       class="btn btn-sm btn-outline-secondary">
+                      <i class="mdi mdi-clipboard-check-outline"></i> Ver registro
+                    </a>
+                  {% else %}
+                    <a href="{% url 'alert-outcome' alert.id %}?back={% url 'alert' %}{% if selected_campaing %}&campaing={{ selected_campaing.id }}{% endif %}{% if selected_crop %}&crop={{ selected_crop.id }}{% endif %}"
+                       class="btn btn-sm btn-outline-danger">
+                      <i class="mdi mdi-clipboard-alert-outline"></i> Registrar daños
+                    </a>
+                  {% endif %}
+                {% endif %}
+                </td>
             </tr>
 
             {% empty %}
             <tr>
-                <td colspan="6" class="text-center text-muted py-4">
+                <td colspan="7" class="text-center text-muted py-4">
                 No hay alertas registradas para este cultivo.
                 </td>
             </tr>
